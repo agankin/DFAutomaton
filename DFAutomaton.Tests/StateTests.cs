@@ -14,8 +14,8 @@ namespace DFAutomaton.Tests
             var expectedValue = ShoppingStates.Ordered;
 
             orderedStateOption.Match(
-                state => state.AssertValueEquals(expectedValue),
-                () => Assert.Fail($"State is None but expected {expectedValue}"));
+                state => state.AssertReducedTo(expectedValue),
+                () => Assert.Fail($"Next state must not be None"));
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace DFAutomaton.Tests
             var noneStateOption = start[ShoppingActions.Receive];
 
             noneStateOption.Match(
-                state => Assert.Fail($"State is expected to be None but value is {state.Value}"),
+                state => Assert.Fail($"Next state must be None"),
                 () => { });
         }
     }

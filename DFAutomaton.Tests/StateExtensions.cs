@@ -4,14 +4,15 @@ namespace DFAutomaton.Tests
 {
     public static class StateExtensions
     {
-        public static void AssertValueEquals<TTransition, TState>(
-            this State<TTransition, TState> state,
-            TState expected)
+        public static void AssertReducedTo<TTransition, TState>(
+            this StateReducer<TTransition, TState> stateReducer,
+            TState expectedReducedValue)
             where TTransition : notnull
         {
-            state.Value.Match(
-                value => Assert.AreEqual(value, expected),
-                () => Assert.Fail($"State value is None but expected to be {expected}"));
+            var (_, reducer) = stateReducer;
+            var reducedValue = reducer(default!);
+
+            Assert.AreEqual(reducedValue, expectedReducedValue);
         }
     }
 }
