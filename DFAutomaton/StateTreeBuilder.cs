@@ -61,6 +61,6 @@
                 () => acceptedState);
         }
 
-        private static Func<TValue, TValue> FConstant<TValue>(TValue value) => value => value;
+        private static Func<TValue, TValue> FConstant<TValue>(TValue value) => _ => value;
     }
 }

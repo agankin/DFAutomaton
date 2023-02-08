@@ -12,7 +12,7 @@ namespace DFAutomaton.Tests
             var (_, reducer) = stateReducer;
             var reducedValue = reducer(default!);
 
-            Assert.AreEqual(reducedValue, expectedReducedValue);
+            Assert.AreEqual(expectedReducedValue, reducedValue);
         }
     }
 }

@@ -17,7 +17,7 @@
 
     public enum ShoppingActions
     {
-        Order,
+        Order = 1,
 
         Pay,
 
@@ -26,7 +26,7 @@
 
     public enum ShoppingStates
     {
-        Ordered,
+        Ordered = 1,
 
         Shipped,
 
