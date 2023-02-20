@@ -1,24 +1,24 @@
-﻿using DFAutomaton.Extensions;
-using Optional;
+﻿using Optional;
+using Optional.Collections;
 
 namespace DFAutomaton
 {
     internal class AcceptedStateDict<TTransition, TState>
         where TTransition : notnull
     {
-        private readonly Dictionary<AcceptedState<TState>, StateReducer<TTransition, TState>> _acceptedStates = new();
+        private readonly Dictionary<AcceptedStateHandle<TState>, NextState<TTransition, TState>> _acceptedStates = new();
 
-        public Option<StateReducer<TTransition, TState>> this[AcceptedState<TState> acceptedState] =>
-            _acceptedStates.Get(acceptedState);
+        public Option<NextState<TTransition, TState>> this[AcceptedStateHandle<TState> acceptedState] =>
+            _acceptedStates.GetValueOrNone(acceptedState);
 
         public void Add(
-            AcceptedState<TState> acceptedState,
+            AcceptedStateHandle<TState> acceptedState,
             State<TTransition, TState> state,
             Func<TState, TState> reducer)
         {
-            var stateReducer = new StateReducer<TTransition, TState>(state, reducer);
+            var nextState = new NextState<TTransition, TState>(state, reducer);
 
-            _acceptedStates.Add(acceptedState, stateReducer);
+            _acceptedStates.Add(acceptedState, nextState);
         }
     }
 }
