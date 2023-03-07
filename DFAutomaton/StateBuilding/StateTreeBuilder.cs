@@ -2,81 +2,91 @@
 {
     public static class StateTreeBuilder
     {
-        public static State<TTransition, TState> ToState<TTransition, TState>(
+        public static State<TTransition, TState> ToNewState<TTransition, TState>(
             this State<TTransition, TState> current,
             TTransition transition,
-            TState state)
+            TState nextStateValue)
             where TTransition : notnull
         {
-            return current.ToState(transition, ConstantReducer(state));
+            return current.ToNewState(transition, ConstantReducer(nextStateValue));
         }
 
-        public static State<TTransition, TState> ToState<TTransition, TState>(
+        public static State<TTransition, TState> ToNewState<TTransition, TState>(
             this State<TTransition, TState> current,
             TTransition transition,
-            Func<TState, TState> nextState)
+            Func<TState, TState> reducer)
             where TTransition : notnull
         {
-            var dfaState = StateFactory<TTransition, TState>.SubState(current.AcceptedStates);
+            var nextState = StateFactory<TTransition, TState>.SubState(current.AcceptedStates);
 
-            return current.ToState(transition, dfaState, nextState);
+            return current.LinkState(transition, nextState, reducer);
         }
 
-        public static AcceptedStateHandle<TState> ToAccepted<TTransition, TState>(
+        public static State<TTransition, TState> LinkState<TTransition, TState>(
             this State<TTransition, TState> current,
             TTransition transition,
-            TState state)
+            State<TTransition, TState> nextState,
+            TState nextStateValue)
             where TTransition : notnull
         {
-            var acceptedStates = current.AcceptedStates;
-
-            var dfaState = StateFactory<TTransition, TState>.Accepted(acceptedStates);
-            var reducer = ConstantReducer(state);
-
-            current.ToState(transition, dfaState, reducer);
-
-            var acceptedState = new AcceptedStateHandle<TState>();
-            acceptedStates.Add(acceptedState, dfaState, reducer);
-
-            return acceptedState;
+            var reducer = ConstantReducer(nextStateValue);
+            return current.LinkState(transition, nextState, reducer);
         }
 
-        public static AcceptedStateHandle<TState> ToAccepted<TTransition, TState>(
+        public static AcceptedStateHandle<TState> ToNewAccepted<TTransition, TState>(
+            this State<TTransition, TState> current,
+            TTransition transition,
+            TState acceptedStateValue)
+            where TTransition : notnull
+        {
+            return current.ToNewAccepted(transition, ConstantReducer(acceptedStateValue));
+        }
+
+        public static AcceptedStateHandle<TState> ToNewAccepted<TTransition, TState>(
             this State<TTransition, TState> current,
             TTransition transition,
             Func<TState, TState> reducer)
             where TTransition : notnull
         {
             var acceptedStates = current.AcceptedStates;
+            var acceptedState = StateFactory<TTransition, TState>.Accepted(acceptedStates);
 
-            var dfaState = StateFactory<TTransition, TState>.Accepted(acceptedStates);
+            current.LinkState(transition, acceptedState, reducer);
 
-            current.ToState(transition, dfaState, reducer);
+            var acceptedStateHandle = new AcceptedStateHandle<TState>();
+            acceptedStates.Add(acceptedStateHandle, acceptedState);
 
-            var acceptedState = new AcceptedStateHandle<TState>();
-            acceptedStates.Add(acceptedState, dfaState, reducer);
-
-            return acceptedState;
+            return acceptedStateHandle;
         }
 
-        public static AcceptedStateHandle<TState> ToAccepted<TTransition, TState>(
+        public static AcceptedStateHandle<TState> LinkAccepted<TTransition, TState>(
             this State<TTransition, TState> current,
             TTransition transition,
-            AcceptedStateHandle<TState> acceptedState)
+            AcceptedStateHandle<TState> acceptedStateHandle,
+            TState acceptedStateValue)
+            where TTransition : notnull
+        {
+            var reducer = ConstantReducer(acceptedStateValue);
+            return current.LinkAccepted(transition, acceptedStateHandle, reducer);
+        }
+
+        public static AcceptedStateHandle<TState> LinkAccepted<TTransition, TState>(
+            this State<TTransition, TState> current,
+            TTransition transition,
+            AcceptedStateHandle<TState> acceptedStateHandle,
+            Func<TState, TState> reducer)
             where TTransition : notnull
         {
             var acceptedStates = current.AcceptedStates;
-            var nextStateOpt = acceptedStates[acceptedState];
+            var acceptedStateOption = acceptedStates[acceptedStateHandle];
 
-            return nextStateOpt.Match(
-                nextState =>
+            return acceptedStateOption.Match(
+                acceptedState =>
                 {
-                    var (state, reducer) = nextState;
-
-                    current.ToState(transition, state, reducer);
-                    return acceptedState;
+                    current.LinkState(transition, acceptedState, reducer);
+                    return acceptedStateHandle;
                 },
-                () => acceptedState);
+                () => acceptedStateHandle);
         }
 
         private static Func<TValue, TValue> ConstantReducer<TValue>(TValue value) => _ => value;

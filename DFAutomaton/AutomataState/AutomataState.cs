@@ -3,8 +3,7 @@ using Optional.Collections;
 
 namespace DFAutomaton
 {
-    public class AutomataState<TTransition, TState>
-        where TTransition : notnull
+    public class AutomataState<TTransition, TState> where TTransition : notnull
     {
         private readonly IReadOnlyDictionary<TTransition, AutomataNextState<TTransition, TState>> _nextStates;
 

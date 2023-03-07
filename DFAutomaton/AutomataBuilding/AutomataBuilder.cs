@@ -1,7 +1,6 @@
 ﻿namespace DFAutomaton
 {
-    public class AutomataBuilder<TTransition, TState>
-        where TTransition : notnull
+    public class AutomataBuilder<TTransition, TState> where TTransition : notnull
     {
         private AutomataBuilder(State<TTransition, TState> startState) => StartState = startState;
 

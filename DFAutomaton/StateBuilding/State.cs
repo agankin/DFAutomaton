@@ -3,8 +3,7 @@ using Optional.Collections;
 
 namespace DFAutomaton
 {
-    public class State<TTransition, TState>
-        where TTransition : notnull
+    public class State<TTransition, TState> where TTransition : notnull
     {
         private readonly Dictionary<TTransition, NextState<TTransition, TState>> _nextStates = new();
 
@@ -23,17 +22,19 @@ namespace DFAutomaton
         public Option<NextState<TTransition, TState>> this[TTransition transition] =>
             _nextStates.GetValueOrNone(transition);
 
-        internal State<TTransition, TState> ToState(
+        public State<TTransition, TState> LinkState(
             TTransition transition,
-            State<TTransition, TState> dfaState,
+            State<TTransition, TState> nextState,
             Func<TState, TState> reducer)
         {
-            var (state, _) = _nextStates[transition] = new NextState<TTransition, TState>(dfaState, reducer);
+            if (Type == StateType.Accepted)
+                throw new InvalidOperationException("Cannot link a state to the accepted state.");
+
+            var (state, _) = _nextStates[transition] = new NextState<TTransition, TState>(nextState, reducer);
 
             return state;
         }
 
-        internal IReadOnlyDictionary<TTransition, NextState<TTransition, TState>> GetNextStates() =>
-            _nextStates;
+        internal IReadOnlyDictionary<TTransition, NextState<TTransition, TState>> GetNextStates() => _nextStates;
     }
 }

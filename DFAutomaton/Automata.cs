@@ -2,8 +2,7 @@
 
 namespace DFAutomaton
 {
-    public class Automata<TTransition, TState>
-        where TTransition : notnull
+    public class Automata<TTransition, TState> where TTransition : notnull
     {
         public Automata(AutomataState<TTransition, TState> start) => Start = start;
 
@@ -26,10 +25,10 @@ namespace DFAutomaton
         private Func<CurrentState, Option<CurrentState, AutomataError>> Reduce(TTransition transition) =>
             automataState =>
             {
-                var (dfaState, state) = automataState;
+                var (state, stateValue) = automataState;
 
-                return dfaState[transition].Match(
-                    Reduce(state),
+                return state[transition].Match(
+                    Reduce(stateValue),
                     () => Option.None<CurrentState, AutomataError>(Error(AutomataErrorType.TransitionNotExists)));
             };
 

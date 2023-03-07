@@ -6,27 +6,37 @@ namespace DFAutomaton.Tests
     public class StateTreeTests
     {
         [Test]
-        public void TestTransition()
+        public void TransitionsScenario()
         {
             var tree = ShoppingStateTree.Create();
 
-            var afterAddBread = tree.ShoppingState[ShoppingActions.AddBread];
-            afterAddBread.AssertSome(state => Assert.AreEqual(tree.ShoppingState, state.State));
+            var shopping = tree.ShoppingState;
+            var paid = tree.PaidState;
+
+            var afterAddBread = shopping[ShoppingActions.AddBread];
+            afterAddBread.AssertSomeNextState(shopping, ShoppingStateReducers.AddBread);
 
             var afterAddButter = afterAddBread.FlatMap(state => state.State[ShoppingActions.AddButter]);
-            afterAddButter.AssertSome(state => Assert.AreEqual(tree.ShoppingState, state.State));
+            afterAddButter.AssertSomeNextState(shopping, ShoppingStateReducers.AddButter);
 
-            var paid = afterAddButter.FlatMap(state => state.State[ShoppingActions.PayForGoods]);
-            paid.AssertSome(paidState => Assert.True(tree.IsGoodsPaidState(paidState.State)));
+            var afterPay = afterAddButter.FlatMap(state => state.State[ShoppingActions.PayForGoods]);
+            afterPay.AssertSomeNextState(paid, ShoppingStateReducers.PayForGoods);
+
+            var afterReceive = afterPay.FlatMap(state => state.State[ShoppingActions.ReceiveGoods]);
+            afterReceive.AssertSome(nextState =>
+            {
+                Assert.AreEqual(StateType.Accepted, nextState.State.Type);
+                Assert.AreEqual(ShoppingStateReducers.ReceiveGoods, nextState.Reducer);
+            });
         }
 
         [Test]
-        public void TestNoTransition()
+        public void TestTransitionNotExists()
         {
             var tree = ShoppingStateTree.Create();
-            var receive = tree.ShoppingState[ShoppingActions.ReceiveGoods];
+            var goodsReceivedState = tree.ShoppingState[ShoppingActions.ReceiveGoods];
 
-            receive.AssertNone();
+            goodsReceivedState.AssertNone();
         }
     }
 }
