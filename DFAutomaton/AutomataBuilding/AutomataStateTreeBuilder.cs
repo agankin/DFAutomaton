@@ -19,9 +19,15 @@ namespace DFAutomaton
             where TTransition : notnull
         {
             var type = state.Type;
-            var automataNextStates = state.GetNextStates().ToAutomataNextStates(buildedStates);
+            var automataNextStates = new Dictionary<TTransition, AutomataNextState<TTransition, TState>>();
+            var automataState = buildedStates[state] =
+                new AutomataState<TTransition, TState>(type, automataNextStates);
 
-            return new AutomataState<TTransition, TState>(type, automataNextStates);
+            state.GetNextStates()
+                .ToAutomataNextStates(buildedStates)
+                .CopyTo(automataNextStates);
+
+            return automataState;
         }
 
         private static IReadOnlyDictionary<TTransition, AutomataNextState<TTransition, TState>> ToAutomataNextStates<TTransition, TState>(
@@ -43,9 +49,18 @@ namespace DFAutomaton
             var automataState = buildedStates.GetValueOrNone(state)
                 .Match(
                     automataState => automataState,
-                    () => buildedStates[state] = state.ToAutomataState(buildedStates));
+                    () => state.ToAutomataState(buildedStates));
 
             return new AutomataNextState<TTransition, TState>(automataState, reducer);
+        }
+
+        private static void CopyTo<TTransition, TState>(
+            this IReadOnlyDictionary<TTransition, AutomataNextState<TTransition, TState>> sourceDict,
+            IDictionary<TTransition, AutomataNextState<TTransition, TState>> destDict)
+            where TTransition : notnull
+        {
+            foreach (var keyValue in sourceDict)
+                destDict[keyValue.Key] = keyValue.Value;
         }
     }
 }
