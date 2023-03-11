@@ -7,17 +7,11 @@ namespace DFAutomaton
     {
         private readonly Dictionary<TTransition, NextState<TTransition, TState>> _nextStates = new();
 
-        internal State(StateType type, AcceptedStateDict<TTransition, TState> acceptedStates)
-        {
-            Type = type;
-            AcceptedStates = acceptedStates;
-        }
+        internal State(StateType type) => Type = type;
 
         public StateType Type { get; }
 
         public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_nextStates.Keys);
-
-        internal AcceptedStateDict<TTransition, TState> AcceptedStates { get; }
 
         public Option<NextState<TTransition, TState>> this[TTransition transition] =>
             _nextStates.GetValueOrNone(transition);

@@ -35,8 +35,7 @@ namespace DFAutomaton.Tests
         public void LinkExistingStateWithReducer()
         {
             var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
-            var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(
-                new AcceptedStateDict<ShoppingActions, ShoppingState>());
+            var newState = StateFactory<ShoppingActions, ShoppingState>.SubState();
             
             var newLinkedState = startState.LinkState(
                 ShoppingActions.AddBread,
@@ -52,8 +51,7 @@ namespace DFAutomaton.Tests
         public void LinkExistingConstantState()
         {
             var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
-            var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(
-                new AcceptedStateDict<ShoppingActions, ShoppingState>());
+            var newState = StateFactory<ShoppingActions, ShoppingState>.SubState();
             var newValue = new ShoppingState(ShoppingStateType.Shopping, ShoppingStateReducers.BreadPrice);
             
             var newLinkedState = startState.LinkState(ShoppingActions.AddBread, newState, newValue);

@@ -1,7 +1,13 @@
 ﻿namespace DFAutomaton
 {
-    public class AcceptedStateHandle<TState>
+    public class AcceptedStateHandle<TTransition, TState>
+        where TTransition : notnull
     {
-        internal AcceptedStateHandle() { }
+        internal AcceptedStateHandle(State<TTransition, TState> acceptedState)
+        {
+            AcceptedState = acceptedState;
+        }
+
+        internal State<TTransition, TState> AcceptedState { get; }
     }
 }
