@@ -8,7 +8,7 @@ namespace DFAutomaton.Tests
         public static void AssertSomeNextState<TTransition, TState>(
             this Option<AutomataNextState<TTransition, TState>> nextStateReducerOption,
             AutomataState<TTransition, TState> expectedNextState,
-            Func<TState, TState> expectedReducer)
+            StateReducer<TTransition, TState> expectedReducer)
             where TTransition : notnull
         {
             nextStateReducerOption.AssertSome(nextStateReducer =>

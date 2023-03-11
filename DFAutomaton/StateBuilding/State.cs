@@ -25,7 +25,7 @@ namespace DFAutomaton
         public State<TTransition, TState> LinkState(
             TTransition transition,
             State<TTransition, TState> nextState,
-            Func<TState, TState> reducer)
+            StateReducer<TTransition, TState> reducer)
         {
             if (Type == StateType.Accepted)
                 throw new InvalidOperationException("Cannot link a state to the accepted state.");

@@ -2,6 +2,6 @@
 {
     public readonly record struct AutomataNextState<TTransition, TState>(
         AutomataState<TTransition, TState> State,
-        Func<TState, TState> Reducer)
+        StateReducer<TTransition, TState> Reducer)
         where TTransition : notnull;
 }

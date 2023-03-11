@@ -8,7 +8,7 @@ namespace DFAutomaton.Tests
         public static void AssertSomeNextState<TTransition, TState>(
             this Option<NextState<TTransition, TState>> nextStateReducerOption,
             State<TTransition, TState> expectedNextState,
-            Func<TState, TState> expectedReducer)
+            StateReducer<TTransition, TState> expectedReducer)
             where TTransition : notnull
         {
             nextStateReducerOption.AssertSome(nextStateReducer =>
@@ -27,18 +27,20 @@ namespace DFAutomaton.Tests
             TState expectedReducedValue)
             where TTransition : notnull
         {
+            var control = new AutomataControl<TTransition>(_ => { });
+
             nextStateReducerOption.AssertSome(nextStateReducer =>
             {
                 var (nextState, reducer) = nextStateReducer;
 
                 Assert.AreEqual(expectedNextState, nextState);
-                Assert.AreEqual(expectedReducedValue, reducer(valueToReduce));
+                Assert.AreEqual(expectedReducedValue, reducer(control, valueToReduce));
             });
         }
 
         public static void AssertSomeAccepted<TTransition, TState>(
             this Option<NextState<TTransition, TState>> nextStateReducerOption,
-            Func<TState, TState> expectedReducer)
+            StateReducer<TTransition, TState> expectedReducer)
             where TTransition : notnull
         {
             nextStateReducerOption.AssertSome(nextStateReducer =>
@@ -56,12 +58,14 @@ namespace DFAutomaton.Tests
             TState expectedReducedValue)
             where TTransition : notnull
         {
+            var control = new AutomataControl<TTransition>(_ => { });
+
             nextStateReducerOption.AssertSome(nextStateReducer =>
             {
                 var (nextState, reducer) = nextStateReducer;
 
                 Assert.AreEqual(StateType.Accepted, nextState.Type);
-                Assert.AreEqual(expectedReducedValue, reducer(valueToReduce));
+                Assert.AreEqual(expectedReducedValue, reducer(control, valueToReduce));
             });
         }
     }

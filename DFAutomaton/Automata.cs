@@ -13,35 +13,52 @@ namespace DFAutomaton
             var initialAutomataState = Option.Some<CurrentState, AutomataError>(
                 new CurrentState(Start, startStateValue));
 
-            return transitions.Aggregate(initialAutomataState, Reduce)
+            var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
+            var control = new AutomataControl<TTransition>(transitionsEnumerator.QueueEmited);
+
+            return transitionsEnumerator.ToEnumerable()
+                .Aggregate(
+                    initialAutomataState,
+                    (automataState, transition) => Reduce(control, automataState, transition))
                 .Map(automataState => automataState.StateValue);
         }
 
         private Option<CurrentState, AutomataError> Reduce(
+            AutomataControl<TTransition> control,
             Option<CurrentState, AutomataError> currentState,
-            TTransition transition) =>
-            currentState.FlatMap(Reduce(transition));
+            TTransition transition)
+        {
+            return currentState.FlatMap(Reduce(control, transition));
+        }
 
-        private Func<CurrentState, Option<CurrentState, AutomataError>> Reduce(TTransition transition) =>
-            automataState =>
+        private Func<CurrentState, Option<CurrentState, AutomataError>> Reduce(
+            AutomataControl<TTransition> control,
+            TTransition transition)
+        {
+            return automataState =>
             {
                 var (state, stateValue) = automataState;
 
                 return state[transition].Match(
-                    Reduce(stateValue),
+                    Reduce(control, stateValue),
                     () => Option.None<CurrentState, AutomataError>(Error(AutomataErrorType.TransitionNotExists)));
             };
+        }
 
-        private Func<AutomataNextState<TTransition, TState>, Option<CurrentState, AutomataError>> Reduce(TState stateValue) =>
-            automataNextState =>
+        private Func<AutomataNextState<TTransition, TState>, Option<CurrentState, AutomataError>> Reduce(
+            AutomataControl<TTransition> control,
+            TState stateValue)
+        {
+            return automataNextState =>
             {
                 var (nextState, reducer) = automataNextState;
-                var nextStateValue = reducer(stateValue);
+                var nextStateValue = reducer(control, stateValue);
 
                 var nextAutomataState = new CurrentState(nextState, nextStateValue);
 
                 return Option.Some<CurrentState, AutomataError>(nextAutomataState);
             };
+        }
 
         private static AutomataError Error(AutomataErrorType type) => new AutomataError(type);
 
