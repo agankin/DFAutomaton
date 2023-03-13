@@ -9,6 +9,8 @@ namespace DFAutomaton
 
         internal State(StateType type) => Type = type;
 
+        public object? Tag { get; set; }
+
         public StateType Type { get; }
 
         public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_nextStates.Keys);
@@ -30,5 +32,7 @@ namespace DFAutomaton
         }
 
         internal IReadOnlyDictionary<TTransition, NextState<TTransition, TState>> GetNextStates() => _nextStates;
+
+        public override string? ToString() => Tag?.ToString() ?? base.ToString();
     }
 }

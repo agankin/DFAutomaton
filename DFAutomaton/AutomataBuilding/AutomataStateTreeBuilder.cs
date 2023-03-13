@@ -21,7 +21,7 @@ namespace DFAutomaton
             var type = state.Type;
             var automataNextStates = new Dictionary<TTransition, AutomataNextState<TTransition, TState>>();
             var automataState = buildedStates[state] =
-                new AutomataState<TTransition, TState>(type, automataNextStates);
+                new AutomataState<TTransition, TState>(state.Tag, type, automataNextStates);
 
             state.GetNextStates()
                 .ToAutomataNextStates(buildedStates)
