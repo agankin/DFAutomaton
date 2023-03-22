@@ -19,7 +19,7 @@
             StateReducer<TTransition, TState> reducer)
             where TTransition : notnull
         {
-            var nextState = StateFactory<TTransition, TState>.SubState();
+            var nextState = StateFactory<TTransition, TState>.SubState(current.GetNextId);
 
             return current.LinkState(transition, nextState, reducer);
         }
@@ -53,7 +53,7 @@
             StateReducer<TTransition, TState> reducer)
             where TTransition : notnull
         {
-            var acceptedState = StateFactory<TTransition, TState>.Accepted();
+            var acceptedState = StateFactory<TTransition, TState>.Accepted(current.GetNextId);
             current.LinkState(transition, acceptedState, reducer);
 
             return new AcceptedStateHandle<TTransition, TState>(acceptedState);

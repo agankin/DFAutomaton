@@ -9,14 +9,18 @@ namespace DFAutomaton
         private readonly IReadOnlyDictionary<TTransition, Next<TTransition, TState>> _nextStates;
 
         internal AutomataState(
+            long id,
             object? tag,
             StateType type,
             IReadOnlyDictionary<TTransition, Next<TTransition, TState>> nextStates)
         {
+            Id = id;
             Tag = tag;
             Type = type;
             _nextStates = nextStates;
         }
+
+        public long Id { get; }
 
         public object? Tag { get; }
 
@@ -27,6 +31,6 @@ namespace DFAutomaton
         public Option<Next<TTransition, TState>> this[TTransition transition] =>
             _nextStates.GetValueOrNone(transition);
 
-        public override string? ToString() => Tag?.ToString() ?? base.ToString();
+        public override string? ToString() => this.Format();
     }
 }

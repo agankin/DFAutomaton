@@ -8,7 +8,14 @@ namespace DFAutomaton
     {
         private readonly Dictionary<TTransition, NextState<TTransition, TState>> _nextStates = new();
 
-        internal State(StateType type) => Type = type;
+        internal State(StateType type, Func<long> getNextId)
+        {
+            Id = getNextId();
+            Type = type;
+            GetNextId = getNextId;
+        }
+
+        public long Id { get; }
 
         public object? Tag { get; set; }
 
@@ -22,6 +29,8 @@ namespace DFAutomaton
         Option<Next<TTransition, TState>> IState<TTransition, TState>.this[TTransition transition] =>
             _nextStates.GetValueOrNone(transition)
                 .Map(next => new Next<TTransition, TState>(next.State, next.Reducer));
+
+        internal Func<long> GetNextId { get; }
 
         public State<TTransition, TState> LinkState(
             TTransition transition,
@@ -38,6 +47,6 @@ namespace DFAutomaton
 
         internal IReadOnlyDictionary<TTransition, NextState<TTransition, TState>> GetNextStates() => _nextStates;
 
-        public override string? ToString() => Tag?.ToString() ?? base.ToString();
+        public override string? ToString() => this.Format();
     }
 }

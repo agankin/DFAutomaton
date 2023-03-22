@@ -4,6 +4,8 @@ namespace DFAutomaton
 {
     public interface IState<TTransition, TState> where TTransition : notnull
     {
+        long Id { get; }
+
         object? Tag { get; }
 
         public StateType Type { get; }

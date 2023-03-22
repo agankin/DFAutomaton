@@ -1,33 +1,11 @@
 ﻿namespace DFAutomaton.Utils
 {
-    internal class StateIdGenerator
+    internal static class StateIdGenerator
     {
-        public static StateIdDict<TTransition, TState> Generate<TTransition, TState>(
-            IState<TTransition, TState> startState)
-            where TTransition : notnull
+        public static Func<long> CreateNew()
         {
-            var stateIdDict = new StateIdDict<TTransition, TState>();
-            AddStateId(stateIdDict, startState, currentId: 0);
-
-            return stateIdDict;
-        }
-
-        private static int AddStateId<TTransition, TState>(
-            StateIdDict<TTransition, TState> stateIdDict,
-            IState<TTransition, TState> state,
-            int currentId)
-            where TTransition : notnull
-        {
-            if (stateIdDict.ContainsState(state))
-                return currentId;
-
-            stateIdDict.GetValueOrNone(state).MatchNone(() => stateIdDict[state] = currentId++);
-
-            return state.Transitions.Aggregate(
-                currentId,
-                (id, transition) => state[transition]
-                    .Map(next => AddStateId(stateIdDict, next.State, id))
-                    .ValueOr(id));
+            long currentId = 0;
+            return () => currentId++;
         }
     }
 }
