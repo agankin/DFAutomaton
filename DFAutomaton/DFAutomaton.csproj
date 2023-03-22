@@ -15,4 +15,8 @@
       <_Parameter1>DFAutomaton.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="StateGraphBuilding\" />
+  </ItemGroup>
 </Project>

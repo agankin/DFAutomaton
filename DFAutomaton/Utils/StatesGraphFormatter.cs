@@ -4,10 +4,10 @@ namespace DFAutomaton.Utils
 {
     public static class StatesGraphFormatter<TTransition, TState> where TTransition : notnull
     {
-        public static string Format(State<TTransition, TState> startState)
+        public static string Format(IState<TTransition, TState> startState)
         {
             var stateIdDict = StateIdGenerator.Generate(startState);
-            var formattedStates = new HashSet<State<TTransition, TState>>();
+            var formattedStates = new HashSet<IState<TTransition, TState>>();
 
             var lines = GetStateLines(startState, stateIdDict, formattedStates);
 
@@ -15,9 +15,9 @@ namespace DFAutomaton.Utils
         }
 
         private static IEnumerable<string> GetStateLines(
-            State<TTransition, TState> state,
+            IState<TTransition, TState> state,
             StateIdDict<TTransition, TState> stateIdDict,
-            ISet<State<TTransition, TState>> formattedStates)
+            ISet<IState<TTransition, TState>> formattedStates)
         {
             if (formattedStates.Contains(state))
                 yield break;
@@ -41,7 +41,7 @@ namespace DFAutomaton.Utils
         }
 
         private static Func<TTransition, string> FormatTransition(
-            State<TTransition, TState> fromState,
+            IState<TTransition, TState> fromState,
             StateIdDict<TTransition, TState> stateIdDict)
         {
             return transition =>

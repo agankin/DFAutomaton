@@ -15,7 +15,7 @@
 
         public Automata<TTransition, TState> Build()
         {
-            var automataStartState = StartState.BuildAutomataTree();
+            var automataStartState = StartState.BuildAutomataGraph();
 
             return new Automata<TTransition, TState>(automataStartState);
         }

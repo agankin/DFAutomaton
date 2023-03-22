@@ -3,13 +3,13 @@
 namespace DFAutomaton.Tests
 {
     [TestFixture]
-    public class AutomataStateTreeTests
+    public class AutomataStateGraphTests
     {
         [Test]
         public void TransitionsScenario()
         {
-            var tree = ShoppingStateTree.Create();
-            var start = tree.ShoppingState.BuildAutomataTree();
+            var graph = ShoppingStateGraph.Create();
+            var start = graph.ShoppingState.BuildAutomataGraph();
 
             var afterAddBread = start[ShoppingActions.AddBread];
             afterAddBread.AssertSomeNextState(start, ShoppingStateReducers.AddBread);
@@ -35,7 +35,7 @@ namespace DFAutomaton.Tests
         [Test]
         public void TestTransitionNotExists()
         {
-            var startState = ShoppingStateTree.Create().ShoppingState.BuildAutomataTree();
+            var startState = ShoppingStateGraph.Create().ShoppingState.BuildAutomataGraph();
             var receive = startState[ShoppingActions.ReceiveGoods];
 
             receive.AssertNone();

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Optional;
 
-namespace DFAutomaton
+namespace DFAutomaton.Utils
 {
     internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
     {

@@ -1,6 +1,6 @@
 ﻿namespace DFAutomaton
 {
-    public static class StateTreeBuilder
+    public static class StateGraphBuildingExtensions
     {
         public static State<TTransition, TState> ToNewState<TTransition, TState>(
             this State<TTransition, TState> current,

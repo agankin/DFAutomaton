@@ -6,8 +6,8 @@ namespace DFAutomaton.Tests
     public static class AssertAutomataStateExtensions
     {
         public static void AssertSomeNextState<TTransition, TState>(
-            this Option<AutomataNextState<TTransition, TState>> nextStateReducerOption,
-            AutomataState<TTransition, TState> expectedNextState,
+            this Option<Next<TTransition, TState>> nextStateReducerOption,
+            IState<TTransition, TState> expectedNextState,
             StateReducer<TTransition, TState> expectedReducer)
             where TTransition : notnull
         {

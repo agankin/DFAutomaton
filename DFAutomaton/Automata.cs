@@ -1,12 +1,13 @@
-﻿using Optional;
+﻿using DFAutomaton.Utils;
+using Optional;
 
 namespace DFAutomaton
 {
     public class Automata<TTransition, TState> where TTransition : notnull
     {
-        public Automata(AutomataState<TTransition, TState> start) => Start = start;
+        public Automata(IState<TTransition, TState> start) => Start = start;
 
-        public AutomataState<TTransition, TState> Start { get; }
+        public IState<TTransition, TState> Start { get; }
 
         public Option<TState, AutomataError> Run(TState startStateValue, IEnumerable<TTransition> transitions)
         {
@@ -45,7 +46,7 @@ namespace DFAutomaton
             };
         }
 
-        private Func<AutomataNextState<TTransition, TState>, Option<CurrentState, AutomataError>> Reduce(
+        private Func<Next<TTransition, TState>, Option<CurrentState, AutomataError>> Reduce(
             AutomataControl<TTransition> control,
             TState stateValue)
         {
@@ -63,7 +64,7 @@ namespace DFAutomaton
         private static AutomataError Error(AutomataErrorType type) => new AutomataError(type);
 
         private readonly record struct CurrentState(
-            AutomataState<TTransition, TState> State,
+            IState<TTransition, TState> State,
             TState StateValue);
     }
 }

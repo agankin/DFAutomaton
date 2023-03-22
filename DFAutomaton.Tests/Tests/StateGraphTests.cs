@@ -3,15 +3,15 @@
 namespace DFAutomaton.Tests
 {
     [TestFixture]
-    public class StateTreeTests
+    public class StateGraphTests
     {
         [Test]
         public void TransitionsScenario()
         {
-            var tree = ShoppingStateTree.Create();
+            var graph = ShoppingStateGraph.Create();
 
-            var shopping = tree.ShoppingState;
-            var paid = tree.PaidState;
+            var shopping = graph.ShoppingState;
+            var paid = graph.PaidState;
 
             var afterAddBread = shopping[ShoppingActions.AddBread];
             afterAddBread.AssertSomeNextState(shopping, ShoppingStateReducers.AddBread);
@@ -33,8 +33,8 @@ namespace DFAutomaton.Tests
         [Test]
         public void TestTransitionNotExists()
         {
-            var tree = ShoppingStateTree.Create();
-            var goodsReceivedState = tree.ShoppingState[ShoppingActions.ReceiveGoods];
+            var graph = ShoppingStateGraph.Create();
+            var goodsReceivedState = graph.ShoppingState[ShoppingActions.ReceiveGoods];
 
             goodsReceivedState.AssertNone();
         }

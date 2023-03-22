@@ -1,12 +1,12 @@
 ﻿namespace DFAutomaton.Tests
 {
-    public class ShoppingStateTree
+    public class ShoppingStateGraph
     {
         public State<ShoppingActions, ShoppingState> ShoppingState { get; init; } = null!;
         
         public State<ShoppingActions, ShoppingState> PaidState { get; init; } = null!;
 
-        public static ShoppingStateTree Create()
+        public static ShoppingStateGraph Create()
         {
             var shoppingState = StateFactory<ShoppingActions, ShoppingState>.Start();
 
@@ -17,7 +17,7 @@
             paidState
                 .ToNewAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
 
-            return new ShoppingStateTree
+            return new ShoppingStateGraph
             {
                 ShoppingState = shoppingState,
                 PaidState = paidState

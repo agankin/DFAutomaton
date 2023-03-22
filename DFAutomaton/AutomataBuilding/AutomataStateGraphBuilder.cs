@@ -2,9 +2,9 @@
 
 namespace DFAutomaton
 {
-    public static class AutomataStateTreeBuilder
+    internal static class AutomataStateGraphBuilder
     {
-        public static AutomataState<TTransition, TState> BuildAutomataTree<TTransition, TState>(
+        public static IState<TTransition, TState> BuildAutomataGraph<TTransition, TState>(
             this State<TTransition, TState> start)
             where TTransition : notnull
         {
@@ -13,13 +13,13 @@ namespace DFAutomaton
             return start.ToAutomataState(buildedStates);
         }
 
-        private static AutomataState<TTransition, TState> ToAutomataState<TTransition, TState>(
+        private static IState<TTransition, TState> ToAutomataState<TTransition, TState>(
             this State<TTransition, TState> state,
             IDictionary<State<TTransition, TState>, AutomataState<TTransition, TState>> buildedStates)
             where TTransition : notnull
         {
             var type = state.Type;
-            var automataNextStates = new Dictionary<TTransition, AutomataNextState<TTransition, TState>>();
+            var automataNextStates = new Dictionary<TTransition, Next<TTransition, TState>>();
             var automataState = buildedStates[state] =
                 new AutomataState<TTransition, TState>(state.Tag, type, automataNextStates);
 
@@ -30,7 +30,7 @@ namespace DFAutomaton
             return automataState;
         }
 
-        private static IReadOnlyDictionary<TTransition, AutomataNextState<TTransition, TState>> ToAutomataNextStates<TTransition, TState>(
+        private static IReadOnlyDictionary<TTransition, Next<TTransition, TState>> ToAutomataNextStates<TTransition, TState>(
             this IReadOnlyDictionary<TTransition, NextState<TTransition, TState>> nextStates,
             IDictionary<State<TTransition, TState>, AutomataState<TTransition, TState>> buildedStates)
             where TTransition : notnull
@@ -40,7 +40,7 @@ namespace DFAutomaton
                 nextState => nextState.Value.ToAutomataNextState(buildedStates));
         }
 
-        private static AutomataNextState<TTransition, TState> ToAutomataNextState<TTransition, TState>(
+        private static Next<TTransition, TState> ToAutomataNextState<TTransition, TState>(
             this NextState<TTransition, TState> nextState,
             IDictionary<State<TTransition, TState>, AutomataState<TTransition, TState>> buildedStates)
             where TTransition : notnull
@@ -51,12 +51,12 @@ namespace DFAutomaton
                     automataState => automataState,
                     () => state.ToAutomataState(buildedStates));
 
-            return new AutomataNextState<TTransition, TState>(automataState, reducer);
+            return new Next<TTransition, TState>(automataState, reducer);
         }
 
         private static void CopyTo<TTransition, TState>(
-            this IReadOnlyDictionary<TTransition, AutomataNextState<TTransition, TState>> sourceDict,
-            IDictionary<TTransition, AutomataNextState<TTransition, TState>> destDict)
+            this IReadOnlyDictionary<TTransition, Next<TTransition, TState>> sourceDict,
+            IDictionary<TTransition, Next<TTransition, TState>> destDict)
             where TTransition : notnull
         {
             foreach (var keyValue in sourceDict)

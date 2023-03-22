@@ -3,7 +3,7 @@
     internal class StateIdGenerator
     {
         public static StateIdDict<TTransition, TState> Generate<TTransition, TState>(
-            State<TTransition, TState> startState)
+            IState<TTransition, TState> startState)
             where TTransition : notnull
         {
             var stateIdDict = new StateIdDict<TTransition, TState>();
@@ -14,7 +14,7 @@
 
         private static int AddStateId<TTransition, TState>(
             StateIdDict<TTransition, TState> stateIdDict,
-            State<TTransition, TState> state,
+            IState<TTransition, TState> state,
             int currentId)
             where TTransition : notnull
         {
