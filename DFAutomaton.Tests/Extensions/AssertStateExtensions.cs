@@ -27,11 +27,10 @@ namespace DFAutomaton.Tests
             TState expectedReducedValue)
             where TTransition : notnull
         {
-            var runState = new AutomataRunState<TTransition>(_ => { });
-
             stateTransitionOption.AssertSome(transition =>
             {
                 var (nextState, reducer) = transition;
+                var runState = new AutomataRunState<TTransition, TState>(nextState, _ => { });
 
                 Assert.AreEqual(expectedNextState, nextState);
                 Assert.AreEqual(expectedReducedValue, reducer(runState, valueToReduce));
@@ -58,11 +57,10 @@ namespace DFAutomaton.Tests
             TState expectedReducedValue)
             where TTransition : notnull
         {
-            var runState = new AutomataRunState<TTransition>(_ => { });
-
             stateTransitionOption.AssertSome(transition =>
             {
                 var (nextState, reducer) = transition;
+                var runState = new AutomataRunState<TTransition, TState>(nextState, _ => { });
 
                 Assert.AreEqual(StateType.Accepted, nextState.Type);
                 Assert.AreEqual(expectedReducedValue, reducer(runState, valueToReduce));
