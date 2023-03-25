@@ -12,22 +12,22 @@ namespace DFAutomaton.Tests
             var start = graph.ShoppingState.BuildAutomataGraph();
 
             var afterAddBread = start[ShoppingActions.AddBread];
-            afterAddBread.AssertSomeNextState(start, ShoppingStateReducers.AddBread);
+            afterAddBread.AssertTransition(start, ShoppingStateReducers.AddBread);
 
-            var afterAddButter = afterAddBread.FlatMap(state => state.State[ShoppingActions.AddButter]);
-            afterAddButter.AssertSomeNextState(start, ShoppingStateReducers.AddButter);
+            var afterAddButter = afterAddBread.FlatMap(state => state.NextState[ShoppingActions.AddButter]);
+            afterAddButter.AssertTransition(start, ShoppingStateReducers.AddButter);
 
-            var afterPaid = afterAddButter.FlatMap(state => state.State[ShoppingActions.PayForGoods]);
+            var afterPaid = afterAddButter.FlatMap(state => state.NextState[ShoppingActions.PayForGoods]);
             afterPaid.AssertSome(nextState =>
             {
-                Assert.AreEqual(StateType.SubState, nextState.State.Type);
+                Assert.AreEqual(StateType.SubState, nextState.NextState.Type);
                 Assert.AreEqual(ShoppingStateReducers.PayForGoods, nextState.Reducer);
             });
 
-            var afterReceived = afterPaid.FlatMap(state => state.State[ShoppingActions.ReceiveGoods]);
+            var afterReceived = afterPaid.FlatMap(state => state.NextState[ShoppingActions.ReceiveGoods]);
             afterReceived.AssertSome(nextState =>
             {
-                Assert.AreEqual(StateType.Accepted, nextState.State.Type);
+                Assert.AreEqual(StateType.Accepted, nextState.NextState.Type);
                 Assert.AreEqual(ShoppingStateReducers.ReceiveGoods, nextState.Reducer);
             });
         }

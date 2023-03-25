@@ -29,7 +29,7 @@ namespace DFAutomaton.Utils
             yield return string.Empty;
 
             var nextStatesLines = state.Transitions
-                .Select(transition => state[transition].ValueOrFailure().State)
+                .Select(transition => state[transition].ValueOrFailure().NextState)
                 .SelectMany(nextState => GetStateLines(nextState, formattedStates));
             foreach (var nextStateLine in nextStatesLines)
                 yield return nextStateLine;

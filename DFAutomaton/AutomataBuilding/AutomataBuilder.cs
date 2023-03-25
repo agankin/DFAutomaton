@@ -8,9 +8,9 @@
 
         public static AutomataBuilder<TTransition, TState> Create()
         {
-            var dfaStartState = StateFactory<TTransition, TState>.Start();
+            var startState = StateFactory<TTransition, TState>.Start();
 
-            return new AutomataBuilder<TTransition, TState>(dfaStartState);
+            return new AutomataBuilder<TTransition, TState>(startState);
         }
 
         public Automata<TTransition, TState> Build()

@@ -15,25 +15,25 @@ namespace DFAutomaton
                 new CurrentState(Start, startStateValue));
 
             var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
-            var control = new AutomataControl<TTransition>(transitionsEnumerator.QueueEmited);
+            var runState = new AutomataRunState<TTransition>(transitionsEnumerator.QueueEmited);
 
             return transitionsEnumerator.ToEnumerable()
                 .Aggregate(
                     initialAutomataState,
-                    (automataState, transition) => Reduce(control, automataState, transition))
+                    (automataState, transition) => Reduce(runState, automataState, transition))
                 .Map(automataState => automataState.StateValue);
         }
 
         private Option<CurrentState, AutomataError> Reduce(
-            AutomataControl<TTransition> control,
+            AutomataRunState<TTransition> runState,
             Option<CurrentState, AutomataError> currentState,
             TTransition transition)
         {
-            return currentState.FlatMap(Reduce(control, transition));
+            return currentState.FlatMap(Reduce(runState, transition));
         }
 
         private Func<CurrentState, Option<CurrentState, AutomataError>> Reduce(
-            AutomataControl<TTransition> control,
+            AutomataRunState<TTransition> runState,
             TTransition transition)
         {
             return automataState =>
@@ -41,19 +41,19 @@ namespace DFAutomaton
                 var (state, stateValue) = automataState;
 
                 return state[transition].Match(
-                    Reduce(control, stateValue),
+                    Reduce(runState, stateValue),
                     () => Option.None<CurrentState, AutomataError>(Error(AutomataErrorType.TransitionNotExists)));
             };
         }
 
-        private Func<Next<TTransition, TState>, Option<CurrentState, AutomataError>> Reduce(
-            AutomataControl<TTransition> control,
+        private Func<StateTransition<TTransition, TState>, Option<CurrentState, AutomataError>> Reduce(
+            AutomataRunState<TTransition> runState,
             TState stateValue)
         {
             return automataNextState =>
             {
                 var (nextState, reducer) = automataNextState;
-                var nextStateValue = reducer(control, stateValue);
+                var nextStateValue = reducer(runState, stateValue);
 
                 var nextAutomataState = new CurrentState(nextState, nextStateValue);
 

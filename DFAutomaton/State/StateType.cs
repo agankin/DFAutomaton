@@ -2,7 +2,7 @@
 {
     public enum StateType
     {
-        Start,
+        Start = 1,
 
         SubState,
 

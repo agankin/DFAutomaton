@@ -12,7 +12,7 @@ namespace DFAutomaton.Tests
             var newState = startState.ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
             Assert.AreEqual(StateType.SubState, newState.Type);
-            startState[ShoppingActions.PayForGoods].AssertSomeNextState(
+            startState[ShoppingActions.PayForGoods].AssertTransition(
                 newState,
                 ShoppingStateReducers.PayForGoods);
         }
@@ -28,7 +28,7 @@ namespace DFAutomaton.Tests
 
             var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
             startState[ShoppingActions.PayForGoods]
-                .AssertSomeNextState(newState, initialValue, newValue);
+                .AssertTransition(newState, initialValue, newValue);
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace DFAutomaton.Tests
 
             Assert.AreEqual(newState, newLinkedState);
             startState[ShoppingActions.AddBread]
-                .AssertSomeNextState(newState, ShoppingStateReducers.AddBread);
+                .AssertTransition(newState, ShoppingStateReducers.AddBread);
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace DFAutomaton.Tests
 
             var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
             startState[ShoppingActions.AddBread]
-                .AssertSomeNextState(newState, initialValue, newValue);
+                .AssertTransition(newState, initialValue, newValue);
         }
     }
 }

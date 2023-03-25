@@ -1,7 +1,7 @@
 ﻿namespace DFAutomaton
 {
-    public readonly record struct NextState<TTransition, TState>(
-        State<TTransition, TState> State,
+    public readonly record struct Transition<TTransition, TState>(
+        State<TTransition, TState> NextState,
         StateReducer<TTransition, TState> Reducer)
         where TTransition : notnull;
 }

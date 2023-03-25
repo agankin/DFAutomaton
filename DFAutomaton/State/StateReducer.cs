@@ -1,6 +1,6 @@
 ﻿namespace DFAutomaton
 {
     public delegate TState StateReducer<TTransition, TState>(
-        AutomataControl<TTransition> control,
+        AutomataRunState<TTransition> control,
         TState state);
 }

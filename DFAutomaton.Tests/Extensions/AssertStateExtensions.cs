@@ -5,67 +5,67 @@ namespace DFAutomaton.Tests
 {
     public static class AssertStateExtensions
     {
-        public static void AssertSomeNextState<TTransition, TState>(
-            this Option<NextState<TTransition, TState>> nextStateReducerOption,
+        public static void AssertTransition<TTransition, TState>(
+            this Option<Transition<TTransition, TState>> stateTransitionOption,
             State<TTransition, TState> expectedNextState,
             StateReducer<TTransition, TState> expectedReducer)
             where TTransition : notnull
         {
-            nextStateReducerOption.AssertSome(nextStateReducer =>
+            stateTransitionOption.AssertSome(transition =>
             {
-                var (nextState, reducer) = nextStateReducer;
+                var (nextState, reducer) = transition;
 
                 Assert.AreEqual(expectedNextState, nextState);
                 Assert.AreEqual(expectedReducer, reducer);
             });
         }
 
-        public static void AssertSomeNextState<TTransition, TState>(
-            this Option<NextState<TTransition, TState>> nextStateReducerOption,
+        public static void AssertTransition<TTransition, TState>(
+            this Option<Transition<TTransition, TState>> stateTransitionOption,
             State<TTransition, TState> expectedNextState,
             TState valueToReduce,
             TState expectedReducedValue)
             where TTransition : notnull
         {
-            var control = new AutomataControl<TTransition>(_ => { });
+            var runState = new AutomataRunState<TTransition>(_ => { });
 
-            nextStateReducerOption.AssertSome(nextStateReducer =>
+            stateTransitionOption.AssertSome(transition =>
             {
-                var (nextState, reducer) = nextStateReducer;
+                var (nextState, reducer) = transition;
 
                 Assert.AreEqual(expectedNextState, nextState);
-                Assert.AreEqual(expectedReducedValue, reducer(control, valueToReduce));
+                Assert.AreEqual(expectedReducedValue, reducer(runState, valueToReduce));
             });
         }
 
-        public static void AssertSomeAccepted<TTransition, TState>(
-            this Option<NextState<TTransition, TState>> nextStateReducerOption,
+        public static void AssertAccepted<TTransition, TState>(
+            this Option<Transition<TTransition, TState>> stateTransitionOption,
             StateReducer<TTransition, TState> expectedReducer)
             where TTransition : notnull
         {
-            nextStateReducerOption.AssertSome(nextStateReducer =>
+            stateTransitionOption.AssertSome(transition =>
             {
-                var (nextState, reducer) = nextStateReducer;
+                var (nextState, reducer) = transition;
 
                 Assert.AreEqual(StateType.Accepted, nextState.Type);
                 Assert.AreEqual(expectedReducer, reducer);
             });
         }
 
-        public static void AssertSomeAccepted<TTransition, TState>(
-            this Option<NextState<TTransition, TState>> nextStateReducerOption,
+        public static void AssertAccepted<TTransition, TState>(
+            this Option<Transition<TTransition, TState>> stateTransitionOption,
             TState valueToReduce,
             TState expectedReducedValue)
             where TTransition : notnull
         {
-            var control = new AutomataControl<TTransition>(_ => { });
+            var runState = new AutomataRunState<TTransition>(_ => { });
 
-            nextStateReducerOption.AssertSome(nextStateReducer =>
+            stateTransitionOption.AssertSome(transition =>
             {
-                var (nextState, reducer) = nextStateReducer;
+                var (nextState, reducer) = transition;
 
                 Assert.AreEqual(StateType.Accepted, nextState.Type);
-                Assert.AreEqual(expectedReducedValue, reducer(control, valueToReduce));
+                Assert.AreEqual(expectedReducedValue, reducer(runState, valueToReduce));
             });
         }
     }

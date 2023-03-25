@@ -6,7 +6,7 @@ namespace DFAutomaton
     public class State<TTransition, TState> : IState<TTransition, TState>
         where TTransition : notnull
     {
-        private readonly Dictionary<TTransition, NextState<TTransition, TState>> _nextStates = new();
+        private readonly Dictionary<TTransition, Transition<TTransition, TState>> _transitions = new();
 
         internal State(StateType type, Func<long> getNextId)
         {
@@ -21,14 +21,14 @@ namespace DFAutomaton
 
         public StateType Type { get; }
 
-        public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_nextStates.Keys);
+        public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_transitions.Keys);
 
-        public Option<NextState<TTransition, TState>> this[TTransition transition] =>
-            _nextStates.GetValueOrNone(transition);
+        public Option<Transition<TTransition, TState>> this[TTransition transition] =>
+            _transitions.GetValueOrNone(transition);
 
-        Option<Next<TTransition, TState>> IState<TTransition, TState>.this[TTransition transition] =>
-            _nextStates.GetValueOrNone(transition)
-                .Map(next => new Next<TTransition, TState>(next.State, next.Reducer));
+        Option<StateTransition<TTransition, TState>> IState<TTransition, TState>.this[TTransition transition] =>
+            _transitions.GetValueOrNone(transition)
+                .Map(next => new StateTransition<TTransition, TState>(next.NextState, next.Reducer));
 
         internal Func<long> GetNextId { get; }
 
@@ -40,12 +40,12 @@ namespace DFAutomaton
             if (Type == StateType.Accepted)
                 throw new InvalidOperationException("Cannot link a state to the accepted state.");
 
-            var (state, _) = _nextStates[transition] = new NextState<TTransition, TState>(nextState, reducer);
+            var (state, _) = _transitions[transition] = new Transition<TTransition, TState>(nextState, reducer);
 
             return state;
         }
 
-        internal IReadOnlyDictionary<TTransition, NextState<TTransition, TState>> GetNextStates() => _nextStates;
+        internal IReadOnlyDictionary<TTransition, Transition<TTransition, TState>> GetTransitions() => _transitions;
 
         public override string? ToString() => this.Format();
     }

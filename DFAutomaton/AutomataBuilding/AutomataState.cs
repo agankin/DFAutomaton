@@ -6,18 +6,18 @@ namespace DFAutomaton
     internal class AutomataState<TTransition, TState> : IState<TTransition, TState>
         where TTransition : notnull
     {
-        private readonly IReadOnlyDictionary<TTransition, Next<TTransition, TState>> _nextStates;
+        private readonly IReadOnlyDictionary<TTransition, StateTransition<TTransition, TState>> _transitions;
 
         internal AutomataState(
             long id,
             object? tag,
             StateType type,
-            IReadOnlyDictionary<TTransition, Next<TTransition, TState>> nextStates)
+            IReadOnlyDictionary<TTransition, StateTransition<TTransition, TState>> transitions)
         {
             Id = id;
             Tag = tag;
             Type = type;
-            _nextStates = nextStates;
+            _transitions = transitions;
         }
 
         public long Id { get; }
@@ -26,10 +26,10 @@ namespace DFAutomaton
 
         public StateType Type { get; }
 
-        public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_nextStates.Keys);
+        public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_transitions.Keys);
 
-        public Option<Next<TTransition, TState>> this[TTransition transition] =>
-            _nextStates.GetValueOrNone(transition);
+        public Option<StateTransition<TTransition, TState>> this[TTransition transition] =>
+            _transitions.GetValueOrNone(transition);
 
         public override string? ToString() => this.Format();
     }

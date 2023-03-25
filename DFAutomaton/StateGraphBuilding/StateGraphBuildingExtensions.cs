@@ -5,12 +5,12 @@
         public static State<TTransition, TState> ToNewState<TTransition, TState>(
             this State<TTransition, TState> current,
             TTransition transition,
-            TState nextStateValue)
+            TState newStateValue)
             where TTransition : notnull
         {
-            var reducer = ConstantReducer<TTransition, TState>(nextStateValue);
+            var newStateReducer = ConstantReducer<TTransition, TState>(newStateValue);
 
-            return current.ToNewState(transition, reducer);
+            return current.ToNewState(transition, newStateReducer);
         }
 
         public static State<TTransition, TState> ToNewState<TTransition, TState>(
@@ -19,9 +19,9 @@
             StateReducer<TTransition, TState> reducer)
             where TTransition : notnull
         {
-            var nextState = StateFactory<TTransition, TState>.SubState(current.GetNextId);
+            var newState = StateFactory<TTransition, TState>.SubState(current.GetNextId);
 
-            return current.LinkState(transition, nextState, reducer);
+            return current.LinkState(transition, newState, reducer);
         }
 
         public static State<TTransition, TState> LinkState<TTransition, TState>(
@@ -84,7 +84,8 @@
             return acceptedStateHandle;
         }
 
-        private static StateReducer<TTransition, TState> ConstantReducer<TTransition, TState>(TState newState) =>
-            (_, _) => newState;
+        private static StateReducer<TTransition, TState> ConstantReducer<TTransition, TState>(TState newStateValue)
+            where TTransition : notnull =>
+            (_, _) => newStateValue;
     }
 }

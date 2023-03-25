@@ -12,6 +12,6 @@ namespace DFAutomaton
 
         public IReadOnlySet<TTransition> Transitions { get; }
 
-        Option<Next<TTransition, TState>> this[TTransition transition] { get; }
+        Option<StateTransition<TTransition, TState>> this[TTransition transition] { get; }
     }
 }

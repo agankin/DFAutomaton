@@ -1,10 +1,10 @@
 ﻿namespace DFAutomaton
 {
-    public class AutomataControl<TTransition>
+    public class AutomataRunState<TTransition>
     {
         private readonly Action<TTransition> _emitNext;
 
-        public AutomataControl(Action<TTransition> emitNext) => _emitNext = emitNext;
+        public AutomataRunState(Action<TTransition> emitNext) => _emitNext = emitNext;
 
         public void EmitNext(TTransition transition) => _emitNext(transition);
     }
