@@ -1,16 +1,18 @@
-﻿using Optional.Collections;
+﻿using Optional;
+using Optional.Collections;
 
 namespace DFAutomaton
 {
     internal static class AutomataStateGraphBuilder
     {
-        public static IState<TTransition, TState> BuildAutomataGraph<TTransition, TState>(
+        public static Option<IState<TTransition, TState>, AutomataGraphError> BuildAutomataGraph<TTransition, TState>(
             this State<TTransition, TState> start)
             where TTransition : notnull
         {
             var buildedStates = new Dictionary<State<TTransition, TState>, AutomataState<TTransition, TState>>();
 
-            return start.ToAutomataState(buildedStates);
+            var startState = start.ToAutomataState(buildedStates);
+            return AutomataStateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState);
         }
 
         private static IState<TTransition, TState> ToAutomataState<TTransition, TState>(

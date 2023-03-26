@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Optional.Unsafe;
 
 namespace DFAutomaton.Tests
 {
@@ -9,7 +10,7 @@ namespace DFAutomaton.Tests
         public void TransitionsScenario()
         {
             var graph = ShoppingStateGraph.Create();
-            var start = graph.ShoppingState.BuildAutomataGraph();
+            var start = graph.ShoppingState.BuildAutomataGraph().AssertSome();
 
             var afterAddBread = start[ShoppingActions.AddBread];
             afterAddBread.AssertTransition(start, ShoppingStateReducers.AddBread);
@@ -35,8 +36,9 @@ namespace DFAutomaton.Tests
         [Test]
         public void TestTransitionNotExists()
         {
-            var startState = ShoppingStateGraph.Create().ShoppingState.BuildAutomataGraph();
-            var receive = startState[ShoppingActions.ReceiveGoods];
+            var stateGraph = ShoppingStateGraph.Create();
+            var start = stateGraph.ShoppingState.BuildAutomataGraph().AssertSome();
+            var receive = start[ShoppingActions.ReceiveGoods];
 
             receive.AssertNone();
         }

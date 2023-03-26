@@ -1,4 +1,6 @@
-﻿namespace DFAutomaton
+﻿using Optional;
+
+namespace DFAutomaton
 {
     public class AutomataBuilder<TTransition, TState> where TTransition : notnull
     {
@@ -13,11 +15,11 @@
             return new AutomataBuilder<TTransition, TState>(startState);
         }
 
-        public Automata<TTransition, TState> Build()
+        public Option<Automata<TTransition, TState>, AutomataGraphError> Build()
         {
-            var automataStartState = StartState.BuildAutomataGraph();
+            var startOrError = StartState.BuildAutomataGraph();
 
-            return new Automata<TTransition, TState>(automataStartState);
+            return startOrError.Map(start => new Automata<TTransition, TState>(start));
         }
     }
 }
