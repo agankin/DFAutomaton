@@ -24,5 +24,10 @@ namespace DFAutomaton.Tests
             option.Match(
                 _ => Assert.Fail("Expected None but optional value is Some."),
                 () => { });
+
+        public static void AssertNone<TValue, TError>(this Option<TValue, TError> option, Action<TError> onError) =>
+            option.Match(
+                _ => Assert.Fail("Expected None but optional value is Some."),
+                onError);
     }
 }

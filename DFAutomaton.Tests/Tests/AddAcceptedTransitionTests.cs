@@ -3,10 +3,10 @@
 namespace DFAutomaton.Tests
 {
     [TestFixture]
-    public class ToAcceptedStateTests
+    public class AddAcceptedTransitionTests
     {
         [Test]
-        public void ToNewWithReducer()
+        public void AddNewWithReducer()
         {
             var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
             var newStateHandle = startState.ToNewAccepted(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
@@ -15,7 +15,7 @@ namespace DFAutomaton.Tests
         }
 
         [Test]
-        public void ToNewConstantState()
+        public void AddNewConstantState()
         {
             var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
             var newValue = new ShoppingState(ShoppingStateType.GoodsPaid, 100);

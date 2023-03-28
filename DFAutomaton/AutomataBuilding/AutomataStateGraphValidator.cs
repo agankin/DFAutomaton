@@ -2,7 +2,7 @@
 
 namespace DFAutomaton
 {
-    public static class AutomataStateGraphValidator<TTransition, TState> where TTransition : notnull
+    internal static class AutomataStateGraphValidator<TTransition, TState> where TTransition : notnull
     {
         public static Option<IState<TTransition, TState>, AutomataGraphError> ValidateAnyReachAccepted(IState<TTransition, TState> startState)
         {
@@ -21,7 +21,7 @@ namespace DFAutomaton
 
             var errorOption = StateGraphVisitor<TTransition, TState>.VisitTillResult(
                 startState,
-                state => CanReachAccepted(startState, statesReachingAccepted)
+                state => CanReachAccepted(state, statesReachingAccepted)
                     ? Option.None<AutomataGraphError>()
                     : AutomataGraphError.AcceptedIsUnreachable.Some());
 
