@@ -3,14 +3,14 @@
 namespace DFAutomaton.Tests
 {
     [TestFixture]
-    public class AutomataStateGraphTests
+    public class AutomatonStateGraphTests
     {
         [Test]
         public void TransitionsScenario()
         {
             var graph = ShoppingStateGraph.Create();
 
-            graph.ShoppingState.BuildAutomataGraph().AssertSome(start =>
+            graph.ShoppingState.BuildAutomatonGraph().AssertSome(start =>
             {
                 var afterAddBread = start[ShoppingActions.AddBread];
                 afterAddBread.AssertTransition(start, ShoppingStateReducers.AddBread);
@@ -39,7 +39,7 @@ namespace DFAutomaton.Tests
         {
             var stateGraph = ShoppingStateGraph.Create();
 
-            stateGraph.ShoppingState.BuildAutomataGraph().AssertSome(start =>
+            stateGraph.ShoppingState.BuildAutomatonGraph().AssertSome(start =>
             {
                 var receive = start[ShoppingActions.ReceiveGoods];
                 receive.AssertNone();

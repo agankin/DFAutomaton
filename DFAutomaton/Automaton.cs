@@ -3,77 +3,77 @@ using Optional;
 
 namespace DFAutomaton
 {
-    public class Automata<TTransition, TState> where TTransition : notnull
+    public class Automaton<TTransition, TState> where TTransition : notnull
     {
-        public Automata(IState<TTransition, TState> start) => Start = start;
+        public Automaton(IState<TTransition, TState> start) => Start = start;
 
         public IState<TTransition, TState> Start { get; }
 
-        public Option<TState, AutomataError<TTransition, TState>> Run(TState startStateValue, IEnumerable<TTransition> transitions)
+        public Option<TState, AutomatonError<TTransition, TState>> Run(TState startStateValue, IEnumerable<TTransition> transitions)
         {
-            var initialAutomataState = new CurrentState(Start, startStateValue)
-                .Some<CurrentState, AutomataError<TTransition, TState>>();
+            var initialAutomatonState = new CurrentState(Start, startStateValue)
+                .Some<CurrentState, AutomatonError<TTransition, TState>>();
 
             var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
 
             return transitionsEnumerator.ToEnumerable()
                 .Aggregate(
-                    initialAutomataState,
-                    (automataState, transition) => Reduce(
+                    initialAutomatonState,
+                    (automatonState, transition) => Reduce(
                         transitionsEnumerator.QueueEmited,
-                        automataState,
+                        automatonState,
                         transition))
-                .Map(automataState => automataState.StateValue);
+                .Map(automatonState => automatonState.StateValue);
         }
 
-        private Option<CurrentState, AutomataError<TTransition, TState>> Reduce(
+        private Option<CurrentState, AutomatonError<TTransition, TState>> Reduce(
             Action<TTransition> emitNext,
-            Option<CurrentState, AutomataError<TTransition, TState>> currentState,
+            Option<CurrentState, AutomatonError<TTransition, TState>> currentState,
             TTransition transition)
         {
             return currentState.FlatMap(Reduce(emitNext, transition));
         }
 
-        private Func<CurrentState, Option<CurrentState, AutomataError<TTransition, TState>>> Reduce(
+        private Func<CurrentState, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(
             Action<TTransition> emitNext,
             TTransition transition)
         {
-            return automataState =>
+            return automatonState =>
             {
-                var (state, stateValue) = automataState;
+                var (state, stateValue) = automatonState;
 
                 return state[transition].Match(
                     Reduce(emitNext, stateValue),
-                    () => Option.None<CurrentState, AutomataError<TTransition, TState>>(
+                    () => Option.None<CurrentState, AutomatonError<TTransition, TState>>(
                         GetErrorForTransitionNotFound(state, transition)));
             };
         }
 
-        private Func<StateTransition<TTransition, TState>, Option<CurrentState, AutomataError<TTransition, TState>>> Reduce(
+        private Func<StateTransition<TTransition, TState>, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(
             Action<TTransition> emitNext,
             TState stateValue)
         {
-            return automataNextState =>
+            return automatonNextState =>
             {
-                var (nextState, reducer) = automataNextState;
-                var runState = new AutomataRunState<TTransition, TState>(nextState, emitNext);
+                var (nextState, reducer) = automatonNextState;
+                var runState = new AutomatonRunState<TTransition, TState>(nextState, emitNext);
                 var nextStateValue = reducer(runState, stateValue);
 
-                var nextAutomataState = new CurrentState(nextState, nextStateValue);
+                var nextAutomatonState = new CurrentState(nextState, nextStateValue);
 
-                return Option.Some<CurrentState, AutomataError<TTransition, TState>>(nextAutomataState);
+                return Option.Some<CurrentState, AutomatonError<TTransition, TState>>(nextAutomatonState);
             };
         }
 
-        private static AutomataError<TTransition, TState> GetErrorForTransitionNotFound(
+        private static AutomatonError<TTransition, TState> GetErrorForTransitionNotFound(
             IState<TTransition, TState> state,
             TTransition transition)
         {
             var errorType = state.Type == StateType.Accepted
-                ? AutomataErrorType.TransitionFromAccepted
-                : AutomataErrorType.TransitionNotExists;
+                ? AutomatonErrorType.TransitionFromAccepted
+                : AutomatonErrorType.TransitionNotExists;
 
-            return new AutomataError<TTransition, TState>(errorType, state, transition);
+            return new AutomatonError<TTransition, TState>(errorType, state, transition);
         }
 
         private readonly record struct CurrentState(

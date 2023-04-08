@@ -3,7 +3,7 @@ using Optional;
 
 namespace DFAutomaton.Tests
 {
-    public static class AssertAutomataStateExtensions
+    public static class AssertAutomatonStateExtensions
     {
         public static void AssertTransition<TTransition, TState>(
             this Option<StateTransition<TTransition, TState>> stateTransitionOption,

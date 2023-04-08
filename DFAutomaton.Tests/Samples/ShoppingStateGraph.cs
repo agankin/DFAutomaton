@@ -4,7 +4,7 @@ namespace DFAutomaton.Tests
 {
     public class ShoppingStateGraph
     {
-        public Automata<ShoppingActions, ShoppingState> Automaton { get; init; } = null!;
+        public Automaton<ShoppingActions, ShoppingState> Automaton { get; init; } = null!;
 
         public State<ShoppingActions, ShoppingState> ShoppingState { get; init; } = null!;
         
@@ -12,7 +12,7 @@ namespace DFAutomaton.Tests
 
         public static ShoppingStateGraph Create()
         {
-            var builder = AutomataBuilder<ShoppingActions, ShoppingState>.Create();
+            var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
             var shoppingState = builder.StartState;
 
             shoppingState.LinkState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread);

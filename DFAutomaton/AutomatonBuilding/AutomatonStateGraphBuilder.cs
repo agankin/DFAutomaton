@@ -3,60 +3,60 @@ using Optional.Collections;
 
 namespace DFAutomaton
 {
-    internal static class AutomataStateGraphBuilder
+    internal static class AutomatonStateGraphBuilder
     {
-        public static Option<IState<TTransition, TState>, AutomataGraphError> BuildAutomataGraph<TTransition, TState>(
+        public static Option<IState<TTransition, TState>, AutomatonGraphError> BuildAutomatonGraph<TTransition, TState>(
             this State<TTransition, TState> start)
             where TTransition : notnull
         {
-            var buildedStates = new Dictionary<State<TTransition, TState>, AutomataState<TTransition, TState>>();
+            var buildedStates = new Dictionary<State<TTransition, TState>, AutomatonState<TTransition, TState>>();
 
-            var startState = start.ToAutomataState(buildedStates);
-            return AutomataStateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState);
+            var startState = start.ToAutomatonState(buildedStates);
+            return AutomatonStateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState);
         }
 
-        private static IState<TTransition, TState> ToAutomataState<TTransition, TState>(
+        private static IState<TTransition, TState> ToAutomatonState<TTransition, TState>(
             this State<TTransition, TState> state,
-            IDictionary<State<TTransition, TState>, AutomataState<TTransition, TState>> buildedStates)
+            IDictionary<State<TTransition, TState>, AutomatonState<TTransition, TState>> buildedStates)
             where TTransition : notnull
         {
             var type = state.Type;
-            var automataNextStates = new Dictionary<TTransition, StateTransition<TTransition, TState>>();
-            var automataState = buildedStates[state] = new AutomataState<TTransition, TState>(
+            var automatonNextStates = new Dictionary<TTransition, StateTransition<TTransition, TState>>();
+            var automatonState = buildedStates[state] = new AutomatonState<TTransition, TState>(
                 state.Id,
                 state.Tag,
                 type,
-                automataNextStates);
+                automatonNextStates);
 
             state.GetTransitions()
-                .ToAutomataTransitions(buildedStates)
-                .CopyTo(automataNextStates);
+                .ToAutomatonTransitions(buildedStates)
+                .CopyTo(automatonNextStates);
 
-            return automataState;
+            return automatonState;
         }
 
-        private static IReadOnlyDictionary<TTransition, StateTransition<TTransition, TState>> ToAutomataTransitions<TTransition, TState>(
+        private static IReadOnlyDictionary<TTransition, StateTransition<TTransition, TState>> ToAutomatonTransitions<TTransition, TState>(
             this IReadOnlyDictionary<TTransition, Transition<TTransition, TState>> nextStates,
-            IDictionary<State<TTransition, TState>, AutomataState<TTransition, TState>> buildedStates)
+            IDictionary<State<TTransition, TState>, AutomatonState<TTransition, TState>> buildedStates)
             where TTransition : notnull
         {
             return nextStates.ToDictionary(
                 nextState => nextState.Key,
-                nextState => nextState.Value.ToAutomataTransition(buildedStates));
+                nextState => nextState.Value.ToAutomatonTransition(buildedStates));
         }
 
-        private static StateTransition<TTransition, TState> ToAutomataTransition<TTransition, TState>(
+        private static StateTransition<TTransition, TState> ToAutomatonTransition<TTransition, TState>(
             this Transition<TTransition, TState> nextState,
-            IDictionary<State<TTransition, TState>, AutomataState<TTransition, TState>> buildedStates)
+            IDictionary<State<TTransition, TState>, AutomatonState<TTransition, TState>> buildedStates)
             where TTransition : notnull
         {
             var (state, reducer) = nextState;
-            var automataState = buildedStates.GetValueOrNone(state)
+            var automatonState = buildedStates.GetValueOrNone(state)
                 .Match(
-                    automataState => automataState,
-                    () => state.ToAutomataState(buildedStates));
+                    automatonState => automatonState,
+                    () => state.ToAutomatonState(buildedStates));
 
-            return new StateTransition<TTransition, TState>(automataState, reducer);
+            return new StateTransition<TTransition, TState>(automatonState, reducer);
         }
 
         private static void CopyTo<TTransition, TState>(

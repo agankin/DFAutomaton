@@ -2,9 +2,9 @@
 
 namespace DFAutomaton
 {
-    internal static class AutomataStateGraphValidator<TTransition, TState> where TTransition : notnull
+    internal static class AutomatonStateGraphValidator<TTransition, TState> where TTransition : notnull
     {
-        public static Option<IState<TTransition, TState>, AutomataGraphError> ValidateAnyReachAccepted(IState<TTransition, TState> startState)
+        public static Option<IState<TTransition, TState>, AutomatonGraphError> ValidateAnyReachAccepted(IState<TTransition, TState> startState)
         {
             var statesReachingAccepted = new HashSet<IState<TTransition, TState>>();
 
@@ -17,17 +17,17 @@ namespace DFAutomaton
                 .ValueOr(false);
 
             if (!hasAccepted)
-                return Option.None<IState<TTransition, TState>, AutomataGraphError>(AutomataGraphError.NoAccepted);
+                return Option.None<IState<TTransition, TState>, AutomatonGraphError>(AutomatonGraphError.NoAccepted);
 
             var errorOption = StateGraphVisitor<TTransition, TState>.VisitTillResult(
                 startState,
                 state => CanReachAccepted(state, statesReachingAccepted)
-                    ? Option.None<AutomataGraphError>()
-                    : AutomataGraphError.AcceptedIsUnreachable.Some());
+                    ? Option.None<AutomatonGraphError>()
+                    : AutomatonGraphError.AcceptedIsUnreachable.Some());
 
             return errorOption
-                .Map(Option.None<IState<TTransition, TState>, AutomataGraphError>)
-                .ValueOr(startState.Some<IState<TTransition, TState>, AutomataGraphError>);
+                .Map(Option.None<IState<TTransition, TState>, AutomatonGraphError>)
+                .ValueOr(startState.Some<IState<TTransition, TState>, AutomatonGraphError>);
         }
 
         private static bool CanReachAccepted(

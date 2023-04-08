@@ -3,12 +3,12 @@ using Optional.Collections;
 
 namespace DFAutomaton
 {
-    internal class AutomataState<TTransition, TState> : IState<TTransition, TState>
+    internal class AutomatonState<TTransition, TState> : IState<TTransition, TState>
         where TTransition : notnull
     {
         private readonly IReadOnlyDictionary<TTransition, StateTransition<TTransition, TState>> _transitions;
 
-        internal AutomataState(
+        internal AutomatonState(
             long id,
             object? tag,
             StateType type,

@@ -42,7 +42,7 @@ namespace DFAutomaton.Tests
 
             automaton.Run(startState, transitions).AssertNone(error =>
             {
-                Assert.AreEqual(AutomataErrorType.TransitionNotExists, error.Type);
+                Assert.AreEqual(AutomatonErrorType.TransitionNotExists, error.Type);
                 Assert.AreEqual(ShoppingActions.ReceiveGoods, error.Transition);
             });
         }
@@ -65,7 +65,7 @@ namespace DFAutomaton.Tests
 
             automaton.Run(startState, transitions).AssertNone(error =>
             {
-                Assert.AreEqual(AutomataErrorType.TransitionFromAccepted, error.Type);
+                Assert.AreEqual(AutomatonErrorType.TransitionFromAccepted, error.Type);
                 Assert.AreEqual(ShoppingActions.PayForGoods, error.Transition);
             });
         }

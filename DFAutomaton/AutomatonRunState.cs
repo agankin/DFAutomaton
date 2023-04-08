@@ -1,10 +1,10 @@
 ﻿namespace DFAutomaton
 {
-    public readonly struct AutomataRunState<TTransition, TState> where TTransition : notnull
+    public readonly struct AutomatonRunState<TTransition, TState> where TTransition : notnull
     {
         private readonly Action<TTransition> _emitNext;
 
-        public AutomataRunState(IState<TTransition, TState> transitingTo, Action<TTransition> emitNext)
+        public AutomatonRunState(IState<TTransition, TState> transitingTo, Action<TTransition> emitNext)
         {
             TransitingTo = transitingTo;
             _emitNext = emitNext;

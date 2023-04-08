@@ -3,12 +3,12 @@
 namespace DFAutomaton.Tests
 {
     [TestFixture]
-    public class AutomataStateGraphValidationTests
+    public class AutomatonStateGraphValidationTests
     {
         [Test]
         public void BuildWithoutAccepted()
         {
-            var builder = AutomataBuilder<ShoppingActions, ShoppingState>.Create();
+            var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
             var shoppingState = builder.StartState;
 
             shoppingState
@@ -16,14 +16,14 @@ namespace DFAutomaton.Tests
                 .LinkState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter)
                 .ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
-            var automataOrError = builder.Build();
-            automataOrError.AssertNone(error => Assert.AreEqual(AutomataGraphError.NoAccepted, error));
+            var automatonOrError = builder.Build();
+            automatonOrError.AssertNone(error => Assert.AreEqual(AutomatonGraphError.NoAccepted, error));
         }
 
         [Test]
         public void BuildWithAcceptedUnreachable()
         {
-            var builder = AutomataBuilder<ShoppingActions, ShoppingState>.Create();
+            var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
             var shoppingState = builder.StartState;
 
             shoppingState
@@ -34,8 +34,8 @@ namespace DFAutomaton.Tests
             shoppingState
                 .ToNewState(ShoppingActions.AddButter, ShoppingStateReducers.AddButter);
 
-            var automataOrError = builder.Build();
-            automataOrError.AssertNone(error => Assert.AreEqual(AutomataGraphError.AcceptedIsUnreachable, error));
+            var automatonOrError = builder.Build();
+            automatonOrError.AssertNone(error => Assert.AreEqual(AutomatonGraphError.AcceptedIsUnreachable, error));
         }
     }
 }
