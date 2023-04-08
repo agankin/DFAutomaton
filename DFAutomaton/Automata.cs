@@ -9,10 +9,10 @@ namespace DFAutomaton
 
         public IState<TTransition, TState> Start { get; }
 
-        public Option<TState, AutomataError> Run(TState startStateValue, IEnumerable<TTransition> transitions)
+        public Option<TState, AutomataError<TTransition, TState>> Run(TState startStateValue, IEnumerable<TTransition> transitions)
         {
-            var initialAutomataState = Option.Some<CurrentState, AutomataError>(
-                new CurrentState(Start, startStateValue));
+            var initialAutomataState = new CurrentState(Start, startStateValue)
+                .Some<CurrentState, AutomataError<TTransition, TState>>();
 
             var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
 
@@ -26,15 +26,15 @@ namespace DFAutomaton
                 .Map(automataState => automataState.StateValue);
         }
 
-        private Option<CurrentState, AutomataError> Reduce(
+        private Option<CurrentState, AutomataError<TTransition, TState>> Reduce(
             Action<TTransition> emitNext,
-            Option<CurrentState, AutomataError> currentState,
+            Option<CurrentState, AutomataError<TTransition, TState>> currentState,
             TTransition transition)
         {
             return currentState.FlatMap(Reduce(emitNext, transition));
         }
 
-        private Func<CurrentState, Option<CurrentState, AutomataError>> Reduce(
+        private Func<CurrentState, Option<CurrentState, AutomataError<TTransition, TState>>> Reduce(
             Action<TTransition> emitNext,
             TTransition transition)
         {
@@ -44,11 +44,12 @@ namespace DFAutomaton
 
                 return state[transition].Match(
                     Reduce(emitNext, stateValue),
-                    () => Option.None<CurrentState, AutomataError>(Error(AutomataErrorType.TransitionNotExists)));
+                    () => Option.None<CurrentState, AutomataError<TTransition, TState>>(
+                        GetErrorForTransitionNotFound(state, transition)));
             };
         }
 
-        private Func<StateTransition<TTransition, TState>, Option<CurrentState, AutomataError>> Reduce(
+        private Func<StateTransition<TTransition, TState>, Option<CurrentState, AutomataError<TTransition, TState>>> Reduce(
             Action<TTransition> emitNext,
             TState stateValue)
         {
@@ -60,11 +61,20 @@ namespace DFAutomaton
 
                 var nextAutomataState = new CurrentState(nextState, nextStateValue);
 
-                return Option.Some<CurrentState, AutomataError>(nextAutomataState);
+                return Option.Some<CurrentState, AutomataError<TTransition, TState>>(nextAutomataState);
             };
         }
 
-        private static AutomataError Error(AutomataErrorType type) => new AutomataError(type);
+        private static AutomataError<TTransition, TState> GetErrorForTransitionNotFound(
+            IState<TTransition, TState> state,
+            TTransition transition)
+        {
+            var errorType = state.Type == StateType.Accepted
+                ? AutomataErrorType.TransitionFromAccepted
+                : AutomataErrorType.TransitionNotExists;
+
+            return new AutomataError<TTransition, TState>(errorType, state, transition);
+        }
 
         private readonly record struct CurrentState(
             IState<TTransition, TState> State,

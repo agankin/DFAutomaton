@@ -13,12 +13,10 @@ namespace DFAutomaton.Tests
                 onSome,
                 () => Assert.Fail("Expected Some but optional value is None."));
 
-        public static TValue AssertSome<TValue, TError>(this Option<TValue, TError> option) =>
-            option.ValueOr(error =>
-            {
-                Assert.Fail($"Expected Some but optional value is Error: {error}.");
-                throw new Exception("No Some value to return.");
-            });
+        public static void AssertSome<TValue, TError>(this Option<TValue, TError> option, Action<TValue> onSome) =>
+            option.Match(
+                onSome,
+                error => Assert.Fail($"Expected Some but optional value is None: {error}."));
 
         public static void AssertNone<TValue>(this Option<TValue> option) =>
             option.Match(
