@@ -1,11 +1,10 @@
-﻿namespace DFAutomaton.Utils
+﻿namespace DFAutomaton.Utils;
+
+internal static class StateIdGenerator
 {
-    internal static class StateIdGenerator
+    public static Func<long> CreateNew()
     {
-        public static Func<long> CreateNew()
-        {
-            long currentId = 0;
-            return () => currentId++;
-        }
+        long currentId = 0;
+        return () => currentId++;
     }
 }

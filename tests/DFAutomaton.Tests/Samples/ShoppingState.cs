@@ -1,13 +1,12 @@
-﻿namespace DFAutomaton.Tests
+﻿namespace DFAutomaton.Tests;
+
+public readonly record struct ShoppingState(ShoppingStateType Type, decimal GoodsCost);
+
+public enum ShoppingStateType
 {
-    public readonly record struct ShoppingState(ShoppingStateType Type, decimal GoodsCost);
+    Shopping = 1,
 
-    public enum ShoppingStateType
-    {
-        Shopping = 1,
+    GoodsPaid,
 
-        GoodsPaid,
-
-        GoodsPurchased
-    }
+    GoodsPurchased
 }

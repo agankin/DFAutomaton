@@ -1,17 +1,16 @@
 ﻿using Optional;
 
-namespace DFAutomaton
+namespace DFAutomaton;
+
+public interface IState<TTransition, TState> where TTransition : notnull
 {
-    public interface IState<TTransition, TState> where TTransition : notnull
-    {
-        long Id { get; }
+    long Id { get; }
 
-        object? Tag { get; }
+    object? Tag { get; }
 
-        public StateType Type { get; }
+    public StateType Type { get; }
 
-        public IReadOnlySet<TTransition> Transitions { get; }
+    public IReadOnlySet<TTransition> Transitions { get; }
 
-        Option<StateTransition<TTransition, TState>> this[TTransition transition] { get; }
-    }
+    Option<StateTransition<TTransition, TState>> this[TTransition transition] { get; }
 }

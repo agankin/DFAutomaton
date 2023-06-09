@@ -1,33 +1,32 @@
 ﻿using Optional.Unsafe;
 
-namespace DFAutomaton.Tests
+namespace DFAutomaton.Tests;
+
+public class ShoppingStateGraph
 {
-    public class ShoppingStateGraph
+    public Automaton<ShoppingActions, ShoppingState> Automaton { get; init; } = null!;
+
+    public State<ShoppingActions, ShoppingState> ShoppingState { get; init; } = null!;
+    
+    public State<ShoppingActions, ShoppingState> PaidState { get; init; } = null!;
+
+    public static ShoppingStateGraph Create()
     {
-        public Automaton<ShoppingActions, ShoppingState> Automaton { get; init; } = null!;
+        var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
+        var shoppingState = builder.StartState;
 
-        public State<ShoppingActions, ShoppingState> ShoppingState { get; init; } = null!;
-        
-        public State<ShoppingActions, ShoppingState> PaidState { get; init; } = null!;
+        shoppingState.LinkState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread);
+        shoppingState.LinkState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter);
+        var paidState = shoppingState
+            .ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
+        paidState
+            .ToNewAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
 
-        public static ShoppingStateGraph Create()
+        return new ShoppingStateGraph
         {
-            var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
-            var shoppingState = builder.StartState;
-
-            shoppingState.LinkState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread);
-            shoppingState.LinkState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter);
-            var paidState = shoppingState
-                .ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
-            paidState
-                .ToNewAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
-
-            return new ShoppingStateGraph
-            {
-                Automaton = builder.Build().ValueOrFailure(),
-                ShoppingState = shoppingState,
-                PaidState = paidState
-            };
-        }
+            Automaton = builder.Build().ValueOrFailure(),
+            ShoppingState = shoppingState,
+            PaidState = paidState
+        };
     }
 }

@@ -1,69 +1,68 @@
 ﻿using Optional;
 
-namespace DFAutomaton
+namespace DFAutomaton;
+
+internal static class AutomatonStateGraphValidator<TTransition, TState> where TTransition : notnull
 {
-    internal static class AutomatonStateGraphValidator<TTransition, TState> where TTransition : notnull
+    public static Option<IState<TTransition, TState>, AutomatonGraphError> ValidateAnyReachAccepted(IState<TTransition, TState> startState)
     {
-        public static Option<IState<TTransition, TState>, AutomatonGraphError> ValidateAnyReachAccepted(IState<TTransition, TState> startState)
-        {
-            var statesReachingAccepted = new HashSet<IState<TTransition, TState>>();
+        var statesReachingAccepted = new HashSet<IState<TTransition, TState>>();
 
-            var hasAccepted = StateGraphVisitor<TTransition, TState>
-                .VisitTillResult(
-                    startState,
-                    state => state.Type == StateType.Accepted
-                        ? true.Some()
-                        : Option.None<bool>())
-                .ValueOr(false);
-
-            if (!hasAccepted)
-                return Option.None<IState<TTransition, TState>, AutomatonGraphError>(AutomatonGraphError.NoAccepted);
-
-            var errorOption = StateGraphVisitor<TTransition, TState>.VisitTillResult(
+        var hasAccepted = StateGraphVisitor<TTransition, TState>
+            .VisitTillResult(
                 startState,
-                state => CanReachAccepted(state, statesReachingAccepted)
-                    ? Option.None<AutomatonGraphError>()
-                    : AutomatonGraphError.AcceptedIsUnreachable.Some());
+                state => state.Type == StateType.Accepted
+                    ? true.Some()
+                    : Option.None<bool>())
+            .ValueOr(false);
 
-            return errorOption
-                .Map(Option.None<IState<TTransition, TState>, AutomatonGraphError>)
-                .ValueOr(startState.Some<IState<TTransition, TState>, AutomatonGraphError>);
-        }
+        if (!hasAccepted)
+            return Option.None<IState<TTransition, TState>, AutomatonGraphError>(AutomatonGraphError.NoAccepted);
 
-        private static bool CanReachAccepted(
-            IState<TTransition, TState> state,
-            ISet<IState<TTransition, TState>> statesReachingAccepted)
-        {
-            var visitedStates = new HashSet<IState<TTransition, TState>>();
+        var errorOption = StateGraphVisitor<TTransition, TState>.VisitTillResult(
+            startState,
+            state => CanReachAccepted(state, statesReachingAccepted)
+                ? Option.None<AutomatonGraphError>()
+                : AutomatonGraphError.AcceptedIsUnreachable.Some());
 
-            return CanReachAccepted(state, visitedStates, statesReachingAccepted);
-        }
+        return errorOption
+            .Map(Option.None<IState<TTransition, TState>, AutomatonGraphError>)
+            .ValueOr(startState.Some<IState<TTransition, TState>, AutomatonGraphError>);
+    }
 
-        private static bool CanReachAccepted(
-            IState<TTransition, TState> state,
-            ISet<IState<TTransition, TState>> visitedStates,
-            ISet<IState<TTransition, TState>> statesReachingAccepted)
-        {
-            if (state.Type == StateType.Accepted)
-                return true;
+    private static bool CanReachAccepted(
+        IState<TTransition, TState> state,
+        ISet<IState<TTransition, TState>> statesReachingAccepted)
+    {
+        var visitedStates = new HashSet<IState<TTransition, TState>>();
 
-            if (statesReachingAccepted.Contains(state))
-                return true;
+        return CanReachAccepted(state, visitedStates, statesReachingAccepted);
+    }
 
-            if (visitedStates.Contains(state))
-                return false;
+    private static bool CanReachAccepted(
+        IState<TTransition, TState> state,
+        ISet<IState<TTransition, TState>> visitedStates,
+        ISet<IState<TTransition, TState>> statesReachingAccepted)
+    {
+        if (state.Type == StateType.Accepted)
+            return true;
 
-            visitedStates.Add(state);
+        if (statesReachingAccepted.Contains(state))
+            return true;
 
-            var canReachAccepted = state.Transitions
-                .Any(transition => state[transition]
-                    .Map(t => CanReachAccepted(t.NextState, visitedStates, statesReachingAccepted))
-                    .ValueOr(false));
+        if (visitedStates.Contains(state))
+            return false;
 
-            if (canReachAccepted)
-                statesReachingAccepted.Add(state);
+        visitedStates.Add(state);
 
-            return canReachAccepted;
-        }
+        var canReachAccepted = state.Transitions
+            .Any(transition => state[transition]
+                .Map(t => CanReachAccepted(t.NextState, visitedStates, statesReachingAccepted))
+                .ValueOr(false));
+
+        if (canReachAccepted)
+            statesReachingAccepted.Add(state);
+
+        return canReachAccepted;
     }
 }

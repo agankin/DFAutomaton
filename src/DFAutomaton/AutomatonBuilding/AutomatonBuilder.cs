@@ -1,25 +1,24 @@
 ﻿using Optional;
 
-namespace DFAutomaton
+namespace DFAutomaton;
+
+public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
 {
-    public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
+    private AutomatonBuilder(State<TTransition, TState> startState) => StartState = startState;
+
+    public State<TTransition, TState> StartState { get; }
+
+    public static AutomatonBuilder<TTransition, TState> Create()
     {
-        private AutomatonBuilder(State<TTransition, TState> startState) => StartState = startState;
+        var startState = StateFactory<TTransition, TState>.Start();
 
-        public State<TTransition, TState> StartState { get; }
+        return new AutomatonBuilder<TTransition, TState>(startState);
+    }
 
-        public static AutomatonBuilder<TTransition, TState> Create()
-        {
-            var startState = StateFactory<TTransition, TState>.Start();
+    public Option<Automaton<TTransition, TState>, AutomatonGraphError> Build()
+    {
+        var startOrError = StartState.BuildAutomatonGraph();
 
-            return new AutomatonBuilder<TTransition, TState>(startState);
-        }
-
-        public Option<Automaton<TTransition, TState>, AutomatonGraphError> Build()
-        {
-            var startOrError = StartState.BuildAutomatonGraph();
-
-            return startOrError.Map(start => new Automaton<TTransition, TState>(start));
-        }
+        return startOrError.Map(start => new Automaton<TTransition, TState>(start));
     }
 }

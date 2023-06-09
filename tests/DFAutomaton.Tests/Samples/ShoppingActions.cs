@@ -1,13 +1,12 @@
-﻿namespace DFAutomaton.Tests
+﻿namespace DFAutomaton.Tests;
+
+public enum ShoppingActions
 {
-    public enum ShoppingActions
-    {
-        AddBread = 1,
+    AddBread = 1,
 
-        AddButter,
+    AddButter,
 
-        PayForGoods,
+    PayForGoods,
 
-        ReceiveGoods
-    }
+    ReceiveGoods
 }

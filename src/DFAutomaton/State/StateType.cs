@@ -1,11 +1,10 @@
-﻿namespace DFAutomaton
+﻿namespace DFAutomaton;
+
+public enum StateType
 {
-    public enum StateType
-    {
-        Start = 1,
+    Start = 1,
 
-        SubState,
+    SubState,
 
-        Accepted
-    }
+    Accepted
 }
