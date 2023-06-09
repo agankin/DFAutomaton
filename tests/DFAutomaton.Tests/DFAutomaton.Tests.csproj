@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DFAutomaton\DFAutomaton.csproj" />
+    <ProjectReference Include="..\..\src\DFAutomaton\DFAutomaton.csproj" />
   </ItemGroup>
 
 </Project>
