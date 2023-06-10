@@ -6,13 +6,16 @@ namespace DFAutomaton;
 internal static class AutomatonStateGraphBuilder
 {
     public static Option<IState<TTransition, TState>, AutomatonGraphError> BuildAutomatonGraph<TTransition, TState>(
-        this State<TTransition, TState> start)
+        this State<TTransition, TState> start,
+        BuildConfiguration configuration)
         where TTransition : notnull
     {
         var buildedStates = new Dictionary<State<TTransition, TState>, AutomatonState<TTransition, TState>>();
-
-        var startState = start.ToAutomatonState(buildedStates);
-        return AutomatonStateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState);
+        var startState = start.ToAutomatonState(buildedStates).Some<IState<TTransition, TState>, AutomatonGraphError>();
+        
+        return configuration.ValidateAnyReachesAccepted
+            ? startState.FlatMap(AutomatonStateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted)
+            : startState;
     }
 
     private static IState<TTransition, TState> ToAutomatonState<TTransition, TState>(
@@ -21,12 +24,8 @@ internal static class AutomatonStateGraphBuilder
         where TTransition : notnull
     {
         var type = state.Type;
-        var automatonNextStates = new Dictionary<TTransition, StateTransition<TTransition, TState>>();
-        var automatonState = buildedStates[state] = new AutomatonState<TTransition, TState>(
-            state.Id,
-            state.Tag,
-            type,
-            automatonNextStates);
+        var automatonNextStates = new StateTransitionDict<TTransition, TState>();
+        var automatonState = buildedStates[state] = new(state.Id, state.Tag, type, automatonNextStates);
 
         state.GetTransitions()
             .ToAutomatonTransitions(buildedStates)
@@ -35,14 +34,16 @@ internal static class AutomatonStateGraphBuilder
         return automatonState;
     }
 
-    private static IReadOnlyDictionary<TTransition, StateTransition<TTransition, TState>> ToAutomatonTransitions<TTransition, TState>(
-        this IReadOnlyDictionary<TTransition, Transition<TTransition, TState>> nextStates,
+    private static IStateTransitionDict<TTransition, TState> ToAutomatonTransitions<TTransition, TState>(
+        this ITransitionDict<TTransition, TState> nextStates,
         IDictionary<State<TTransition, TState>, AutomatonState<TTransition, TState>> buildedStates)
         where TTransition : notnull
     {
-        return nextStates.ToDictionary(
+        var dictionary = nextStates.ToDictionary(
             nextState => nextState.Key,
             nextState => nextState.Value.ToAutomatonTransition(buildedStates));
+
+        return new StateTransitionDict<TTransition, TState>(dictionary);
     }
 
     private static StateTransition<TTransition, TState> ToAutomatonTransition<TTransition, TState>(

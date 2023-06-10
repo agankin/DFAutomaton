@@ -7,7 +7,6 @@ internal static class StateFactory<TTransition, TState> where TTransition : notn
     public static State<TTransition, TState> Start()
     {
         var getNextId = StateIdGenerator.CreateNew();
-
         return new State<TTransition, TState>(StateType.Start, getNextId);
     }
 

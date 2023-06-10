@@ -9,7 +9,6 @@ public static class StateGraphBuildingExtensions
         where TTransition : notnull
     {
         var newStateReducer = ConstantReducer<TTransition, TState>(newStateValue);
-
         return current.ToNewState(transition, newStateReducer);
     }
 
@@ -20,7 +19,6 @@ public static class StateGraphBuildingExtensions
         where TTransition : notnull
     {
         var newState = StateFactory<TTransition, TState>.SubState(current.GetNextId);
-
         return current.LinkState(transition, newState, reducer);
     }
 
@@ -32,7 +30,6 @@ public static class StateGraphBuildingExtensions
         where TTransition : notnull
     {
         var reducer = ConstantReducer<TTransition, TState>(nextStateValue);
-        
         return current.LinkState(transition, nextState, reducer);
     }
 
@@ -43,7 +40,6 @@ public static class StateGraphBuildingExtensions
         where TTransition : notnull
     {
         var reducer = ConstantReducer<TTransition, TState>(acceptedStateValue);
-        
         return current.ToNewAccepted(transition, reducer);
     }
 
@@ -67,7 +63,6 @@ public static class StateGraphBuildingExtensions
         where TTransition : notnull
     {
         var reducer = ConstantReducer<TTransition, TState>(acceptedStateValue);
-        
         return current.LinkAccepted(transition, acceptedStateHandle, reducer);
     }
 
@@ -84,7 +79,6 @@ public static class StateGraphBuildingExtensions
         return acceptedStateHandle;
     }
 
-    private static StateReducer<TTransition, TState> ConstantReducer<TTransition, TState>(TState newStateValue)
-        where TTransition : notnull =>
+    private static StateReducer<TTransition, TState> ConstantReducer<TTransition, TState>(TState newStateValue) where TTransition : notnull =>
         (_, _) => newStateValue;
 }

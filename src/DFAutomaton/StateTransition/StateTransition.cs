@@ -2,5 +2,5 @@
 
 public readonly record struct StateTransition<TTransition, TState>(
     IState<TTransition, TState> NextState,
-    StateReducer<TTransition, TState> Reducer)
-    where TTransition : notnull;
+    StateReducer<TTransition, TState> Reducer
+) where TTransition : notnull;

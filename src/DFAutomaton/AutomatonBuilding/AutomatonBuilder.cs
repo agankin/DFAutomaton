@@ -11,14 +11,14 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     public static AutomatonBuilder<TTransition, TState> Create()
     {
         var startState = StateFactory<TTransition, TState>.Start();
-
         return new AutomatonBuilder<TTransition, TState>(startState);
     }
 
-    public Option<Automaton<TTransition, TState>, AutomatonGraphError> Build()
+    public Option<Automaton<TTransition, TState>, AutomatonGraphError> Build(Func<BuildConfiguration, BuildConfiguration>? configure = null)
     {
-        var startOrError = StartState.BuildAutomatonGraph();
+        var configuration = (configure ?? (config => config))(BuildConfiguration.Default);
+        var startOrError = StartState.BuildAutomatonGraph(configuration);
 
-        return startOrError.Map(start => new Automaton<TTransition, TState>(start));
+        return startOrError.Map<Automaton<TTransition, TState>>(start => new(start));
     }
 }
