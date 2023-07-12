@@ -1,10 +1,16 @@
-﻿namespace DFAutomaton;
+﻿using Optional;
+
+namespace DFAutomaton;
 
 public static class StateExtensions
 {
-    public static IState<TTransition, TState> AsImmutable<TTransition, TState>(this State<TTransition, TState> current)
+    public static Option<IState<TTransition, TState>, StateError> Complete<TTransition, TState>(this State<TTransition, TState> start, BuildConfiguration configuration)
         where TTransition : notnull
-        => current;
+    {
+        return configuration.ValidateAnyReachesAccepted
+            ? start.AsImmutable().ValidateAnyReachAccepted()
+            : start.AsImmutable().Some<IState<TTransition, TState>, StateError>();
+    }
 
     public static State<TTransition, TState> ToNewState<TTransition, TState>(
         this State<TTransition, TState> current,
@@ -85,4 +91,8 @@ public static class StateExtensions
 
     private static StateReducer<TTransition, TState> ConstantReducer<TTransition, TState>(TState newStateValue) where TTransition : notnull =>
         (_, _) => newStateValue;
+
+    private static IState<TTransition, TState> AsImmutable<TTransition, TState>(this State<TTransition, TState> current)
+        where TTransition : notnull
+        => current;
 }

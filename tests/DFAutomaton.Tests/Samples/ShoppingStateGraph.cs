@@ -13,7 +13,7 @@ public class ShoppingStateGraph
     public static ShoppingStateGraph Create()
     {
         var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
-        var shoppingState = builder.StartState;
+        var shoppingState = builder.Start;
 
         shoppingState.LinkState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread);
         shoppingState.LinkState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter);

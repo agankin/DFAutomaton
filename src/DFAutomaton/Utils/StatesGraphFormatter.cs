@@ -4,10 +4,10 @@ namespace DFAutomaton.Utils;
 
 public static class StatesGraphFormatter<TTransition, TState> where TTransition : notnull
 {
-    public static string Format(IState<TTransition, TState> startState)
+    public static string Format(IState<TTransition, TState> start)
     {
         var formattedStates = new HashSet<IState<TTransition, TState>>();
-        var lines = GetStateLines(startState, formattedStates);
+        var lines = GetStateLines(start, formattedStates);
 
         return string.Join(Environment.NewLine, lines);
     }

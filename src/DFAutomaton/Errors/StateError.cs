@@ -1,6 +1,6 @@
 ﻿namespace DFAutomaton;
 
-public enum AutomatonGraphError
+public enum StateError
 {
     NoAccepted = 1,
 

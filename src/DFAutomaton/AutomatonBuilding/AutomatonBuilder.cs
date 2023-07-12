@@ -4,20 +4,20 @@ namespace DFAutomaton;
 
 public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
 {
-    private AutomatonBuilder(State<TTransition, TState> startState) => StartState = startState;
+    private AutomatonBuilder(State<TTransition, TState> start) => Start = start;
 
-    public State<TTransition, TState> StartState { get; }
+    public State<TTransition, TState> Start { get; }
 
     public static AutomatonBuilder<TTransition, TState> Create()
     {
-        var startState = StateFactory<TTransition, TState>.Start();
-        return new AutomatonBuilder<TTransition, TState>(startState);
+        var start = StateFactory<TTransition, TState>.Start();
+        return new AutomatonBuilder<TTransition, TState>(start);
     }
 
-    public Option<Automaton<TTransition, TState>, AutomatonGraphError> Build(Func<BuildConfiguration, BuildConfiguration>? configure = null)
+    public Option<Automaton<TTransition, TState>, StateError> Build(Func<BuildConfiguration, BuildConfiguration>? configure = null)
     {
         var configuration = (configure ?? (config => config))(BuildConfiguration.Default);
-        var startOrError = StartState.Complete(configuration);
+        var startOrError = Start.Complete(configuration);
 
         return startOrError.Map<Automaton<TTransition, TState>>(start => new(start));
     }

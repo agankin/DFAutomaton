@@ -2,14 +2,14 @@
 
 namespace DFAutomaton;
 
-internal static class StateGraphVisitor<TTransition, TState> where TTransition : notnull
+internal static class StateVisitor<TTransition, TState> where TTransition : notnull
 {
     public static Option<TResult> VisitTillResult<TResult>(
-        IState<TTransition, TState> startState,
+        IState<TTransition, TState> start,
         Func<IState<TTransition, TState>, Option<TResult>> visit)
     {
         var visitedStates = new HashSet<IState<TTransition, TState>>();
-        return VisitTillResult(startState, visit, visitedStates);
+        return VisitTillResult(start, visit, visitedStates);
     }
 
     private static Option<TResult> VisitTillResult<TResult>(

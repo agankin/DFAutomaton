@@ -4,29 +4,29 @@ namespace DFAutomaton;
 
 internal static class AutomatonStateGraphValidator
 {
-    public static Option<IState<TTransition, TState>, AutomatonGraphError> ValidateAnyReachAccepted<TTransition, TState>(this IState<TTransition, TState> startState)
+    public static Option<IState<TTransition, TState>, StateError> ValidateAnyReachAccepted<TTransition, TState>(this IState<TTransition, TState> start)
         where TTransition : notnull
     {
         var statesReachingAccepted = new HashSet<IState<TTransition, TState>>();
 
-        var hasAccepted = StateGraphVisitor<TTransition, TState>
+        var hasAccepted = StateVisitor<TTransition, TState>
             .VisitTillResult(
-                startState,
+                start,
                 state => state.Type == StateType.Accepted ? true.Some() : Option.None<bool>())
             .ValueOr(false);
 
         if (!hasAccepted)
-            return Option.None<IState<TTransition, TState>, AutomatonGraphError>(AutomatonGraphError.NoAccepted);
+            return Option.None<IState<TTransition, TState>, StateError>(StateError.NoAccepted);
 
-        var errorOption = StateGraphVisitor<TTransition, TState>.VisitTillResult(
-            startState,
+        var errorOption = StateVisitor<TTransition, TState>.VisitTillResult(
+            start,
             state => CanReachAccepted(state, statesReachingAccepted)
-                ? Option.None<AutomatonGraphError>()
-                : AutomatonGraphError.AcceptedIsUnreachable.Some());
+                ? Option.None<StateError>()
+                : StateError.AcceptedIsUnreachable.Some());
 
         return errorOption
-            .Map(Option.None<IState<TTransition, TState>, AutomatonGraphError>)
-            .ValueOr(startState.Some<IState<TTransition, TState>, AutomatonGraphError>);
+            .Map(Option.None<IState<TTransition, TState>, StateError>)
+            .ValueOr(start.Some<IState<TTransition, TState>, StateError>);
     }
 
     private static bool CanReachAccepted<TTransition, TState>(

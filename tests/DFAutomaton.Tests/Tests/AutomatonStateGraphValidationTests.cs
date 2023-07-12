@@ -9,7 +9,7 @@ public class AutomatonStateGraphValidationTests
     public void BuildWithoutAccepted()
     {
         var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
-        var shoppingState = builder.StartState;
+        var shoppingState = builder.Start;
 
         shoppingState
             .LinkState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread)
@@ -17,14 +17,14 @@ public class AutomatonStateGraphValidationTests
             .ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
         var automatonOrError = builder.Build();
-        automatonOrError.AssertNone(error => Assert.AreEqual(AutomatonGraphError.NoAccepted, error));
+        automatonOrError.AssertNone(error => Assert.AreEqual(StateError.NoAccepted, error));
     }
 
     [Test]
     public void BuildWithAcceptedUnreachable()
     {
         var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
-        var shoppingState = builder.StartState;
+        var shoppingState = builder.Start;
 
         shoppingState
             .ToNewState(ShoppingActions.AddBread, ShoppingStateReducers.AddBread)
@@ -35,6 +35,6 @@ public class AutomatonStateGraphValidationTests
             .ToNewState(ShoppingActions.AddButter, ShoppingStateReducers.AddButter);
 
         var automatonOrError = builder.Build();
-        automatonOrError.AssertNone(error => Assert.AreEqual(AutomatonGraphError.AcceptedIsUnreachable, error));
+        automatonOrError.AssertNone(error => Assert.AreEqual(StateError.AcceptedIsUnreachable, error));
     }
 }

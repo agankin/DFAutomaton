@@ -9,9 +9,9 @@ public class Automaton<TTransition, TState> where TTransition : notnull
 
     public IState<TTransition, TState> Start { get; }
 
-    public Option<TState, AutomatonError<TTransition, TState>> Run(TState startStateValue, IEnumerable<TTransition> transitions)
+    public Option<TState, AutomatonError<TTransition, TState>> Run(TState startValue, IEnumerable<TTransition> transitions)
     {
-        var initialState = new CurrentState(Start, startStateValue).Some<CurrentState, AutomatonError<TTransition, TState>>();
+        var initialState = new CurrentState(Start, startValue).Some<CurrentState, AutomatonError<TTransition, TState>>();
         var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
 
         return transitionsEnumerator.ToEnumerable()

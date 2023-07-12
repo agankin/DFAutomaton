@@ -8,58 +8,53 @@ public class AddTransitionTests
     [Test]
     public void AddNewStateWithReducer()
     {
-        var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = startState.ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
+        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
+        var newState = start.ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
         Assert.AreEqual(StateType.SubState, newState.Type);
-        startState[ShoppingActions.PayForGoods].AssertTransition(
-            newState,
-            ShoppingStateReducers.PayForGoods);
+        start[ShoppingActions.PayForGoods].AssertTransition(newState, ShoppingStateReducers.PayForGoods);
     }
 
     [Test]
     public void AddNewConstantState()
     {
-        var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
+        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
         var newValue = new ShoppingState(ShoppingStateType.GoodsPaid, 100);
-        var newState = startState.ToNewState(ShoppingActions.PayForGoods, newValue);
+        var newState = start.ToNewState(ShoppingActions.PayForGoods, newValue);
 
         Assert.AreEqual(StateType.SubState, newState.Type);
 
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        startState[ShoppingActions.PayForGoods]
-            .AssertTransition(newState, initialValue, newValue);
+        start[ShoppingActions.PayForGoods].AssertTransition(newState, initialValue, newValue);
     }
 
     [Test]
     public void LinkExistingStateWithReducer()
     {
-        var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(startState.GetNextId);
+        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
+        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GetNextId);
         
-        var newLinkedState = startState.LinkState(
+        var newLinkedState = start.LinkState(
             ShoppingActions.AddBread,
             newState,
             ShoppingStateReducers.AddBread);
 
         Assert.AreEqual(newState, newLinkedState);
-        startState[ShoppingActions.AddBread]
-            .AssertTransition(newState, ShoppingStateReducers.AddBread);
+        start[ShoppingActions.AddBread].AssertTransition(newState, ShoppingStateReducers.AddBread);
     }
 
     [Test]
     public void LinkExistingConstantState()
     {
-        var startState = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(startState.GetNextId);
+        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
+        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GetNextId);
         var newValue = new ShoppingState(ShoppingStateType.Shopping, ShoppingStateReducers.BreadPrice);
         
-        var newLinkedState = startState.LinkState(ShoppingActions.AddBread, newState, newValue);
+        var newLinkedState = start.LinkState(ShoppingActions.AddBread, newState, newValue);
 
         Assert.AreEqual(newState, newLinkedState);
 
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        startState[ShoppingActions.AddBread]
-            .AssertTransition(newState, initialValue, newValue);
+        start[ShoppingActions.AddBread].AssertTransition(newState, initialValue, newValue);
     }
 }
