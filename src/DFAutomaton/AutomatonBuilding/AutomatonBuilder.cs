@@ -17,7 +17,7 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     public Option<Automaton<TTransition, TState>, AutomatonGraphError> Build(Func<BuildConfiguration, BuildConfiguration>? configure = null)
     {
         var configuration = (configure ?? (config => config))(BuildConfiguration.Default);
-        var startOrError = StartState.BuildAutomatonGraph(configuration);
+        var startOrError = StartState.Complete(configuration);
 
         return startOrError.Map<Automaton<TTransition, TState>>(start => new(start));
     }

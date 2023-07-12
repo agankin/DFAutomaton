@@ -5,7 +5,7 @@ namespace DFAutomaton;
 
 public class State<TTransition, TState> : IState<TTransition, TState> where TTransition : notnull
 {
-    private readonly TransitionDict<TTransition, TState> _transitions = new();
+    private readonly TransitionDict<TTransition, TState, State<TTransition, TState>> _transitions = new();
 
     internal State(StateType type, Func<long> getNextId)
     {
@@ -22,12 +22,12 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
 
     public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_transitions.Keys);
 
-    public Option<Transition<TTransition, TState>> this[TTransition transition] =>
+    public Option<Transition<TTransition, TState, State<TTransition, TState>>> this[TTransition transition] =>
         _transitions.GetValueOrNone(transition);
 
-    Option<StateTransition<TTransition, TState>> IState<TTransition, TState>.this[TTransition transition] =>
+    Option<Transition<TTransition, TState, IState<TTransition, TState>>> IState<TTransition, TState>.this[TTransition transition] =>
         _transitions.GetValueOrNone(transition)
-            .Map<StateTransition<TTransition, TState>>(next => new(next.NextState, next.Reducer));
+            .Map<Transition<TTransition, TState, IState<TTransition, TState>>>(next => new(next.NextState, next.Reducer));
 
     internal Func<long> GetNextId { get; }
 
@@ -41,7 +41,7 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
         return state;
     }
 
-    internal ITransitionDict<TTransition, TState> GetTransitions() => _transitions;
+    internal ITransitionDict<TTransition, TState, State<TTransition, TState>> GetTransitions() => _transitions;
 
-    public override string? ToString() => this.Format();
+    public override string? ToString() => ((IState<TTransition, TState>)this).Format();
 }

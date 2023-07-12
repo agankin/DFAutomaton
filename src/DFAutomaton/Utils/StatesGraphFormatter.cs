@@ -45,8 +45,7 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
         };
     }
 
-    private static string FormatState(IState<TTransition, TState> state) =>
-        state.Format();
+    private static string FormatState(IState<TTransition, TState> state) => state.Format();
 
     private static string FormatTransition(TTransition transition, IState<TTransition, TState> toState) =>
         $"    {transition} -> State {toState.Id}";

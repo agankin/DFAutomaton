@@ -6,7 +6,22 @@ namespace DFAutomaton.Tests;
 public static class AssertStateExtensions
 {
     public static void AssertTransition<TTransition, TState>(
-        this Option<Transition<TTransition, TState>> stateTransitionOption,
+        this Option<Transition<TTransition, TState, IState<TTransition, TState>>> stateTransitionOption,
+        IState<TTransition, TState> expectedNextState,
+        StateReducer<TTransition, TState> expectedReducer)
+        where TTransition : notnull
+    {
+        stateTransitionOption.AssertSome(transition =>
+        {
+            var (nextState, reducer) = transition;
+
+            Assert.AreEqual(expectedNextState, nextState);
+            Assert.AreEqual(expectedReducer, reducer);
+        });
+    }
+
+    public static void AssertTransition<TTransition, TState>(
+        this Option<Transition<TTransition, TState, State<TTransition, TState>>> stateTransitionOption,
         State<TTransition, TState> expectedNextState,
         StateReducer<TTransition, TState> expectedReducer)
         where TTransition : notnull
@@ -21,7 +36,7 @@ public static class AssertStateExtensions
     }
 
     public static void AssertTransition<TTransition, TState>(
-        this Option<Transition<TTransition, TState>> stateTransitionOption,
+        this Option<Transition<TTransition, TState, State<TTransition, TState>>> stateTransitionOption,
         State<TTransition, TState> expectedNextState,
         TState valueToReduce,
         TState expectedReducedValue)
@@ -38,7 +53,7 @@ public static class AssertStateExtensions
     }
 
     public static void AssertAccepted<TTransition, TState>(
-        this Option<Transition<TTransition, TState>> stateTransitionOption,
+        this Option<Transition<TTransition, TState, State<TTransition, TState>>> stateTransitionOption,
         StateReducer<TTransition, TState> expectedReducer)
         where TTransition : notnull
     {
@@ -52,7 +67,7 @@ public static class AssertStateExtensions
     }
 
     public static void AssertAccepted<TTransition, TState>(
-        this Option<Transition<TTransition, TState>> stateTransitionOption,
+        this Option<Transition<TTransition, TState, State<TTransition, TState>>> stateTransitionOption,
         TState valueToReduce,
         TState expectedReducedValue)
         where TTransition : notnull

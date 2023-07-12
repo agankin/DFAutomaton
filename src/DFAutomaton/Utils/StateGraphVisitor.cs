@@ -39,7 +39,7 @@ internal static class StateGraphVisitor<TTransition, TState> where TTransition :
 
     private static Option<TResult> ResultOrVisitNext<TResult>(
         Option<TResult> result,
-        Option<StateTransition<TTransition, TState>> transitionOption,
+        Option<Transition<TTransition, TState, IState<TTransition, TState>>> transitionOption,
         Func<IState<TTransition, TState>, Option<TResult>> visit,
         ISet<IState<TTransition, TState>> visitedStates)
     {

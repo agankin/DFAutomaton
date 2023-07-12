@@ -12,5 +12,9 @@ public interface IState<TTransition, TState> where TTransition : notnull
 
     public IReadOnlySet<TTransition> Transitions { get; }
 
-    Option<StateTransition<TTransition, TState>> this[TTransition transition] { get; }
+    Option<Transition<TTransition, TState, IState<TTransition, TState>>> this[TTransition transition] { get; }
+
+    public string Format() => string.IsNullOrEmpty(Tag?.ToString())
+        ? $"State {Id}"
+        : $"State {Id}: {Tag}";
 }

@@ -10,7 +10,7 @@ public class AutomatonStateGraphTests
     {
         var graph = ShoppingStateGraph.Create();
 
-        graph.ShoppingState.BuildAutomatonGraph(BuildConfiguration.Default).AssertSome(start =>
+        graph.ShoppingState.Complete(BuildConfiguration.Default).AssertSome(start =>
         {
             var afterAddBread = start[ShoppingActions.AddBread];
             afterAddBread.AssertTransition(start, ShoppingStateReducers.AddBread);
@@ -39,7 +39,7 @@ public class AutomatonStateGraphTests
     {
         var stateGraph = ShoppingStateGraph.Create();
 
-        stateGraph.ShoppingState.BuildAutomatonGraph(BuildConfiguration.Default).AssertSome(start =>
+        stateGraph.ShoppingState.Complete(BuildConfiguration.Default).AssertSome(start =>
         {
             var receive = start[ShoppingActions.ReceiveGoods];
             receive.AssertNone();

@@ -1,12 +1,13 @@
 namespace DFAutomaton;
 
-internal class StateTransitionDict<TTransition, TState>
-    : Dictionary<TTransition, StateTransition<TTransition, TState>>, IStateTransitionDict<TTransition, TState>
+internal class TransitionDict<TTransition, TState, TDFAState>
+    : Dictionary<TTransition, Transition<TTransition, TState, TDFAState>>, ITransitionDict<TTransition, TState, TDFAState>
     where TTransition : notnull
+    where TDFAState : IState<TTransition, TState>
 {
-    public StateTransitionDict() : base() {}
+    public TransitionDict() : base() {}
 
-    public StateTransitionDict(IDictionary<TTransition, StateTransition<TTransition, TState>> dictionary) : base(dictionary)
+    public TransitionDict(IDictionary<TTransition, Transition<TTransition, TState, TDFAState>> dictionary) : base(dictionary)
     {
     }
 }

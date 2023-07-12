@@ -43,7 +43,7 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         };
     }
 
-    private Func<StateTransition<TTransition, TState>, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(
+    private Func<Transition<TTransition, TState, IState<TTransition, TState>>, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(
         Action<TTransition> emitNext,
         TState stateValue)
     {

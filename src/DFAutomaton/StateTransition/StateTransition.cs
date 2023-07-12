@@ -1,6 +1,8 @@
 ﻿namespace DFAutomaton;
 
-public readonly record struct StateTransition<TTransition, TState>(
-    IState<TTransition, TState> NextState,
+public readonly record struct Transition<TTransition, TState, TDFAState>(
+    TDFAState NextState,
     StateReducer<TTransition, TState> Reducer
-) where TTransition : notnull;
+)
+where TTransition : notnull
+where TDFAState : IState<TTransition, TState>;
