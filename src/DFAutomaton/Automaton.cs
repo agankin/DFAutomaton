@@ -43,13 +43,13 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         };
     }
 
-    private Func<Transition<TTransition, TState, IState<TTransition, TState>>, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(
+    private Func<IState<TTransition, TState>.Move, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(
         Action<TTransition> emitNext,
         TState stateValue)
     {
-        return automatonNextState =>
+        return move =>
         {
-            var (nextState, reducer) = automatonNextState;
+            var (nextState, reducer) = move;
             var runState = new AutomatonRunState<TTransition, TState>(nextState, emitNext);
             var nextStateValue = reducer(runState, stateValue);
             var nextAutomatonState = new CurrentState(nextState, nextStateValue);

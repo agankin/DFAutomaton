@@ -58,7 +58,7 @@ internal static class AutomatonStateGraphValidator
 
         var canReachAccepted = state.Transitions
             .Any(transition => state[transition]
-                .Map(t => CanReachAccepted(t.NextState, visitedStates, statesReachingAccepted))
+                .Map(move => CanReachAccepted(move.NextState, visitedStates, statesReachingAccepted))
                 .ValueOr(false));
 
         if (canReachAccepted)

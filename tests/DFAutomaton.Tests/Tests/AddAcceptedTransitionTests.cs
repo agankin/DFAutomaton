@@ -11,7 +11,7 @@ public class AddAcceptedTransitionTests
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
         var newState = start.ToNewAccepted(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
-        start[ShoppingActions.PayForGoods].AssertAccepted(ShoppingStateReducers.PayForGoods);
+        start[ShoppingActions.PayForGoods].AssertMoveToAccepted(ShoppingStateReducers.PayForGoods);
     }
 
     [Test]
@@ -22,7 +22,7 @@ public class AddAcceptedTransitionTests
         start.ToNewAccepted(ShoppingActions.PayForGoods, newValue);
 
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.PayForGoods].AssertAccepted(initialValue, newValue);
+        start[ShoppingActions.PayForGoods].AssertMoveToAccepted(initialValue, newValue);
     }
 
     [Test]
@@ -33,7 +33,7 @@ public class AddAcceptedTransitionTests
         var linkedAccepted = start.LinkAccepted(ShoppingActions.AddButter, newAccepted, ShoppingStateReducers.ReceiveGoods);
 
         Assert.AreEqual(newAccepted, linkedAccepted);
-        start[ShoppingActions.AddButter].AssertAccepted(ShoppingStateReducers.ReceiveGoods);
+        start[ShoppingActions.AddButter].AssertMoveToAccepted(ShoppingStateReducers.ReceiveGoods);
         Assert.AreEqual(start[ShoppingActions.AddBread], start[ShoppingActions.AddButter]);
     }
 
@@ -48,7 +48,7 @@ public class AddAcceptedTransitionTests
         Assert.AreEqual(newAccepted, linkedAccepted);
         
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.AddButter].AssertAccepted(initialValue, newValue);
+        start[ShoppingActions.AddButter].AssertMoveToAccepted(initialValue, newValue);
 
         start[ShoppingActions.AddBread].AssertSome(addBread =>
             start[ShoppingActions.AddButter].AssertSome(addButter =>

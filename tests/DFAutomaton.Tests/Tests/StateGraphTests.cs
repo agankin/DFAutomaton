@@ -14,13 +14,13 @@ public class StateGraphTests
         var paid = graph.PaidState;
 
         var afterAddBread = shopping[ShoppingActions.AddBread];
-        afterAddBread.AssertTransition(shopping, ShoppingStateReducers.AddBread);
+        afterAddBread.AssertMove(shopping, ShoppingStateReducers.AddBread);
 
         var afterAddButter = afterAddBread.FlatMap(state => state.NextState[ShoppingActions.AddButter]);
-        afterAddButter.AssertTransition(shopping, ShoppingStateReducers.AddButter);
+        afterAddButter.AssertMove(shopping, ShoppingStateReducers.AddButter);
 
         var afterPay = afterAddButter.FlatMap(state => state.NextState[ShoppingActions.PayForGoods]);
-        afterPay.AssertTransition(paid, ShoppingStateReducers.PayForGoods);
+        afterPay.AssertMove(paid, ShoppingStateReducers.PayForGoods);
 
         var afterReceive = afterPay.FlatMap(state => state.NextState[ShoppingActions.ReceiveGoods]);
         afterReceive.AssertSome(nextState =>

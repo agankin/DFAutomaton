@@ -1,6 +1,6 @@
 ﻿namespace DFAutomaton;
 
-public delegate TState StateReducer<TTransition, TState>(
+public delegate TState Reducer<TTransition, TState>(
     AutomatonRunState<TTransition, TState> runState,
     TState state)
     where TTransition : notnull;

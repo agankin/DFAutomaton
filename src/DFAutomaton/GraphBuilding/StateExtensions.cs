@@ -25,7 +25,7 @@ public static class StateExtensions
     public static State<TTransition, TState> ToNewState<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
-        StateReducer<TTransition, TState> reducer)
+        Reducer<TTransition, TState> reducer)
         where TTransition : notnull
     {
         var newState = StateFactory<TTransition, TState>.SubState(current.GetNextId);
@@ -56,7 +56,7 @@ public static class StateExtensions
     public static AcceptedState<TTransition, TState> ToNewAccepted<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
-        StateReducer<TTransition, TState> reducer)
+        Reducer<TTransition, TState> reducer)
         where TTransition : notnull
     {
         var acceptedState = StateFactory<TTransition, TState>.Accepted(current.GetNextId);
@@ -80,7 +80,7 @@ public static class StateExtensions
         this State<TTransition, TState> current,
         TTransition transition,
         AcceptedState<TTransition, TState> acceptedState,
-        StateReducer<TTransition, TState> reducer)
+        Reducer<TTransition, TState> reducer)
         where TTransition : notnull
     {
         var state = acceptedState.State;
@@ -89,7 +89,7 @@ public static class StateExtensions
         return acceptedState;
     }
 
-    private static StateReducer<TTransition, TState> ConstantReducer<TTransition, TState>(TState newStateValue) where TTransition : notnull =>
+    private static Reducer<TTransition, TState> ConstantReducer<TTransition, TState>(TState newStateValue) where TTransition : notnull =>
         (_, _) => newStateValue;
 
     private static IState<TTransition, TState> AsImmutable<TTransition, TState>(this State<TTransition, TState> current)
