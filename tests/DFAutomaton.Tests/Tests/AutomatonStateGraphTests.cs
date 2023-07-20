@@ -13,23 +13,27 @@ public class AutomatonStateGraphTests
         graph.ShoppingState.Complete(BuildConfiguration.Default).AssertSome(start =>
         {
             var afterAddBread = start[ShoppingActions.AddBread];
-            afterAddBread.AssertMove(start, ShoppingStateReducers.AddBread);
+            afterAddBread.AssertTransition(start, ShoppingStateReducers.AddBread);
 
-            var afterAddButter = afterAddBread.FlatMap(state => state.NextState[ShoppingActions.AddButter]);
-            afterAddButter.AssertMove(start, ShoppingStateReducers.AddButter);
+            var afterAddButter = afterAddBread.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.AddButter]);
+            afterAddButter.AssertTransition(start, ShoppingStateReducers.AddButter);
 
-            var afterPaid = afterAddButter.FlatMap(state => state.NextState[ShoppingActions.PayForGoods]);
-            afterPaid.AssertSome(move =>
+            var afterPaid = afterAddButter.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.PayForGoods]);
+            afterPaid.AssertSome(transition =>
             {
-                Assert.AreEqual(StateType.SubState, move.NextState.Type);
-                Assert.AreEqual(ShoppingStateReducers.PayForGoods, move.Reducer);
+                var (nextStateOption, _, reduce) = transition;
+
+                nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.SubState, nextState.Type));
+                Assert.AreEqual(ShoppingStateReducers.PayForGoods, reduce);
             });
 
-            var afterReceived = afterPaid.FlatMap(state => state.NextState[ShoppingActions.ReceiveGoods]);
-            afterReceived.AssertSome(move =>
+            var afterReceived = afterPaid.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.ReceiveGoods]);
+            afterReceived.AssertSome(transition =>
             {
-                Assert.AreEqual(StateType.Accepted, move.NextState.Type);
-                Assert.AreEqual(ShoppingStateReducers.ReceiveGoods, move.Reducer);
+                var (nextStateOption, _, reduce) = transition;
+
+                nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
+                Assert.AreEqual(ShoppingStateReducers.ReceiveGoods, reduce);
             });
         });
     }

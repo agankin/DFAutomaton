@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Optional.Unsafe;
 
 namespace DFAutomaton.Tests;
 
@@ -11,7 +12,7 @@ public class AddAcceptedTransitionTests
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
         var newState = start.ToNewAccepted(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
-        start[ShoppingActions.PayForGoods].AssertMoveToAccepted(ShoppingStateReducers.PayForGoods);
+        start[ShoppingActions.PayForGoods].AssertTransitionToAccepted(ShoppingStateReducers.PayForGoods);
     }
 
     [Test]
@@ -22,7 +23,7 @@ public class AddAcceptedTransitionTests
         start.ToNewAccepted(ShoppingActions.PayForGoods, newValue);
 
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.PayForGoods].AssertMoveToAccepted(initialValue, newValue);
+        start[ShoppingActions.PayForGoods].AssertTransitionToAccepted(initialValue, newValue);
     }
 
     [Test]
@@ -33,8 +34,19 @@ public class AddAcceptedTransitionTests
         var linkedAccepted = start.LinkAccepted(ShoppingActions.AddButter, newAccepted, ShoppingStateReducers.ReceiveGoods);
 
         Assert.AreEqual(newAccepted, linkedAccepted);
-        start[ShoppingActions.AddButter].AssertMoveToAccepted(ShoppingStateReducers.ReceiveGoods);
-        Assert.AreEqual(start[ShoppingActions.AddBread], start[ShoppingActions.AddButter]);
+        start[ShoppingActions.AddButter].AssertTransitionToAccepted(ShoppingStateReducers.ReceiveGoods);
+
+        start[ShoppingActions.AddBread].AssertSome(breadAddedTransition =>
+        {
+            start[ShoppingActions.AddButter].AssertSome(butterAddedTransition =>
+            {
+                var (breadAdded, _, breadAddedReduce) = breadAddedTransition;
+                var (butterAdded, _, butterAddedReduce) = butterAddedTransition;
+
+                Assert.AreEqual(breadAdded, butterAdded);
+                Assert.AreEqual(breadAddedReduce, butterAddedReduce);
+            });
+        });
     }
 
     [Test]
@@ -48,10 +60,10 @@ public class AddAcceptedTransitionTests
         Assert.AreEqual(newAccepted, linkedAccepted);
         
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.AddButter].AssertMoveToAccepted(initialValue, newValue);
+        start[ShoppingActions.AddButter].AssertTransitionToAccepted(initialValue, newValue);
 
         start[ShoppingActions.AddBread].AssertSome(addBread =>
             start[ShoppingActions.AddButter].AssertSome(addButter =>
-                Assert.AreEqual(addBread.NextState, addButter.NextState)));
+                Assert.AreEqual(addBread.State, addButter.State)));
     }
 }

@@ -5,7 +5,7 @@ namespace DFAutomaton;
 
 public class State<TTransition, TState> : IState<TTransition, TState> where TTransition : notnull
 {
-    private readonly Dictionary<TTransition, State<TTransition, TState>.Move> _transitionMoveDict = new();
+    private readonly Dictionary<TTransition, State<TTransition, TState>.Transition> _transitionDict = new();
 
     internal State(StateType type, Func<long> getNextId)
     {
@@ -20,32 +20,44 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
 
     public StateType Type { get; }
 
-    public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_transitionMoveDict.Keys);
+    public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_transitionDict.Keys);
 
-    public Option<State<TTransition, TState>.Move> this[TTransition transition] => _transitionMoveDict.GetValueOrNone(transition);
+    public Option<Transition> this[TTransition transition] => _transitionDict.GetValueOrNone(transition);
 
-    Option<IState<TTransition, TState>.Move> IState<TTransition, TState>.this[TTransition transition] =>
-        _transitionMoveDict.GetValueOrNone(transition)
-            .Map<IState<TTransition, TState>.Move>(next => new(next.NextState, next.Reducer));
+    Option<IState<TTransition, TState>.Transition> IState<TTransition, TState>.this[TTransition transition] =>
+        _transitionDict.GetValueOrNone(transition).Map<IState<TTransition, TState>.Transition>(transition =>
+            new(transition.State.Map<IState<TTransition, TState>>(_ => _), transition.GoToState, transition.Reduce));
 
     internal Func<long> GetNextId { get; }
 
-    public State<TTransition, TState> LinkState(TTransition transition, State<TTransition, TState> nextState, Reducer<TTransition, TState> reducer)
+    public State<TTransition, TState> LinkState(TTransition transition, State<TTransition, TState> nextState, Reduce<TState> reduce)
     {
         if (Type == StateType.Accepted)
             throw new InvalidOperationException("Cannot link a state to the accepted state.");
 
-        var (state, _) = _transitionMoveDict[transition] = new(nextState, reducer);
+        _transitionDict[transition] = new(nextState.Some(), _ => nextState, reduce);
 
-        return state;
+        return nextState;
     }
 
-    internal IReadOnlyDictionary<TTransition, State<TTransition, TState>.Move> GetTransitions() => _transitionMoveDict;
+    public void GoToState(
+        TTransition transition,
+        GoToState<TTransition, TState, State<TTransition, TState>> goToState,
+        Reduce<TState> reduce)
+    {
+        if (Type == StateType.Accepted)
+            throw new InvalidOperationException("Cannot link a state to the accepted state.");
+
+        _transitionDict[transition] = new(Option.None<State<TTransition, TState>>(), goToState, reduce);
+    }
+
+    internal IReadOnlyDictionary<TTransition, Transition> GetTransitions() => _transitionDict;
 
     public override string? ToString() => ((IState<TTransition, TState>)this).Format();
 
-    public readonly record struct Move(
-        State<TTransition, TState> NextState,
-        Reducer<TTransition, TState> Reducer
-    );
+    public record Transition(
+        Option<State<TTransition, TState>> State,
+        GoToState<TTransition, TState, State<TTransition, TState>> GoToState,
+        Reduce<TState> Reduce
+    ) : Transition<TTransition, TState, State<TTransition, TState>>(State, GoToState, Reduce);
 }

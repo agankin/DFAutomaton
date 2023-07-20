@@ -33,17 +33,18 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
         return state.Transitions.Select(transition => state[transition])
             .Aggregate(
                 Option.None<TResult>(),
-                (result, moveOption) => ResultOrVisitNext(result, moveOption, visit, visitedStates));
+                (result, transitionOption) => ResultOrVisitNext(result, transitionOption, visit, visitedStates));
     }
 
     private static Option<TResult> ResultOrVisitNext<TResult>(
         Option<TResult> result,
-        Option<IState<TTransition, TState>.Move> moveOption,
+        Option<IState<TTransition, TState>.Transition> transitionOption,
         Func<IState<TTransition, TState>, Option<TResult>> visit,
         ISet<IState<TTransition, TState>> visitedStates)
     {
         return result.Else(
-            moveOption.FlatMap(
-                move => VisitTillResult(move.NextState, visit, visitedStates)));
+            transitionOption.FlatMap(
+                transition => transition.State.FlatMap(
+                    state => VisitTillResult(state, visit, visitedStates))));
     }
 }

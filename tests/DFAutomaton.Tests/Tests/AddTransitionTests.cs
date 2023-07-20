@@ -12,7 +12,7 @@ public class AddTransitionTests
         var newState = start.ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
         Assert.AreEqual(StateType.SubState, newState.Type);
-        start[ShoppingActions.PayForGoods].AssertMove(newState, ShoppingStateReducers.PayForGoods);
+        start[ShoppingActions.PayForGoods].AssertTransition(newState, ShoppingStateReducers.PayForGoods);
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class AddTransitionTests
         Assert.AreEqual(StateType.SubState, newState.Type);
 
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.PayForGoods].AssertMove(newState, initialValue, newValue);
+        start[ShoppingActions.PayForGoods].AssertTransition(newState, initialValue, newValue);
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class AddTransitionTests
             ShoppingStateReducers.AddBread);
 
         Assert.AreEqual(newState, newLinkedState);
-        start[ShoppingActions.AddBread].AssertMove(newState, ShoppingStateReducers.AddBread);
+        start[ShoppingActions.AddBread].AssertTransition(newState, ShoppingStateReducers.AddBread);
     }
 
     [Test]
@@ -55,6 +55,6 @@ public class AddTransitionTests
         Assert.AreEqual(newState, newLinkedState);
 
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.AddBread].AssertMove(newState, initialValue, newValue);
+        start[ShoppingActions.AddBread].AssertTransition(newState, initialValue, newValue);
     }
 }

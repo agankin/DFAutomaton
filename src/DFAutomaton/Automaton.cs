@@ -38,20 +38,20 @@ public class Automaton<TTransition, TState> where TTransition : notnull
             var (state, stateValue) = automatonState;
 
             return state[transition].Match(
-                Reduce(emitNext, stateValue),
+                Reduce(transition, stateValue),
                 () => Option.None<CurrentState, AutomatonError<TTransition, TState>>(GetErrorForTransitionNotFound(state, transition)));
         };
     }
 
-    private Func<IState<TTransition, TState>.Move, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(
-        Action<TTransition> emitNext,
-        TState stateValue)
+    private Func<IState<TTransition, TState>.Transition, Option<CurrentState, AutomatonError<TTransition, TState>>> Reduce(TTransition transition, TState stateValue)
     {
-        return move =>
+        return stateTransition =>
         {
-            var (nextState, reducer) = move;
-            var runState = new AutomatonRunState<TTransition, TState>(nextState, emitNext);
-            var nextStateValue = reducer(runState, stateValue);
+            var (nextStateOption, goToState, reduce) = stateTransition;
+
+            var nextStateValue = reduce(stateValue);
+            var nextState = nextStateOption.ValueOr(() => goToState(nextStateValue));
+            
             var nextAutomatonState = new CurrentState(nextState, nextStateValue);
 
             return nextAutomatonState.Some<CurrentState, AutomatonError<TTransition, TState>>();

@@ -1,4 +1,5 @@
-﻿using Optional.Unsafe;
+﻿using Optional;
+using Optional.Unsafe;
 
 namespace DFAutomaton.Utils;
 
@@ -28,9 +29,10 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
 
         yield return string.Empty;
 
-        var nextStatesLines = state.Transitions
-            .Select(transition => state[transition].ValueOrFailure().NextState)
-            .SelectMany(nextState => GetStateLines(nextState, formattedStates));
+        var nextStates = state.Transitions.Select(transition => state[transition].ValueOrFailure().State)
+            .Where(nextState => nextState.HasValue)
+            .Select(nextStateOption => nextStateOption.ValueOrFailure());
+        var nextStatesLines = nextStates.SelectMany(nextState => GetStateLines(nextState, formattedStates));
         foreach (var nextStateLine in nextStatesLines)
             yield return nextStateLine;
     }
@@ -39,7 +41,7 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
     {
         return transition =>
         {
-            var (toState, reducer) = fromState[transition].ValueOrFailure();
+            var (toState, _, _) = fromState[transition].ValueOrFailure();
 
             return FormatTransition(transition, toState);
         };
@@ -47,6 +49,9 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
 
     private static string FormatState(IState<TTransition, TState> state) => state.Format();
 
-    private static string FormatTransition(TTransition transition, IState<TTransition, TState> toState) =>
-        $"    {transition} -> State {toState.Id}";
+    private static string FormatTransition(TTransition transition, Option<IState<TTransition, TState>> toStateOption)
+    {
+        var toStateFormatted = toStateOption.Map(toState => toState.Id.ToString()).ValueOr("DYNAMIC GOTO");
+        return $"    {transition} -> State {toStateFormatted}";
+    }
 }
