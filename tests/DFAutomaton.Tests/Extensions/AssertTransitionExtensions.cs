@@ -8,12 +8,12 @@ public static class AssertTransitionExtensions
     public static void AssertTransition<TTransition, TState>(
         this Option<IState<TTransition, TState>.Transition> stateTransitionOption,
         IState<TTransition, TState> expectedNextState,
-        Reduce<TState> expectedReduce)
+        ReduceValue<TTransition, TState> expectedReduce)
         where TTransition : notnull
     {
         stateTransitionOption.AssertSome(stateTransition =>
         {
-            var (nextStateOption, _, reduce) = stateTransition;
+            var (_, nextStateOption, reduce) = stateTransition;
 
             nextStateOption.AssertSome(nextState => Assert.AreEqual(expectedNextState, nextState));
             Assert.AreEqual(expectedReduce, reduce);
@@ -23,12 +23,12 @@ public static class AssertTransitionExtensions
     public static void AssertTransition<TTransition, TState>(
         this Option<State<TTransition, TState>.Transition> stateTransitionOption,
         State<TTransition, TState> expectedNextState,
-        Reduce<TState> expectedReduce)
+        ReduceValue<TTransition, TState> expectedReduce)
         where TTransition : notnull
     {
         stateTransitionOption.AssertSome(stateTransition =>
         {
-            var (nextStateOption, _, reduce) = stateTransition;
+            var (_, nextStateOption, reduce) = stateTransition;
 
             nextStateOption.AssertSome(nextState => Assert.AreEqual(expectedNextState, nextState));
             Assert.AreEqual(expectedReduce, reduce);
@@ -44,21 +44,26 @@ public static class AssertTransitionExtensions
     {
         stateTransitionOption.AssertSome(stateTransition =>
         {
-            var (nextStateOption, _, reduce) = stateTransition;
+            var (_, nextStateOption, reduce) = stateTransition;
 
             nextStateOption.AssertSome(nextState => Assert.AreEqual(expectedNextState, nextState));
-            Assert.AreEqual(expectedReducedValue, reduce(valueToReduce));
+
+            var automatonState = new AutomatonState<TTransition, TState>(
+                valueToReduce,
+                nextStateOption.Map<IState<TTransition, TState>>(_ => _),
+                _ => {});
+            Assert.AreEqual(expectedReducedValue, reduce(automatonState));
         });
     }
 
     public static void AssertTransitionToAccepted<TTransition, TState>(
         this Option<State<TTransition, TState>.Transition> stateTransitionOption,
-        Reduce<TState> expectedReduce)
+        ReduceValue<TTransition, TState> expectedReduce)
         where TTransition : notnull
     {
         stateTransitionOption.AssertSome(stateTransition =>
         {
-            var (nextStateOption, _, reduce) = stateTransition;
+            var (_, nextStateOption, reduce) = stateTransition;
 
             nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
             Assert.AreEqual(expectedReduce, reduce);
@@ -73,10 +78,15 @@ public static class AssertTransitionExtensions
     {
         stateTransitionOption.AssertSome(stateTransition =>
         {
-            var (nextStateOption, _, reduce) = stateTransition;
+            var (_, nextStateOption, reduce) = stateTransition;
 
             nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
-            Assert.AreEqual(expectedReducedValue, reduce(valueToReduce));
+            
+            var automatonState = new AutomatonState<TTransition, TState>(
+                valueToReduce,
+                nextStateOption.Map<IState<TTransition, TState>>(_ => _),
+                _ => {});
+            Assert.AreEqual(expectedReducedValue, reduce(automatonState));
         });
     }
 }

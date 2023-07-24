@@ -25,7 +25,7 @@ public class StateGraphTests
         var afterReceive = afterPay.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.ReceiveGoods]);
         afterReceive.AssertSome(transition =>
         {
-            var (nextStateOption, _, reduce) = transition;
+            var (_, nextStateOption, reduce) = transition;
 
             nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
             Assert.AreEqual(ShoppingStateReducers.ReceiveGoods, reduce);

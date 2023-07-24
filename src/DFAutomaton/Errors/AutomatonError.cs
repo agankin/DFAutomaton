@@ -1,20 +1,11 @@
 ﻿namespace DFAutomaton;
 
-public class AutomatonError<TTransition, TState> where TTransition : notnull
-{
-    public AutomatonError(AutomatonErrorType type, IState<TTransition, TState> state, TTransition transition)
-    {
-        Type = type;
-        State = state;
-        Transition = transition;
-    }
-
-    public AutomatonErrorType Type { get; }
-
-    public IState<TTransition, TState> State { get; }
-
-    public TTransition Transition { get; }
-}
+public record AutomatonError<TTransition, TState>(
+    AutomatonErrorType Type,
+    IState<TTransition, TState> State,
+    TTransition Transition
+)
+where TTransition : notnull;
 
 public enum AutomatonErrorType
 {

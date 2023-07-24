@@ -19,8 +19,8 @@ public interface IState<TTransition, TState> where TTransition : notnull
         : $"State {Id}: {Tag}";
 
     public record Transition(
+        TransitionType Type,
         Option<IState<TTransition, TState>> State,
-        GoToState<TTransition, TState, IState<TTransition, TState>> GoToState,
-        Reduce<TState> Reduce
-    ) : Transition<TTransition, TState, IState<TTransition, TState>>(State, GoToState, Reduce);
+        Reduce<TTransition, TState, IState<TTransition, TState>> Reduce
+    ) : Transition<TTransition, TState, IState<TTransition, TState>>(Type, State, Reduce);
 }

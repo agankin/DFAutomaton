@@ -3,15 +3,16 @@ using Optional;
 namespace DFAutomaton;
 
 public record Transition<TTransition, TState, TDFAState>(
+    TransitionType Type,
     Option<TDFAState> State,
-    GoToState<TTransition, TState, TDFAState> GoToState,
-    Reduce<TState> Reduce
+    Reduce<TTransition, TState, TDFAState> Reduce
 )
 where TTransition : notnull
 where TDFAState : IState<TTransition, TState>;
 
-public delegate TDFAState GoToState<TTransition, TState, out TDFAState>(TState state)
-    where TTransition : notnull
-    where TDFAState : IState<TTransition, TState>;
+public enum TransitionType
+{
+    FixedState = 1,
 
-public delegate TState Reduce<TState>(TState state);
+    DynamicGoTo
+}

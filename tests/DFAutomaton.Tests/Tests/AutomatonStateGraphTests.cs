@@ -21,7 +21,7 @@ public class AutomatonStateGraphTests
             var afterPaid = afterAddButter.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.PayForGoods]);
             afterPaid.AssertSome(transition =>
             {
-                var (nextStateOption, _, reduce) = transition;
+                var (_, nextStateOption, reduce) = transition;
 
                 nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.SubState, nextState.Type));
                 Assert.AreEqual(ShoppingStateReducers.PayForGoods, reduce);
@@ -30,7 +30,7 @@ public class AutomatonStateGraphTests
             var afterReceived = afterPaid.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.ReceiveGoods]);
             afterReceived.AssertSome(transition =>
             {
-                var (nextStateOption, _, reduce) = transition;
+                var (_, nextStateOption, reduce) = transition;
 
                 nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
                 Assert.AreEqual(ShoppingStateReducers.ReceiveGoods, reduce);

@@ -41,7 +41,7 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
     {
         return transition =>
         {
-            var (toState, _, _) = fromState[transition].ValueOrFailure();
+            var (_, toState, _) = fromState[transition].ValueOrFailure();
 
             return FormatTransition(transition, toState);
         };

@@ -15,12 +15,12 @@ public class ShoppingStateGraph
         var builder = AutomatonBuilder<ShoppingActions, ShoppingState>.Create();
         var shoppingState = builder.Start;
 
-        shoppingState.LinkState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread);
-        shoppingState.LinkState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter);
+        shoppingState.LinkFixedState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread);
+        shoppingState.LinkFixedState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter);
         var paidState = shoppingState
-            .ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
+            .ToNewFixedState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
         paidState
-            .ToNewAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
+            .ToNewFixedAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
 
         return new ShoppingStateGraph
         {

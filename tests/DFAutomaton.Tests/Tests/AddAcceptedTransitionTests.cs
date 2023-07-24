@@ -10,7 +10,7 @@ public class AddAcceptedTransitionTests
     public void AddNewWithReducer()
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = start.ToNewAccepted(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
+        var newState = start.ToNewFixedAccepted(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
         start[ShoppingActions.PayForGoods].AssertTransitionToAccepted(ShoppingStateReducers.PayForGoods);
     }
@@ -20,7 +20,7 @@ public class AddAcceptedTransitionTests
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
         var newValue = new ShoppingState(ShoppingStateType.GoodsPaid, 100);
-        start.ToNewAccepted(ShoppingActions.PayForGoods, newValue);
+        start.ToNewFixedAccepted(ShoppingActions.PayForGoods, newValue);
 
         var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
         start[ShoppingActions.PayForGoods].AssertTransitionToAccepted(initialValue, newValue);
@@ -30,8 +30,8 @@ public class AddAcceptedTransitionTests
     public void LinkExistingStateWithReducer()
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newAccepted = start.ToNewAccepted(ShoppingActions.AddBread, ShoppingStateReducers.ReceiveGoods);
-        var linkedAccepted = start.LinkAccepted(ShoppingActions.AddButter, newAccepted, ShoppingStateReducers.ReceiveGoods);
+        var newAccepted = start.ToNewFixedAccepted(ShoppingActions.AddBread, ShoppingStateReducers.ReceiveGoods);
+        var linkedAccepted = start.LinkFixedAccepted(ShoppingActions.AddButter, newAccepted, ShoppingStateReducers.ReceiveGoods);
 
         Assert.AreEqual(newAccepted, linkedAccepted);
         start[ShoppingActions.AddButter].AssertTransitionToAccepted(ShoppingStateReducers.ReceiveGoods);
@@ -54,8 +54,8 @@ public class AddAcceptedTransitionTests
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
         var newValue = new ShoppingState(ShoppingStateType.GoodsPurchased, 0);
-        var newAccepted = start.ToNewAccepted(ShoppingActions.AddBread, newValue);
-        var linkedAccepted = start.LinkAccepted(ShoppingActions.AddButter, newAccepted, newValue);
+        var newAccepted = start.ToNewFixedAccepted(ShoppingActions.AddBread, newValue);
+        var linkedAccepted = start.LinkFixedAccepted(ShoppingActions.AddButter, newAccepted, newValue);
 
         Assert.AreEqual(newAccepted, linkedAccepted);
         

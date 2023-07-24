@@ -19,7 +19,7 @@ internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
 
     object? IEnumerator.Current => Current;
 
-    public void QueueEmited(TTransition transition) => _emitedQueue.Enqueue(transition);
+    public void EmitNext(TTransition transition) => _emitedQueue.Enqueue(transition);
 
     public bool MoveNext()
     {

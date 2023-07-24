@@ -12,9 +12,9 @@ public class AutomatonStateGraphValidationTests
         var shoppingState = builder.Start;
 
         shoppingState
-            .LinkState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread)
-            .LinkState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter)
-            .ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
+            .LinkFixedState(ShoppingActions.AddBread, shoppingState, ShoppingStateReducers.AddBread)
+            .LinkFixedState(ShoppingActions.AddButter, shoppingState, ShoppingStateReducers.AddButter)
+            .ToNewFixedState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
         var automatonOrError = builder.Build();
         automatonOrError.AssertNone(error => Assert.AreEqual(StateError.NoAccepted, error));
@@ -27,12 +27,12 @@ public class AutomatonStateGraphValidationTests
         var shoppingState = builder.Start;
 
         shoppingState
-            .ToNewState(ShoppingActions.AddBread, ShoppingStateReducers.AddBread)
-            .ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods)
-            .ToNewAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
+            .ToNewFixedState(ShoppingActions.AddBread, ShoppingStateReducers.AddBread)
+            .ToNewFixedState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods)
+            .ToNewFixedAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
 
         shoppingState
-            .ToNewState(ShoppingActions.AddButter, ShoppingStateReducers.AddButter);
+            .ToNewFixedState(ShoppingActions.AddButter, ShoppingStateReducers.AddButter);
 
         var automatonOrError = builder.Build();
         automatonOrError.AssertNone(error => Assert.AreEqual(StateError.AcceptedIsUnreachable, error));

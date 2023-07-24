@@ -9,7 +9,7 @@ public class AddTransitionTests
     public void AddNewStateWithReducer()
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = start.ToNewState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
+        var newState = start.ToNewFixedState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
 
         Assert.AreEqual(StateType.SubState, newState.Type);
         start[ShoppingActions.PayForGoods].AssertTransition(newState, ShoppingStateReducers.PayForGoods);
@@ -20,7 +20,7 @@ public class AddTransitionTests
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
         var newValue = new ShoppingState(ShoppingStateType.GoodsPaid, 100);
-        var newState = start.ToNewState(ShoppingActions.PayForGoods, newValue);
+        var newState = start.ToNewFixedState(ShoppingActions.PayForGoods, newValue);
 
         Assert.AreEqual(StateType.SubState, newState.Type);
 
@@ -34,7 +34,7 @@ public class AddTransitionTests
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
         var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GetNextId);
         
-        var newLinkedState = start.LinkState(
+        var newLinkedState = start.LinkFixedState(
             ShoppingActions.AddBread,
             newState,
             ShoppingStateReducers.AddBread);
@@ -50,7 +50,7 @@ public class AddTransitionTests
         var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GetNextId);
         var newValue = new ShoppingState(ShoppingStateType.Shopping, ShoppingStateReducers.BreadPrice);
         
-        var newLinkedState = start.LinkState(ShoppingActions.AddBread, newState, newValue);
+        var newLinkedState = start.LinkFixedState(ShoppingActions.AddBread, newState, newValue);
 
         Assert.AreEqual(newState, newLinkedState);
 
