@@ -2,13 +2,11 @@ using Optional;
 
 namespace DFAutomaton;
 
-public delegate ReduceResult<TTransition, TState, TDFAState> Reduce<TTransition, TState, TDFAState>(AutomatonState<TTransition, TState> state)
-where TTransition : notnull
-where TDFAState : IState<TTransition, TState>;
+public delegate ReduceResult<TTransition, TState> Reduce<TTransition, TState>(AutomatonState<TTransition, TState> state)
+where TTransition : notnull;
 
-public readonly record struct ReduceResult<TTransition, TState, TDFAState>(
+public readonly record struct ReduceResult<TTransition, TState>(
     TState State,
-    Option<TDFAState> GoToState
+    Option<IState<TTransition, TState>> GoToState
 )
-where TTransition : notnull
-where TDFAState : IState<TTransition, TState>;
+where TTransition : notnull;

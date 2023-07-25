@@ -42,12 +42,12 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     {
         ValidateLinkingNotAccepted();
 
-        Reduce<TTransition, TState, State<TTransition, TState>> reduce = automatonState =>
+        Reduce<TTransition, TState> reduce = automatonState =>
         {
             var reducedValue = reduceValue(automatonState);
-            return new ReduceResult<TTransition, TState, State<TTransition, TState>>(
+            return new ReduceResult<TTransition, TState>(
                 reducedValue,
-                Option.None<State<TTransition, TState>>());
+                Option.None<IState<TTransition, TState>>());
         };
         _transitionDict[transition] = new(TransitionType.FixedState, nextState.Some(), reduce);
 
@@ -57,7 +57,7 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     public State<TTransition, TState> LinkDynamic(
         TTransition transition,
         State<TTransition, TState> nextState,
-        Reduce<TTransition, TState, State<TTransition, TState>> reduce)
+        Reduce<TTransition, TState> reduce)
     {
         ValidateLinkingNotAccepted();
         _transitionDict[transition] = new(TransitionType.DynamicGoTo, nextState.Some(), reduce);
@@ -73,18 +73,8 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     {
         var (type, nextStateOption, reduce) = transition;
         var mappedNextStateOption = transition.State.Map<IState<TTransition, TState>>(_ => _);
-        var mappedReduce = MapReduce(transition.Reduce);
         
-        return new(type, mappedNextStateOption, mappedReduce);
-    }
-
-    private static Reduce<TTransition, TState, IState<TTransition, TState>> MapReduce(Reduce<TTransition, TState, State<TTransition, TState>> reduce)
-    {
-        return automatonState =>
-        {
-            var (nextStateValue, goToState) = reduce(automatonState);
-            return new(nextStateValue, goToState.Map<IState<TTransition, TState>>(_ => _));
-        };
+        return new(type, mappedNextStateOption, reduce);
     }
 
     private void ValidateLinkingNotAccepted()
@@ -96,6 +86,6 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     public record Transition(
         TransitionType Type,
         Option<State<TTransition, TState>> State,
-        Reduce<TTransition, TState, State<TTransition, TState>> Reduce
+        Reduce<TTransition, TState> Reduce
     ) : Transition<TTransition, TState, State<TTransition, TState>>(Type, State, Reduce);
 }

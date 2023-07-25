@@ -21,6 +21,6 @@ public interface IState<TTransition, TState> where TTransition : notnull
     public record Transition(
         TransitionType Type,
         Option<IState<TTransition, TState>> State,
-        Reduce<TTransition, TState, IState<TTransition, TState>> Reduce
+        Reduce<TTransition, TState> Reduce
     ) : Transition<TTransition, TState, IState<TTransition, TState>>(Type, State, Reduce);
 }
