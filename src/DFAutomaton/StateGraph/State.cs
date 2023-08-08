@@ -54,15 +54,10 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
         return nextState;
     }
     
-    public State<TTransition, TState> LinkDynamic(
-        TTransition transition,
-        State<TTransition, TState> nextState,
-        Reduce<TTransition, TState> reduce)
+    public void LinkDynamic(TTransition transition, Reduce<TTransition, TState> reduce)
     {
         ValidateLinkingNotAccepted();
-        _transitionDict[transition] = new(TransitionType.DynamicGoTo, nextState.Some(), reduce);
-
-        return nextState;
+        _transitionDict[transition] = new(TransitionType.DynamicGoTo, Option.None<State<TTransition, TState>>(), reduce);
     }
 
     internal IReadOnlyDictionary<TTransition, Transition> GetTransitions() => _transitionDict;
