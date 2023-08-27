@@ -5,7 +5,7 @@ namespace DFAutomaton;
 /// <summary>
 /// Automaton states graph validator.
 /// </summary>
-internal static class AutomatonStateGraphValidator
+internal static class StateGraphValidator
 {
     /// <summary>
     /// Validates states graph.

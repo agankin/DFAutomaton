@@ -8,11 +8,11 @@ namespace DFAutomaton;
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 /// <typeparam name="TDFAState">Automaton state type.</typeparam>
-/// <param name="Type">Transition kind.</param>
+/// <param name="Kind">Transition kind.</param>
 /// <param name="State">Next automaton state if fixed transition or none if dynamic.</param>
 /// <param name="Reduce">Automaton state reducer.</param>
 public record Transition<TTransition, TState, TDFAState>(
-    TransitionType Type,
+    TransitionKind Kind,
     Option<TDFAState> State,
     Reduce<TTransition, TState> Reduce
 )
@@ -22,7 +22,7 @@ where TDFAState : IState<TTransition, TState>;
 /// <summary>
 /// Transition kind.
 /// </summary>
-public enum TransitionType
+public enum TransitionKind
 {
     /// <summary>
     /// Transition to fixed state.

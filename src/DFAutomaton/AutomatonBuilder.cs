@@ -1,4 +1,5 @@
-﻿using Optional;
+﻿using DFAutomaton.Utils;
+using Optional;
 
 namespace DFAutomaton;
 
@@ -31,9 +32,9 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// </summary>
     /// <param name="configure">Validation configuration function.</param>
     /// <returns>Automaton or error.</returns>
-    public Option<Automaton<TTransition, TState>, StateError> Build(Func<BuildConfiguration, BuildConfiguration>? configure = null)
+    public Option<Automaton<TTransition, TState>, StateError> Build(Configure<ValidationConfiguration>? configure = null)
     {
-        var configuration = (configure ?? (config => config))(BuildConfiguration.Default);
+        var configuration = (configure ?? (config => config))(ValidationConfiguration.Default);
         var startOrError = Start.Complete(configuration);
 
         return startOrError.Map<Automaton<TTransition, TState>>(start => new(start));

@@ -46,12 +46,12 @@ public interface IState<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// State transition.
     /// </summary>
-    /// <param name="Type">Transition kind.</param>
+    /// <param name="Kind">Transition kind.</param>
     /// <param name="State">Some next state for fixed transitions or None for dynamic transitions.</param>
     /// <param name="Reduce">State reducer.</param>
     public record Transition(
-        TransitionType Type,
+        TransitionKind Kind,
         Option<IState<TTransition, TState>> State,
         Reduce<TTransition, TState> Reduce
-    ) : Transition<TTransition, TState, IState<TTransition, TState>>(Type, State, Reduce);
+    ) : Transition<TTransition, TState, IState<TTransition, TState>>(Kind, State, Reduce);
 }

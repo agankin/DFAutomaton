@@ -66,7 +66,7 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
             
             return new ReductionResult<TTransition, TState>(reducedValue, Option.None<IState<TTransition, TState>>());
         };
-        _transitionDict[transition] = new(TransitionType.FixedState, nextState.Some(), reduce);
+        _transitionDict[transition] = new(TransitionKind.FixedState, nextState.Some(), reduce);
 
         return nextState;
     }
@@ -79,7 +79,7 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     public void LinkDynamic(TTransition transition, Reduce<TTransition, TState> reduce)
     {
         ValidateLinkingNotAccepted();
-        _transitionDict[transition] = new(TransitionType.DynamicGoTo, Option.None<State<TTransition, TState>>(), reduce);
+        _transitionDict[transition] = new(TransitionKind.DynamicGoTo, Option.None<State<TTransition, TState>>(), reduce);
     }
 
     internal IReadOnlyDictionary<TTransition, Transition> GetTransitions() => _transitionDict;
@@ -89,10 +89,10 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
 
     private static IState<TTransition, TState>.Transition MapTransition(Transition transition)
     {
-        var (type, nextStateOption, reduce) = transition;
+        var (kind, nextStateOption, reduce) = transition;
         var mappedNextStateOption = transition.State.Map<IState<TTransition, TState>>(_ => _);
         
-        return new(type, mappedNextStateOption, reduce);
+        return new(kind, mappedNextStateOption, reduce);
     }
 
     private void ValidateLinkingNotAccepted()
@@ -104,12 +104,12 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     /// <summary>
     /// State transition.
     /// </summary>
-    /// <param name="Type">Transition kind.</param>
+    /// <param name="Kind">Transition kind.</param>
     /// <param name="State">Some next state for fixed transition or None for dynamic transition.</param>
     /// <param name="Reduce">Automaton state reducer.</param>
     public record Transition(
-        TransitionType Type,
+        TransitionKind Kind,
         Option<State<TTransition, TState>> State,
         Reduce<TTransition, TState> Reduce
-    ) : Transition<TTransition, TState, State<TTransition, TState>>(Type, State, Reduce);
+    ) : Transition<TTransition, TState, State<TTransition, TState>>(Kind, State, Reduce);
 }

@@ -54,15 +54,15 @@ public class Automaton<TTransition, TState> where TTransition : notnull
     {
         return stateTransition =>
         {
-            var (type, nextStateOption, reduce) = stateTransition;
+            var (kind, nextStateOption, reduce) = stateTransition;
             var automatonState = new AutomatonState<TTransition, TState>(stateValue, nextStateOption, push);
 
             var (nextStateValue, goToStateOption) = reduce(automatonState);
 
-            var resultNextStateOption = type switch {
-                TransitionType.FixedState => nextStateOption,
-                TransitionType.DynamicGoTo => goToStateOption,
-                _ => throw new Exception($"Unsupported enum {nameof(TransitionType)} value: {type}.")
+            var resultNextStateOption = kind switch {
+                TransitionKind.FixedState => nextStateOption,
+                TransitionKind.DynamicGoTo => goToStateOption,
+                _ => throw new Exception($"Unsupported enum {nameof(TransitionKind)} value: {kind}.")
             };
 
             return resultNextStateOption

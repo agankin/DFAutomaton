@@ -15,7 +15,7 @@ public static class StateExtensions
     /// <param name="start">States graph start.</param>
     /// <param name="configuration">Validation configuration.</param>
     /// <returns>Start state of immutable states graph.</returns>
-    public static Option<IState<TTransition, TState>, StateError> Complete<TTransition, TState>(this State<TTransition, TState> start, BuildConfiguration configuration)
+    public static Option<IState<TTransition, TState>, StateError> Complete<TTransition, TState>(this State<TTransition, TState> start, ValidationConfiguration configuration)
         where TTransition : notnull
     {
         return configuration.ValidateAnyReachesAccepted
