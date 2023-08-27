@@ -32,7 +32,7 @@ public class AddTransitionTests
     public void LinkExistingStateWithReducer()
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GetNextId);
+        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GenerateId);
         
         var newLinkedState = start.LinkFixedState(
             ShoppingActions.AddBread,
@@ -47,7 +47,7 @@ public class AddTransitionTests
     public void LinkExistingConstantState()
     {
         var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GetNextId);
+        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GenerateId);
         var newValue = new ShoppingState(ShoppingStateType.Shopping, ShoppingStateReducers.BreadPrice);
         
         var newLinkedState = start.LinkFixedState(ShoppingActions.AddBread, newState, newValue);

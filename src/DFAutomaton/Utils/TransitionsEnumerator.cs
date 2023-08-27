@@ -3,10 +3,14 @@ using Optional;
 
 namespace DFAutomaton.Utils;
 
+/// <summary>
+/// Enumerator for transitions with possibility to push new transitions to be returned as next values.
+/// </summary>
+/// <typeparam name="TTransition">Transition value type.</typeparam>
 internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
 {
     private readonly IEnumerator<TTransition> _transitionsEnumerator;
-    private readonly Queue<TTransition> _emitedQueue = new Queue<TTransition>();
+    private readonly Queue<TTransition> _emitedQueue = new();
 
     private Option<TTransition> _current = Option.None<TTransition>();
 
@@ -15,12 +19,19 @@ internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
         _transitionsEnumerator = transitions.GetEnumerator();
     }
 
+    /// <inheritdoc/>
     public TTransition Current => _current.ValueOr(() => throw new InvalidOperationException());
-
+    
+    /// <inheritdoc/>
     object? IEnumerator.Current => Current;
 
-    public void EmitNext(TTransition transition) => _emitedQueue.Enqueue(transition);
+    /// <summary>
+    /// Pushes transition into the sequence to be returned first.
+    /// </summary>
+    /// <param name="transition">Transition value.</param>
+    public void Push(TTransition transition) => _emitedQueue.Enqueue(transition);
 
+    /// <inheritdoc/>
     public bool MoveNext()
     {
         if (_emitedQueue.TryDequeue(out var transition))
@@ -37,10 +48,13 @@ internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
         return hasCurrent;
     }
 
+    /// <inheritdoc/>
     public void Reset() => throw new NotSupportedException();
 
+    /// <inheritdoc/>
     public IEnumerable<TTransition> ToEnumerable() => new EnumerableWrapper(this);
 
+    /// <inheritdoc/>
     public void Dispose() => _transitionsEnumerator.Dispose();
 
     private class EnumerableWrapper : IEnumerable<TTransition>

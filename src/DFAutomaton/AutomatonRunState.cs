@@ -10,14 +10,14 @@ internal readonly record struct AutomatonRunState<TTransition, TState> where TTr
     {
         var automatonState = new CurrentState(state, stateValue);
         
-        return new AutomatonRunState<TTransition, TState>
+        return new()
         {
             Value = Option.Some<CurrentState, AutomatonError<TTransition, TState>>(automatonState)
         };
     }
     
     public static AutomatonRunState<TTransition, TState> Error(AutomatonError<TTransition, TState> error) =>
-        new AutomatonRunState<TTransition, TState>
+        new()
         {
             Value = Option.None<CurrentState, AutomatonError<TTransition, TState>>(error)
         };
@@ -26,7 +26,7 @@ internal readonly record struct AutomatonRunState<TTransition, TState> where TTr
     {
         return Value.Match(
             value => map(value.State, value.StateValue),
-            error => AutomatonRunState<TTransition, TState>.Error(error));
+            AutomatonRunState<TTransition, TState>.Error);
     }
 
     public Option<TState, AutomatonError<TTransition, TState>> StateValueOrError() => Value.Map(state => state.StateValue);

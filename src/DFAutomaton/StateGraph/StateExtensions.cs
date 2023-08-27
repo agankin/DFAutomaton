@@ -2,8 +2,19 @@
 
 namespace DFAutomaton;
 
+/// <summary>
+/// Extensions that provide operations for state building.
+/// </summary>
 public static class StateExtensions
 {
+    /// <summary>
+    /// Completes states graph building returning start state of immutable states graph.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="start">States graph start.</param>
+    /// <param name="configuration">Validation configuration.</param>
+    /// <returns>Start state of immutable states graph.</returns>
     public static Option<IState<TTransition, TState>, StateError> Complete<TTransition, TState>(this State<TTransition, TState> start, BuildConfiguration configuration)
         where TTransition : notnull
     {
@@ -12,26 +23,54 @@ public static class StateExtensions
             : start.AsImmutable().Some<IState<TTransition, TState>, StateError>();
     }
 
+    /// <summary>
+    /// Adds transition to new fixed state with reducing to fixed value.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="nextStateValue">Next state value.</param>
+    /// <returns>Next state.</returns>
     public static State<TTransition, TState> ToNewFixedState<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
-        TState newValue)
+        TState nextStateValue)
         where TTransition : notnull
     {
-        var reduce = Constant<TTransition, TState>(newValue);
+        var reduce = Constant<TTransition, TState>(nextStateValue);
         return current.ToNewFixedState(transition, reduce);
     }
 
+    /// <summary>
+    /// Adds transition to new fixed state with applying value reducer.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="reduce">State value reducer.</param>
+    /// <returns>Next state.</returns>
     public static State<TTransition, TState> ToNewFixedState<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
         ReduceValue<TTransition, TState> reduce)
         where TTransition : notnull
     {
-        var newState = StateFactory<TTransition, TState>.SubState(current.GetNextId);
+        var newState = StateFactory<TTransition, TState>.SubState(current.GenerateId);
         return current.LinkFixedState(transition, newState, reduce);
     }
 
+    /// <summary>
+    /// Adds transition to existing automaton state with reducing to fixed value.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="nextState">Next automaton state.</param>
+    /// <param name="nextValue">Next state value.</param>
+    /// <returns>Next state.</returns>
     public static State<TTransition, TState> LinkFixedState<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
@@ -43,6 +82,15 @@ public static class StateExtensions
         return current.LinkFixedState(transition, nextState, reduce);
     }
 
+    /// <summary>
+    /// Adds transition to new fixed accepted state with reducing to fixed value.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="acceptedValue">Next accepted state value.</param>
+    /// <returns>Next accepted state.</returns>
     public static AcceptedState<TTransition, TState> ToNewFixedAccepted<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
@@ -53,18 +101,37 @@ public static class StateExtensions
         return current.ToNewFixedAccepted(transition, reduce);
     }
 
+    /// <summary>
+    /// Adds transition to new fixed accepted state with applying value reducer.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="reduce">State value reducer.</param>
+    /// <returns>Next accepted state.</returns>
     public static AcceptedState<TTransition, TState> ToNewFixedAccepted<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
         ReduceValue<TTransition, TState> reduce)
         where TTransition : notnull
     {
-        var acceptedState = StateFactory<TTransition, TState>.Accepted(current.GetNextId);
+        var acceptedState = StateFactory<TTransition, TState>.Accepted(current.GenerateId);
         current.LinkFixedState(transition, acceptedState, reduce);
 
         return new AcceptedState<TTransition, TState>(acceptedState);
     }
 
+    /// <summary>
+    /// Adds transition to existing accepted state with reducing to fixed value.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="acceptedState">Next accepted state.</param>
+    /// <param name="acceptedStateValue">Next accepted state value.</param>
+    /// <returns>Next accepted state.</returns>
     public static AcceptedState<TTransition, TState> LinkFixedAccepted<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
@@ -76,6 +143,16 @@ public static class StateExtensions
         return current.LinkFixedAccepted(transition, acceptedState, reduce);
     }
 
+    /// <summary>
+    /// Adds transition to existing accepted state with applying value reducer.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="acceptedState">Next accepted state.</param>
+    /// <param name="reduce">State value reducer.</param>
+    /// <returns>Next accepted state.</returns>
     public static AcceptedState<TTransition, TState> LinkFixedAccepted<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,

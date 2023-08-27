@@ -2,8 +2,19 @@
 
 namespace DFAutomaton;
 
+/// <summary>
+/// Utility to traverse through state graphs.
+/// </summary>
+/// <typeparam name="TTransition">Transition value type.</typeparam>
+/// <typeparam name="TState">State value type.</typeparam>
 internal static class StateVisitor<TTransition, TState> where TTransition : notnull
 {
+    /// <summary>
+    /// Traverses through state graph until result found.
+    /// </summary>
+    /// <typeparam name="TResult">Result type.</typeparam>
+    /// <param name="start">State graph start state.</param>
+    /// <param name="visit">Function returning Some result or None.</param>
     public static Option<TResult> VisitTillResult<TResult>(
         IState<TTransition, TState> start,
         Func<IState<TTransition, TState>, Option<TResult>> visit)

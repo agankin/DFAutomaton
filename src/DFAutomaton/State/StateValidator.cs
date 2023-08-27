@@ -2,8 +2,18 @@
 
 namespace DFAutomaton;
 
+/// <summary>
+/// Automaton states graph validator.
+/// </summary>
 internal static class AutomatonStateGraphValidator
 {
+    /// <summary>
+    /// Validates states graph.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="start">States graph start.</param>
+    /// <returns>Returns states graph start or validation error.</returns>
     public static Option<IState<TTransition, TState>, StateError> ValidateAnyReachAccepted<TTransition, TState>(this IState<TTransition, TState> start)
         where TTransition : notnull
     {

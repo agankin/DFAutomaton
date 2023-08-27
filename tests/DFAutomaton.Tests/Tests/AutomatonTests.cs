@@ -42,7 +42,7 @@ public class AutomatonTests
 
         automaton.Run(start, transitions).AssertNone(error =>
         {
-            Assert.AreEqual(AutomatonErrorType.TransitionNotExists, error.Type);
+            Assert.AreEqual(AutomatonErrorType.TransitionNotFound, error.Type);
             Assert.AreEqual(ShoppingActions.ReceiveGoods, error.Transition);
         });
     }
