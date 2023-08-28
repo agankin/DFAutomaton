@@ -1,6 +1,4 @@
-﻿using DFAutomaton.Utils;
-
-namespace DFAutomaton;
+﻿namespace DFAutomaton;
 
 /// <summary>
 /// State factory.
@@ -15,23 +13,22 @@ internal static class StateFactory<TTransition, TState> where TTransition : notn
     /// <returns>Start state.</returns>
     public static State<TTransition, TState> Start()
     {
-        var generateId = StateIdGenerator.CreateNew();
-        return new State<TTransition, TState>(StateType.Start, generateId);
+        var graphContext = new StateGraphContext<TTransition, TState>();
+        var acceptedState = Accepted(graphContext);
+
+        graphContext.SetAcceptedState(acceptedState);
+
+        return new State<TTransition, TState>(StateType.Start, graphContext);
     }
     
     /// <summary>
     /// Creates intermediate state.
     /// </summary>
-    /// <param name="generateId">State id generator.</param>
+    /// <param name="graphContext">State graph context.</param>
     /// <returns>Intermediate state.</returns>
-    public static State<TTransition, TState> SubState(Func<long> generateId) =>
-        new State<TTransition, TState>(StateType.SubState, generateId);
+    public static State<TTransition, TState> SubState(StateGraphContext<TTransition, TState> graphContext) =>
+        new State<TTransition, TState>(StateType.SubState, graphContext);
 
-    /// <summary>
-    /// Creates accepted state.
-    /// </summary>
-    /// <param name="generateId">State id generator.</param>
-    /// <returns>Accepted state.</returns>
-    public static State<TTransition, TState> Accepted(Func<long> generateId) =>
-        new State<TTransition, TState>(StateType.Accepted, generateId);
+    private static State<TTransition, TState> Accepted(StateGraphContext<TTransition, TState> graphContext) =>
+        new State<TTransition, TState>(StateType.Accepted, graphContext);
 }

@@ -29,7 +29,7 @@ public class AutomatonStateGraphValidationTests
         shoppingState
             .ToNewFixedState(ShoppingActions.AddBread, ShoppingStateReducers.AddBread)
             .ToNewFixedState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods)
-            .ToNewFixedAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
+            .ToAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
 
         shoppingState
             .ToNewFixedState(ShoppingActions.AddButter, ShoppingStateReducers.AddButter);

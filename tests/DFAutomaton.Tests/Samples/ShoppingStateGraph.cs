@@ -20,7 +20,7 @@ public class ShoppingStateGraph
         var paidState = shoppingState
             .ToNewFixedState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
         paidState
-            .ToNewFixedAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
+            .ToAccepted(ShoppingActions.ReceiveGoods, ShoppingStateReducers.ReceiveGoods);
 
         return new ShoppingStateGraph
         {

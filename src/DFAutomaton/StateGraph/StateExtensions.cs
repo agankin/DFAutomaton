@@ -57,7 +57,7 @@ public static class StateExtensions
         ReduceValue<TTransition, TState> reduce)
         where TTransition : notnull
     {
-        var newState = StateFactory<TTransition, TState>.SubState(current.GenerateId);
+        var newState = StateFactory<TTransition, TState>.SubState(current.GraphContext);
         return current.LinkFixedState(transition, newState, reduce);
     }
 
@@ -83,87 +83,43 @@ public static class StateExtensions
     }
 
     /// <summary>
-    /// Adds transition to new fixed accepted state with reducing to fixed value.
+    /// Adds transition to the accepted state with reducing to fixed value.
     /// </summary>
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="current">Current state.</param>
     /// <param name="transition">Transition value.</param>
     /// <param name="acceptedValue">Next accepted state value.</param>
-    /// <returns>Next accepted state.</returns>
-    public static AcceptedState<TTransition, TState> ToNewFixedAccepted<TTransition, TState>(
+    /// <returns>Accepted state.</returns>
+    public static AcceptedState<TTransition, TState> ToAccepted<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
         TState acceptedValue)
         where TTransition : notnull
     {
         var reduce = Constant<TTransition, TState>(acceptedValue);
-        return current.ToNewFixedAccepted(transition, reduce);
+        return current.ToAccepted(transition, reduce);
     }
 
     /// <summary>
-    /// Adds transition to new fixed accepted state with applying value reducer.
+    /// Adds transition to the accepted state with applying value reducer.
     /// </summary>
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="current">Current state.</param>
     /// <param name="transition">Transition value.</param>
     /// <param name="reduce">State value reducer.</param>
-    /// <returns>Next accepted state.</returns>
-    public static AcceptedState<TTransition, TState> ToNewFixedAccepted<TTransition, TState>(
+    /// <returns>Accepted state.</returns>
+    public static AcceptedState<TTransition, TState> ToAccepted<TTransition, TState>(
         this State<TTransition, TState> current,
         TTransition transition,
         ReduceValue<TTransition, TState> reduce)
         where TTransition : notnull
     {
-        var acceptedState = StateFactory<TTransition, TState>.Accepted(current.GenerateId);
+        var acceptedState = current.GraphContext.AcceptedState;
         current.LinkFixedState(transition, acceptedState, reduce);
 
         return new AcceptedState<TTransition, TState>(acceptedState);
-    }
-
-    /// <summary>
-    /// Adds transition to existing accepted state with reducing to fixed value.
-    /// </summary>
-    /// <typeparam name="TTransition">Transition value type.</typeparam>
-    /// <typeparam name="TState">State value type.</typeparam>
-    /// <param name="current">Current state.</param>
-    /// <param name="transition">Transition value.</param>
-    /// <param name="acceptedState">Next accepted state.</param>
-    /// <param name="acceptedStateValue">Next accepted state value.</param>
-    /// <returns>Next accepted state.</returns>
-    public static AcceptedState<TTransition, TState> LinkFixedAccepted<TTransition, TState>(
-        this State<TTransition, TState> current,
-        TTransition transition,
-        AcceptedState<TTransition, TState> acceptedState,
-        TState acceptedStateValue)
-        where TTransition : notnull
-    {
-        var reduce = Constant<TTransition, TState>(acceptedStateValue);
-        return current.LinkFixedAccepted(transition, acceptedState, reduce);
-    }
-
-    /// <summary>
-    /// Adds transition to existing accepted state with applying value reducer.
-    /// </summary>
-    /// <typeparam name="TTransition">Transition value type.</typeparam>
-    /// <typeparam name="TState">State value type.</typeparam>
-    /// <param name="current">Current state.</param>
-    /// <param name="transition">Transition value.</param>
-    /// <param name="acceptedState">Next accepted state.</param>
-    /// <param name="reduce">State value reducer.</param>
-    /// <returns>Next accepted state.</returns>
-    public static AcceptedState<TTransition, TState> LinkFixedAccepted<TTransition, TState>(
-        this State<TTransition, TState> current,
-        TTransition transition,
-        AcceptedState<TTransition, TState> acceptedState,
-        ReduceValue<TTransition, TState> reduce)
-        where TTransition : notnull
-    {
-        var state = acceptedState.State;
-        current.LinkFixedState(transition, state, reduce);
-        
-        return acceptedState;
     }
     
     private static ReduceValue<TTransition, TState> Constant<TTransition, TState>(TState newValue)

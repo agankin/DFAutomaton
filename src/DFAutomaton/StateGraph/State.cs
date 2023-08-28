@@ -12,11 +12,11 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
 {
     private readonly Dictionary<TTransition, State<TTransition, TState>.Transition> _transitionDict = new();
 
-    internal State(StateType type, Func<long> generateId)
+    internal State(StateType type, StateGraphContext<TTransition, TState> graphContext)
     {
-        Id = generateId();
+        Id = graphContext.GenerateId();
         Type = type;
-        GenerateId = generateId;
+        GraphContext = graphContext;
     }
 
     /// <inheritdoc/>
@@ -44,7 +44,7 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
         }
     }
 
-    internal Func<long> GenerateId { get; }
+    internal StateGraphContext<TTransition, TState> GraphContext { get; }
 
     /// <summary>
     /// Adds transition to existing fixed next state applying state value reducer.
