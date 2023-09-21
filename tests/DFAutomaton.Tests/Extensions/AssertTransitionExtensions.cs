@@ -5,88 +5,72 @@ namespace DFAutomaton.Tests;
 
 public static class AssertTransitionExtensions
 {
-    public static void AssertTransition<TTransition, TState>(
-        this Option<IState<TTransition, TState>.Transition> stateTransitionOption,
-        IState<TTransition, TState> expectedNextState,
-        ReduceValue<TTransition, TState> expectedReduce)
+    public static IState<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
+        this IState<TTransition, TState>.Transition transition,
+        TransitionKind expectedKind)
         where TTransition : notnull
     {
-        stateTransitionOption.AssertSome(stateTransition =>
-        {
-            var (_, nextStateOption, reduce) = stateTransition;
-
-            nextStateOption.AssertSome(nextState => Assert.AreEqual(expectedNextState, nextState));
-            Assert.AreEqual(expectedReduce, reduce);
-        });
+        Assert.AreEqual(expectedKind, transition.Kind);
+        return transition;
     }
 
-    public static void AssertTransition<TTransition, TState>(
-        this Option<State<TTransition, TState>.Transition> stateTransitionOption,
-        State<TTransition, TState> expectedNextState,
-        ReduceValue<TTransition, TState> expectedReduce)
+    public static State<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
+        this State<TTransition, TState>.Transition transition,
+        TransitionKind expectedKind)
         where TTransition : notnull
     {
-        stateTransitionOption.AssertSome(stateTransition =>
-        {
-            var (_, nextStateOption, reduce) = stateTransition;
-
-            nextStateOption.AssertSome(nextState => Assert.AreEqual(expectedNextState, nextState));
-            Assert.AreEqual(expectedReduce, reduce);
-        });
+        Assert.AreEqual(expectedKind, transition.Kind);
+        return transition;
     }
 
-    public static void AssertTransition<TTransition, TState>(
-        this Option<State<TTransition, TState>.Transition> stateTransitionOption,
-        State<TTransition, TState> expectedNextState,
-        TState valueToReduce,
-        TState expectedReducedValue)
+    public static State<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
+        this State<TTransition, TState>.Transition transition,
+        State<TTransition, TState> expectedState)
         where TTransition : notnull
     {
-        stateTransitionOption.AssertSome(stateTransition =>
-        {
-            var (_, nextStateOption, reduce) = stateTransition;
-
-            nextStateOption.AssertSome(nextState => Assert.AreEqual(expectedNextState, nextState));
-
-            var automatonState = new AutomatonState<TTransition, TState>(
-                valueToReduce,
-                nextStateOption.Map<IState<TTransition, TState>>(_ => _),
-                _ => {});
-            Assert.AreEqual(expectedReducedValue, reduce(automatonState));
-        });
+        Assert.AreEqual(expectedState, transition.State);
+        return transition;
     }
 
-    public static void AssertTransitionToAccepted<TTransition, TState>(
-        this Option<State<TTransition, TState>.Transition> stateTransitionOption,
-        ReduceValue<TTransition, TState> expectedReduce)
+    public static State<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
+        this State<TTransition, TState>.Transition transition,
+        AcceptedState<TTransition, TState> expectedState)
         where TTransition : notnull
     {
-        stateTransitionOption.AssertSome(stateTransition =>
-        {
-            var (_, nextStateOption, reduce) = stateTransition;
-
-            nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
-            Assert.AreEqual(expectedReduce, reduce);
-        });
+        return transition.TransitsTo(expectedState.State);
     }
 
-    public static void AssertTransitionToAccepted<TTransition, TState>(
-        this Option<State<TTransition, TState>.Transition> stateTransitionOption,
-        TState valueToReduce,
-        TState expectedReducedValue)
+    public static IState<TTransition, TState>.Transition Reduces<TTransition, TState>(
+        this IState<TTransition, TState>.Transition transition,
+        TState beforeReduce,
+        TState expectedAfterReduce)
         where TTransition : notnull
     {
-        stateTransitionOption.AssertSome(stateTransition =>
-        {
-            var (_, nextStateOption, reduce) = stateTransition;
+        var automatonState = new AutomatonState<TTransition, TState>(
+            beforeReduce,
+            Option.None<IState<TTransition, TState>>(),
+            _ => {});
+        var actualAfterReduce = transition.Reduce(automatonState).State;
+        
+        Assert.AreEqual(expectedAfterReduce, actualAfterReduce);
+        
+        return transition;
+    }
 
-            nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
-            
-            var automatonState = new AutomatonState<TTransition, TState>(
-                valueToReduce,
-                nextStateOption.Map<IState<TTransition, TState>>(_ => _),
-                _ => {});
-            Assert.AreEqual(expectedReducedValue, reduce(automatonState));
-        });
+    public static State<TTransition, TState>.Transition Reduces<TTransition, TState>(
+        this State<TTransition, TState>.Transition transition,
+        TState beforeReduce,
+        TState expectedAfterReduce)
+        where TTransition : notnull
+    {
+        var automatonState = new AutomatonState<TTransition, TState>(
+            beforeReduce,
+            Option.None<IState<TTransition, TState>>(),
+            _ => {});
+        var actualAfterReduce = transition.Reduce(automatonState).State;
+        
+        Assert.AreEqual(expectedAfterReduce, actualAfterReduce);
+        
+        return transition;
     }
 }

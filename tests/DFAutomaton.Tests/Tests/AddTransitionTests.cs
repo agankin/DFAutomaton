@@ -2,59 +2,81 @@
 
 namespace DFAutomaton.Tests;
 
-[TestFixture]
-public class AddTransitionTests
+[TestFixture(Description = "Tests for adding state transitions.")]
+public partial class AddTransitionTests
 {
-    [Test]
-    public void AddNewStateWithReducer()
+    [Test(Description = "Tests adding transition to fixed state and constant value.")]
+    public void Add_transition_to_fixed_state_with_constant_value()
     {
-        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = start.ToNewFixedState(ShoppingActions.PayForGoods, ShoppingStateReducers.PayForGoods);
+        var start = StateFactory<StateActions, State>.Start();
 
-        Assert.AreEqual(StateType.SubState, newState.Type);
-        start[ShoppingActions.PayForGoods].AssertTransition(newState, ShoppingStateReducers.PayForGoods);
+        var value = new State(StateValue.Initial);
+        var incValue = new State(StateValue.Incremented);
+
+        var incState = start.ToNewFixedState(StateActions.Inc, incValue);
+
+        incState.Is(StateType.SubState);
+        start[StateActions.Inc]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .TransitsTo(incState)
+            .Reduces(value, incValue);
     }
 
-    [Test]
-    public void AddNewConstantState()
+    [Test(Description = "Tests adding transition to fixed state and value reducer.")]
+    public void Add_transition_to_fixed_state_with_reducer()
     {
-        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newValue = new ShoppingState(ShoppingStateType.GoodsPaid, 100);
-        var newState = start.ToNewFixedState(ShoppingActions.PayForGoods, newValue);
-
-        Assert.AreEqual(StateType.SubState, newState.Type);
-
-        var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.PayForGoods].AssertTransition(newState, initialValue, newValue);
-    }
-
-    [Test]
-    public void LinkExistingStateWithReducer()
-    {
-        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GraphContext);
+        var start = StateFactory<StateActions, State>.Start();
+        var incState = start.ToNewFixedState(StateActions.Inc, StateReducers.Inc);
         
-        var newLinkedState = start.LinkFixedState(
-            ShoppingActions.AddBread,
-            newState,
-            ShoppingStateReducers.AddBread);
+        var value = new State(StateValue.Initial);
+        var incValue = new State(StateValue.Incremented);
 
-        Assert.AreEqual(newState, newLinkedState);
-        start[ShoppingActions.AddBread].AssertTransition(newState, ShoppingStateReducers.AddBread);
+        incState.Is(StateType.SubState);
+        start[StateActions.Inc]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .TransitsTo(incState)
+            .Reduces(value, incValue);
     }
 
-    [Test]
-    public void LinkExistingConstantState()
+    [Test(Description = "Tests linking existing state with transition to constant value.")]
+    public void Link_fixed_state_with_constant_value_transition()
     {
-        var start = StateFactory<ShoppingActions, ShoppingState>.Start();
-        var newState = StateFactory<ShoppingActions, ShoppingState>.SubState(start.GraphContext);
-        var newValue = new ShoppingState(ShoppingStateType.Shopping, ShoppingStateReducers.BreadPrice);
+        var start = StateFactory<StateActions, State>.Start();
+        var incState = StateFactory<StateActions, State>.SubState(start.GraphContext);
         
-        var newLinkedState = start.LinkFixedState(ShoppingActions.AddBread, newState, newValue);
+        var value = new State(StateValue.Initial);
+        var incValue = new State(StateValue.Incremented);
+        
+        var linkedState = start.LinkFixedState(StateActions.Inc, incState, incValue);
+        Assert.AreEqual(incState, linkedState);
+        linkedState.Is(StateType.SubState);
+        
+        start[StateActions.Inc]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .TransitsTo(incState)
+            .Reduces(value, incValue);
+    }
 
-        Assert.AreEqual(newState, newLinkedState);
+    [Test(Description = "Tests linking existing state with transition by reducer.")]
+    public void Link_fixed_state_with_value_transition_by_reducer()
+    {
+        var start = StateFactory<StateActions, State>.Start();
+        var incState = StateFactory<StateActions, State>.SubState(start.GraphContext);
+        
+        var linkedState = start.LinkFixedState(StateActions.Inc, incState, StateReducers.Inc);
+        Assert.AreEqual(incState, linkedState);
+        linkedState.Is(StateType.SubState);
 
-        var initialValue = new ShoppingState(ShoppingStateType.Shopping, 0);
-        start[ShoppingActions.AddBread].AssertTransition(newState, initialValue, newValue);
+        var value = new State(StateValue.Initial);
+        var incValue = new State(StateValue.Incremented);
+
+        start[StateActions.Inc]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .TransitsTo(incState)
+            .Reduces(value, incValue);
     }
 }

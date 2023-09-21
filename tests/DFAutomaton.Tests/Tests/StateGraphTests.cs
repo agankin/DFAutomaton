@@ -1,43 +1,87 @@
-﻿using NUnit.Framework;
+﻿using DFAutomaton.Tests.Samples.Shopping;
+using NUnit.Framework;
+using Optional;
 
 namespace DFAutomaton.Tests;
 
 [TestFixture]
 public class StateGraphTests
 {
-    [Test]
+    [Test(Description = "State graph transitions test scenario.")]
     public void TransitionsScenario()
     {
-        var graph = ShoppingStateGraph.Create();
+        var collectingGoods = StateGraph.BeginCollectingGoods();
+        
+        var emptyCartState = new State(
+            Phase.CollectingGoods,
+            Cart.Empty,
+            new Wallet(100)
+        ).Some<State, Errors>();
+        
+        var breadInCartState = new State(
+            Phase.CollectingGoods,
+            new Cart(Goods.Bread),
+            new Wallet(100)
+        ).Some<State, Errors>();
+        
+        var breadInCart = collectingGoods[Actions.PutBreadToCart]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .TransitsTo(collectingGoods)
+            .Reduces(emptyCartState, breadInCartState)
+            .State
+                .IsSome()
+                .Is(StateType.SubState);
 
-        var shopping = graph.ShoppingState;
-        var paid = graph.PaidState;
+        var breadButterInCartState = new State(
+            Phase.CollectingGoods,
+            new Cart(Goods.Bread, Goods.Butter),
+            new Wallet(100)
+        ).Some<State, Errors>();
 
-        var afterAddBread = shopping[ShoppingActions.AddBread];
-        afterAddBread.AssertTransition(shopping, ShoppingStateReducers.AddBread);
+        var breadButterInCart = breadInCart[Actions.PutButterToCart]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .TransitsTo(collectingGoods)
+            .Reduces(breadInCartState, breadButterInCartState)
+            .State
+                .IsSome()
+                .Is(StateType.SubState);
 
-        var afterAddButter = afterAddBread.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.AddButter]);
-        afterAddButter.AssertTransition(shopping, ShoppingStateReducers.AddButter);
+        var walletAfterPayment = new Wallet(100 - Prices.Bread - Prices.Butter);
+        var paidState = new State(
+            Phase.GoodsPaid,
+            new Cart(Goods.Bread, Goods.Butter),
+            walletAfterPayment
+        ).Some<State, Errors>();
 
-        var afterPay = afterAddButter.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.PayForGoods]);
-        afterPay.AssertTransition(paid, ShoppingStateReducers.PayForGoods);
+        var paid = breadButterInCart[Actions.PayForGoods]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .Reduces(breadButterInCartState, paidState)
+            .State
+                .IsSome()
+                .Is(StateType.SubState);
 
-        var afterReceive = afterPay.FlatMap(state => state.State).FlatMap(nextState => nextState[ShoppingActions.ReceiveGoods]);
-        afterReceive.AssertSome(transition =>
-        {
-            var (_, nextStateOption, reduce) = transition;
+        var purchasedState = new State(
+            Phase.GoodsPurchased,
+            new Cart(Goods.Bread, Goods.Butter),
+            walletAfterPayment
+        ).Some<State, Errors>();
 
-            nextStateOption.AssertSome(nextState => Assert.AreEqual(StateType.Accepted, nextState.Type));
-            Assert.AreEqual(ShoppingStateReducers.ReceiveGoods, reduce);
-        });
+        paid[Actions.ReceiveGoods]
+            .IsSome()
+            .TransitsTo(TransitionKind.FixedState)
+            .Reduces(paidState, purchasedState)
+            .State
+                .IsSome()
+                .Is(StateType.Accepted);
     }
 
-    [Test]
+    [Test(Description = "Test for transition not exists error.")]
     public void TestTransitionNotExists()
     {
-        var graph = ShoppingStateGraph.Create();
-        var goodsReceivedState = graph.ShoppingState[ShoppingActions.ReceiveGoods];
-
-        goodsReceivedState.AssertNone();
+        var collectingGoods = StateGraph.BeginCollectingGoods();
+        collectingGoods[Actions.ReceiveGoods].IsNone();
     }
 }
