@@ -8,7 +8,7 @@ namespace DFAutomaton.Tests;
 public class StateGraphTests
 {
     [Test(Description = "State graph transitions test scenario.")]
-    public void TransitionsScenario()
+    public void Transitions_scenario()
     {
         var collectingGoods = StateGraph.BeginCollectingGoods();
         
@@ -31,7 +31,7 @@ public class StateGraphTests
             .Reduces(emptyCartState, breadInCartState)
             .State
                 .IsSome()
-                .Is(StateType.SubState);
+                .Is(StateType.Start);
 
         var breadButterInCartState = new State(
             Phase.CollectingGoods,
@@ -46,7 +46,7 @@ public class StateGraphTests
             .Reduces(breadInCartState, breadButterInCartState)
             .State
                 .IsSome()
-                .Is(StateType.SubState);
+                .Is(StateType.Start);
 
         var walletAfterPayment = new Wallet(100 - Prices.Bread - Prices.Butter);
         var paidState = new State(
@@ -78,8 +78,8 @@ public class StateGraphTests
                 .Is(StateType.Accepted);
     }
 
-    [Test(Description = "Test for transition not exists error.")]
-    public void TestTransitionNotExists()
+    [Test(Description = "Tests transition not exists.")]
+    public void Transition_not_exists()
     {
         var collectingGoods = StateGraph.BeginCollectingGoods();
         collectingGoods[Actions.ReceiveGoods].IsNone();

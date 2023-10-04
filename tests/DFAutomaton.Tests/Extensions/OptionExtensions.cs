@@ -24,8 +24,21 @@ public static class OptionExtensions
             _ => Assert.Fail("Expected None but optional value is Some."),
             () => { });
 
-    public static void IsError<TValue, TError>(this Option<TValue, TError> option, Action<TError> onError) =>
+    public static TError IsError<TValue, TError>(this Option<TValue, TError> option) =>
         option.Match(
-            _ => Assert.Fail("Expected None but optional value is Some."),
-            onError);
+            _ =>
+            {
+                Assert.Fail("Expected None but optional value is Some.");
+                throw new Exception();
+            },
+            error => error);
+
+    public static void IsError<TValue, TError>(this Option<TValue, TError> option, TError expectedError) =>
+        option.Match(
+            _ =>
+            {
+                Assert.Fail("Expected None but optional value is Some.");
+                throw new Exception();
+            },
+            error => Assert.AreEqual(expectedError, error));
 }

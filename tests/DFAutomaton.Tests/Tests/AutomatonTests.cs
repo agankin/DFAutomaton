@@ -1,72 +1,97 @@
-﻿using NUnit.Framework;
+﻿using DFAutomaton.Tests.Samples.Shopping;
+using NUnit.Framework;
+using Optional;
 
 namespace DFAutomaton.Tests;
 
 [TestFixture]
 public class AutomatonTests
 {
-    [Test]
-    public void RunScenario()
+    [Test(Description = "Automaton state transitions test scenario.")]
+    public void Run_valid()
     {
-        var automaton = ShoppingStateGraph.Create().Automaton;
+        var automaton = StateGraph.BuildAutomaton();
 
-        var start = new ShoppingState(ShoppingStateType.Shopping, 0);
+        var wallet = new Wallet(100);
+        var initialState = new State(
+            Phase.CollectingGoods,
+            Cart.Empty,
+            wallet
+        ).Some<State, Errors>();
+
+        var expectedWalletAfterPurchase = new Wallet(100 - Prices.Bread - Prices.Butter);
+        var expectedAfterPurchaseState = new State(
+            Phase.GoodsPurchased,
+            new Cart(Goods.Bread, Goods.Butter),
+            expectedWalletAfterPurchase
+        ).Some<State, Errors>();
+
         var transitions = new[]
         {
-            ShoppingActions.AddBread,
-            ShoppingActions.AddButter,
-            ShoppingActions.PayForGoods,
-            ShoppingActions.ReceiveGoods
+            Actions.PutBreadToCart,
+            Actions.PutButterToCart,
+            Actions.PayForGoods,
+            Actions.ReceiveGoods
         };
 
-        var expectedCost = ShoppingStateReducers.BreadPrice + ShoppingStateReducers.ButterPrice;
-        automaton.Run(start, transitions).AssertSome(finalState =>
-        {
-            Assert.AreEqual(expectedCost, finalState.GoodsCost);
-            Assert.AreEqual(ShoppingStateType.GoodsPurchased, finalState.Type);
-        });
+        var finalState = automaton.Run(initialState, transitions).IsSome();
+        Assert.AreEqual(expectedAfterPurchaseState, finalState);
     }
 
-    [Test]
-    public void RunWithTransitionNotFoundError()
+    [Test(Description = "Automaton error occuring on transition not found test scenario.")]
+    public void Run_with_transition_not_found()
     {
-        var automaton = ShoppingStateGraph.Create().Automaton;
+        var automaton = StateGraph.BuildAutomaton();
 
-        var start = new ShoppingState(ShoppingStateType.Shopping, 0);
+        var wallet = new Wallet(100);
+        var initialState = new State(
+            Phase.CollectingGoods,
+            Cart.Empty,
+            wallet
+        ).Some<State, Errors>();
+        
         var transitions = new[]
         {
-            ShoppingActions.AddBread,
-            ShoppingActions.AddButter,
-            ShoppingActions.ReceiveGoods
+            Actions.PutBreadToCart,
+            Actions.PutButterToCart,
+            Actions.ReceiveGoods
         };
 
-        automaton.Run(start, transitions).AssertNone(error =>
-        {
-            Assert.AreEqual(AutomatonErrorType.TransitionNotFound, error.Type);
-            Assert.AreEqual(ShoppingActions.ReceiveGoods, error.Transition);
-        });
+        automaton.Run(initialState, transitions)
+            .IsError()
+            .HasType(AutomatonErrorType.TransitionNotFound)
+            .OccuredOn(Actions.ReceiveGoods)
+            .State
+                .Is(StateType.Start);
     }
 
-    [Test]
-    public void RunWithTransitFromAcceptedError()
+    [Test(Description = "Automaton error occuring on transition from accepted state test scenario.")]
+    public void Run_with_transit_from_accepted()
     {
-        var automaton = ShoppingStateGraph.Create().Automaton;
+        var automaton = StateGraph.BuildAutomaton();
 
-        var start = new ShoppingState(ShoppingStateType.Shopping, 0);
+        var wallet = new Wallet(100);
+        var initialState = new State(
+            Phase.CollectingGoods,
+            Cart.Empty,
+            wallet
+        ).Some<State, Errors>();
+
         var transitions = new[]
         {
-            ShoppingActions.AddBread,
-            ShoppingActions.AddButter,
-            ShoppingActions.PayForGoods,
-            ShoppingActions.ReceiveGoods,
+            Actions.PutBreadToCart,
+            Actions.PutButterToCart,
+            Actions.PayForGoods,
+            Actions.ReceiveGoods,
 
-            ShoppingActions.PayForGoods
+            Actions.PayForGoods
         };
 
-        automaton.Run(start, transitions).AssertNone(error =>
-        {
-            Assert.AreEqual(AutomatonErrorType.TransitionFromAccepted, error.Type);
-            Assert.AreEqual(ShoppingActions.PayForGoods, error.Transition);
-        });
+        automaton.Run(initialState, transitions)
+            .IsError()
+            .HasType(AutomatonErrorType.TransitionFromAccepted)
+            .OccuredOn(Actions.PayForGoods)
+            .State
+                .Is(StateType.Accepted);
     }
 }

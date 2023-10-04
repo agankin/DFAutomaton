@@ -14,7 +14,7 @@ public partial class AddTransitionTests
 
         var incState = start.ToAccepted(StateActions.Inc, incValue);
 
-        incState.Is(StateType.SubState);
+        incState.Is(StateType.Accepted);
         start[StateActions.Inc]
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)

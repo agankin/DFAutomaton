@@ -23,12 +23,25 @@ public static class AssertTransitionExtensions
         return transition;
     }
 
+    public static IState<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
+        this IState<TTransition, TState>.Transition transition,
+        IState<TTransition, TState> expectedState)
+        where TTransition : notnull
+    {
+        var transitionState = transition.State.IsSome();
+        Assert.AreEqual(expectedState, transitionState);
+        
+        return transition;
+    }
+
     public static State<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
         this State<TTransition, TState>.Transition transition,
         State<TTransition, TState> expectedState)
         where TTransition : notnull
     {
-        Assert.AreEqual(expectedState, transition.State);
+        var transitionState = transition.State.IsSome();
+        Assert.AreEqual(expectedState, transitionState);
+        
         return transition;
     }
 
