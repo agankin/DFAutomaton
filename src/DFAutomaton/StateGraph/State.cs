@@ -29,7 +29,7 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     public StateType Type { get; }
 
     /// <inheritdoc/>
-    public IReadOnlySet<TTransition> Transitions => new HashSet<TTransition>(_transitionDict.Keys);
+    public IReadOnlyCollection<TTransition> Transitions => new HashSet<TTransition>(_transitionDict.Keys);
 
     /// <inheritdoc/>
     public Option<Transition> this[TTransition transition] => _transitionDict.GetValueOrNone(transition);

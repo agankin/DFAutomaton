@@ -27,7 +27,7 @@ public interface IState<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Transition values to next states.
     /// </summary>
-    public IReadOnlySet<TTransition> Transitions { get; }
+    public IReadOnlyCollection<TTransition> Transitions { get; }
 
     /// <summary>
     /// Get state transition by transition value.
