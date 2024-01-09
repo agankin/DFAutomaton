@@ -1,12 +1,12 @@
 # DFAutomaton
 
-DFAutomaton is a library for building Deterministic Finite Automatons.
+DFAutomaton is a library for building Deterministic Finite Automata.
 
-## _Quick overview_
+## Quick overview
 
-The library helps to build automatons in both simple and flexible way. It has the following features:
+This library helps to build automata in a simple and flexible way. It contains the following features:
 
-- Provides convenient domain specific language to define fully generic states graphs
-- Allows defining transitions between connected states in either a constant state change or an application of a state reduction function
-- Gives possibility to define static transitions having next state predefined or dynamic transitions having next state calculated by a more sophisticated form of reducers
-- Builds automaton that can be run over a sequence of transition values and transforming a start state value into a final accepted state value
+- Defining fully generic graph of automaton states with convenient language
+- Building an automaton that will be run over a sequence of transitions transforming a start value into an accepted final state value
+- Defining transitions between states as either a constant value change or as a result of reduction function invocation
+- Defining static transitions with fixed next state or dynamic ones having next state calculated by a more sophisticated form of reduction function
