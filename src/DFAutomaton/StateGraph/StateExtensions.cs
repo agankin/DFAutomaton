@@ -18,9 +18,11 @@ public static class StateExtensions
     public static Option<IState<TTransition, TState>, StateError> Complete<TTransition, TState>(this State<TTransition, TState> start, ValidationConfiguration configuration)
         where TTransition : notnull
     {
+        var immutableStart = start.AsImmutable();
+
         return configuration.ValidateAnyReachesAccepted
-            ? start.AsImmutable().ValidateAnyReachAccepted()
-            : start.AsImmutable().Some<IState<TTransition, TState>, StateError>();
+            ? StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(immutableStart)
+            : immutableStart.Some<IState<TTransition, TState>, StateError>();
     }
 
     /// <summary>

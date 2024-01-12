@@ -1,61 +1,65 @@
 ﻿using Optional;
+using Optional.Unsafe;
 
 namespace DFAutomaton;
 
 /// <summary>
-/// Utility to traverse through state graphs.
+/// Utility to traverse through a states graph.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 internal static class StateVisitor<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Traverses through state graph until result found.
+    /// Traverses through state graph.
     /// </summary>
-    /// <typeparam name="TResult">Result type.</typeparam>
     /// <param name="start">State graph start state.</param>
-    /// <param name="visit">Function returning Some result or None.</param>
-    public static Option<TResult> VisitTillResult<TResult>(
-        IState<TTransition, TState> start,
-        Func<IState<TTransition, TState>, Option<TResult>> visit)
+    /// <param name="visit">Visit function.</param>
+    /// <returns>True if was stopped by visit function, otherwise false.</returns>
+    public static bool Visit(IState<TTransition, TState> start, Func<IState<TTransition, TState>, VisitResult> visit)
     {
         var visitedStates = new HashSet<IState<TTransition, TState>>();
-        return VisitTillResult(start, visit, visitedStates);
+        var statesToVisit = new Stack<IState<TTransition, TState>>();
+
+        statesToVisit.Push(start);
+
+        while (statesToVisit.TryPop(out var currentState))
+        {
+            var result = visit(currentState);
+            if (result == VisitResult.Stop)
+                return true;
+
+            visitedStates.Add(currentState);
+
+            var nextStates = GetNextStates(currentState).Where(state => !visitedStates.Contains(state));
+            foreach (var nextState in nextStates)
+                statesToVisit.Push(nextState);
+        }
+
+        return false;
     }
 
-    private static Option<TResult> VisitTillResult<TResult>(
-        IState<TTransition, TState> state,
-        Func<IState<TTransition, TState>, Option<TResult>> visit,
-        ISet<IState<TTransition, TState>> visitedStates)
+    private static IEnumerable<IState<TTransition, TState>> GetNextStates(IState<TTransition, TState> state)
     {
-        if (visitedStates.Contains(state))
-            return Option.None<TResult>();
-
-        visitedStates.Add(state);
-
-        return visit(state).Else(() => VisitNextStatesTillResult(state, visit, visitedStates));
+        return state.Transitions
+            .Select(transition => state[transition].ValueOrFailure().State)
+            .Where(state => state.HasValue)
+            .Select(state => state.ValueOrFailure());
     }
+}
 
-    private static Option<TResult> VisitNextStatesTillResult<TResult>(
-        IState<TTransition, TState> state,
-        Func<IState<TTransition, TState>, Option<TResult>> visit,
-        ISet<IState<TTransition, TState>> visitedStates)
-    {
-        return state.Transitions.Select(transition => state[transition])
-            .Aggregate(
-                Option.None<TResult>(),
-                (result, transitionOption) => ResultOrVisitNext(result, transitionOption, visit, visitedStates));
-    }
+/// <summary>
+/// Visit function result.
+/// </summary>
+internal enum VisitResult
+{
+    /// <summary>
+    /// Continue visiting.
+    /// </summary>
+    Continue = 1,
 
-    private static Option<TResult> ResultOrVisitNext<TResult>(
-        Option<TResult> result,
-        Option<IState<TTransition, TState>.Transition> transitionOption,
-        Func<IState<TTransition, TState>, Option<TResult>> visit,
-        ISet<IState<TTransition, TState>> visitedStates)
-    {
-        return result.Else(
-            transitionOption.FlatMap(
-                transition => transition.State.FlatMap(
-                    state => VisitTillResult(state, visit, visitedStates))));
-    }
+    /// <summary>
+    /// Stop visiting.
+    /// </summary>
+    Stop
 }
