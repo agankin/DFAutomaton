@@ -10,7 +10,7 @@ namespace DFAutomaton;
 /// <param name="state">Automaton state to be reduced.</param>
 /// <returns>Automaton state reduction result.</returns>
 public delegate ReductionResult<TTransition, TState> Reduce<TTransition, TState>(AutomatonState<TTransition, TState> state)
-where TTransition : notnull;
+    where TTransition : notnull;
 
 /// <summary>
 /// Automaton state reduction result.
