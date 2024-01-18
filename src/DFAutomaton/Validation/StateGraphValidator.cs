@@ -8,7 +8,24 @@ namespace DFAutomaton;
 internal static class StateGraphValidator<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Validates states graph.
+    /// Validates states graph contains at least one accepted state.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="start">States graph start.</param>
+    /// <returns>Returns states graph start or validation error.</returns>
+    public static Option<IState<TTransition, TState>, StateError> ValidateHasAccepted(IState<TTransition, TState> start)
+    {
+        var acceptedReached = StateVisitor<TTransition, TState>.Visit(start, StopWhenReachedAccepted);
+        
+        if (!acceptedReached)
+            return Option.None<IState<TTransition, TState>, StateError>(StateError.NoAccepted);
+
+        return start.Some<IState<TTransition, TState>, StateError>();
+    }
+
+    /// <summary>
+    /// Validates any state can reach accepted state (only through static transitions).
     /// </summary>
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
@@ -24,6 +41,9 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
 
         return start.Some<IState<TTransition, TState>, StateError>();
     }
+
+    private static VisitResult StopWhenReachedAccepted(IState<TTransition, TState> state) =>
+        state.Type == StateType.Accepted ? VisitResult.Stop : VisitResult.Continue;
 
     private static Func<IState<TTransition, TState>, VisitResult> StopWhenCannotReachAccepted(ISet<IState<TTransition, TState>> canReachAcceptedStates)
     {

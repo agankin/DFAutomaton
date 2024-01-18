@@ -15,14 +15,15 @@ public static class StateExtensions
     /// <param name="start">States graph start.</param>
     /// <param name="configuration">Validation configuration.</param>
     /// <returns>Start state of immutable states graph.</returns>
-    public static Option<IState<TTransition, TState>, StateError> Complete<TTransition, TState>(this State<TTransition, TState> start, ValidationConfiguration configuration)
+    public static Option<IState<TTransition, TState>, StateError> Complete<TTransition, TState>(this State<TTransition, TState> startState, ValidationConfiguration configuration)
         where TTransition : notnull
     {
-        var immutableStart = start.AsImmutable();
+        var start = startState.AsImmutable();
 
         return configuration.ValidateAnyReachesAccepted
-            ? StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(immutableStart)
-            : immutableStart.Some<IState<TTransition, TState>, StateError>();
+            ? StateGraphValidator<TTransition, TState>.ValidateHasAccepted(start)
+                .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(start))
+            : start.Some<IState<TTransition, TState>, StateError>();
     }
 
     /// <summary>
