@@ -18,7 +18,7 @@ public partial class AddTransitionTests
 
     private static class StateReducers
     {
-        public static State Inc(AutomatonState<StateActions, State> automatonState) =>
-            automatonState.CurrentValue with { Value = StateValue.Incremented };
+        public static State Inc(AutomatonTransition<StateActions, State> automatonTransition) =>
+            automatonTransition.StateValueBefore with { Value = StateValue.Incremented };
     }
 }

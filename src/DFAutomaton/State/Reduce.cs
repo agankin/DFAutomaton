@@ -7,9 +7,9 @@ namespace DFAutomaton;
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
-/// <param name="state">Automaton state to be reduced.</param>
+/// <param name="automatonTransition">Automaton transition.</param>
 /// <returns>Automaton state reduction result.</returns>
-public delegate ReductionResult<TTransition, TState> Reduce<TTransition, TState>(AutomatonState<TTransition, TState> state)
+public delegate ReductionResult<TTransition, TState> Reduce<TTransition, TState>(AutomatonTransition<TTransition, TState> automatonTransition)
     where TTransition : notnull;
 
 /// <summary>
@@ -20,7 +20,7 @@ public delegate ReductionResult<TTransition, TState> Reduce<TTransition, TState>
 /// <param name="State">Reduced state value.</param>
 /// <param name="GoToState">Some next state that automaton must go to or None.</param>
 public readonly record struct ReductionResult<TTransition, TState>(
-    TState State,
+    TState StateValue,
     Option<IState<TTransition, TState>> GoToState
 )
 where TTransition : notnull;

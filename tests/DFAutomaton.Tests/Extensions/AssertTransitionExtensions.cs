@@ -54,36 +54,40 @@ public static class AssertTransitionExtensions
     }
 
     public static IState<TTransition, TState>.Transition Reduces<TTransition, TState>(
-        this IState<TTransition, TState>.Transition transition,
+        this IState<TTransition, TState>.Transition stateTransition,
+        TTransition transition,
         TState beforeReduce,
         TState expectedAfterReduce)
         where TTransition : notnull
     {
-        var automatonState = new AutomatonState<TTransition, TState>(
+        var automatonTransition = new AutomatonTransition<TTransition, TState>(
             beforeReduce,
+            transition,
             Option.None<IState<TTransition, TState>>(),
             _ => {});
-        var actualAfterReduce = transition.Reduce(automatonState).State;
+        var actualAfterReduce = stateTransition.Reduce(automatonTransition).StateValue;
         
         Assert.AreEqual(expectedAfterReduce, actualAfterReduce);
         
-        return transition;
+        return stateTransition;
     }
 
     public static State<TTransition, TState>.Transition Reduces<TTransition, TState>(
-        this State<TTransition, TState>.Transition transition,
+        this State<TTransition, TState>.Transition stateTransition,
+        TTransition transition,
         TState beforeReduce,
         TState expectedAfterReduce)
         where TTransition : notnull
     {
-        var automatonState = new AutomatonState<TTransition, TState>(
+        var automatonTransition = new AutomatonTransition<TTransition, TState>(
             beforeReduce,
+            transition,
             Option.None<IState<TTransition, TState>>(),
             _ => {});
-        var actualAfterReduce = transition.Reduce(automatonState).State;
+        var actualAfterReduce = stateTransition.Reduce(automatonTransition).StateValue;
         
         Assert.AreEqual(expectedAfterReduce, actualAfterReduce);
         
-        return transition;
+        return stateTransition;
     }
 }

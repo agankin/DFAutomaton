@@ -8,11 +8,11 @@ internal readonly record struct AutomatonRunState<TTransition, TState> where TTr
 
     public static AutomatonRunState<TTransition, TState> State(IState<TTransition, TState> state, TState stateValue)
     {
-        var automatonState = new CurrentState(state, stateValue);
+        var currentState = new CurrentState(state, stateValue);
         
         return new()
         {
-            Value = Option.Some<CurrentState, AutomatonError<TTransition, TState>>(automatonState)
+            Value = Option.Some<CurrentState, AutomatonError<TTransition, TState>>(currentState)
         };
     }
     

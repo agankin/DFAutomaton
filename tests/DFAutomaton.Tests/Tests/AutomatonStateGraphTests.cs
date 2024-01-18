@@ -29,7 +29,7 @@ public class AutomatonStateGraphTests
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(collectingGoods)
-            .Reduces(emptyCartState, breadInCartState)
+            .Reduces(Actions.PutBreadToCart, emptyCartState, breadInCartState)
             .State
                 .IsSome()
                 .Is(StateType.Start);
@@ -44,7 +44,7 @@ public class AutomatonStateGraphTests
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(collectingGoods)
-            .Reduces(breadInCartState, breadButterInCartState)
+            .Reduces(Actions.PutButterToCart, breadInCartState, breadButterInCartState)
             .State
                 .IsSome()
                 .Is(StateType.Start);
@@ -59,7 +59,7 @@ public class AutomatonStateGraphTests
         var paid = breadButterInCart[Actions.PayForGoods]
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
-            .Reduces(breadButterInCartState, paidState)
+            .Reduces(Actions.PayForGoods, breadButterInCartState, paidState)
             .State
                 .IsSome()
                 .Is(StateType.SubState);
@@ -73,7 +73,7 @@ public class AutomatonStateGraphTests
         paid[Actions.ReceiveGoods]
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
-            .Reduces(paidState, purchasedState)
+            .Reduces(Actions.ReceiveGoods, paidState, purchasedState)
             .State
                 .IsSome()
                 .Is(StateType.Accepted);

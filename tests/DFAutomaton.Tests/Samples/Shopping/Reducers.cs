@@ -7,32 +7,32 @@ using StateOrError = Option<State, Errors>;
 public static class Reducers
 {
     public static readonly ReduceValue<Actions, StateOrError> PutBreadToCart =
-        automatonState => automatonState.Reduce(state => state with { Cart = state.Cart.Put(Goods.Bread) });
+        automatonTransition => automatonTransition.Reduce(state => state with { Cart = state.Cart.Put(Goods.Bread) });
 
     public static readonly ReduceValue<Actions, StateOrError> PutButterToCart =
-        automatonState => automatonState.Reduce(state => state with { Cart = state.Cart.Put(Goods.Butter) });
+        automatonTransition => automatonTransition.Reduce(state => state with { Cart = state.Cart.Put(Goods.Butter) });
 
     public static readonly ReduceValue<Actions, StateOrError> RemoveBreadFromCart =
-        automatonState => automatonState.Reduce(state => state with { Cart = state.Cart.Remove(Goods.Bread) });
+        automatonTransition => automatonTransition.Reduce(state => state with { Cart = state.Cart.Remove(Goods.Bread) });
 
     public static readonly ReduceValue<Actions, StateOrError> RemoveButterFromCart =
-        automatonState => automatonState.Reduce(state => state with { Cart = state.Cart.Remove(Goods.Butter) });
+        automatonTransition => automatonTransition.Reduce(state => state with { Cart = state.Cart.Remove(Goods.Butter) });
 
     public static readonly ReduceValue<Actions, StateOrError> Pay =
-        automatonState => automatonState.Reduce(state => state.Pay());
+        automatonTransition => automatonTransition.Reduce(state => state.Pay());
 
     public static readonly ReduceValue<Actions, StateOrError> Purchase =
-        automatonState => automatonState.Reduce(state => state.Purchase());
+        automatonTransition => automatonTransition.Reduce(state => state.Purchase());
 
-    private static StateOrError Reduce(this AutomatonState<Actions, StateOrError> automatonState, Func<State, State> reduce)
+    private static StateOrError Reduce(this AutomatonTransition<Actions, StateOrError> automatonTransition, Func<State, State> reduce)
     {
-        var stateOrError = automatonState.CurrentValue;
+        var stateOrError = automatonTransition.StateValueBefore;
         return stateOrError.Map(reduce);
     }
 
-    private static StateOrError Reduce(this AutomatonState<Actions, StateOrError> automatonState, Func<State, StateOrError> reduce)
+    private static StateOrError Reduce(this AutomatonTransition<Actions, StateOrError> automatonTransition, Func<State, StateOrError> reduce)
     {
-        var stateOrError = automatonState.CurrentValue;
+        var stateOrError = automatonTransition.StateValueBefore;
         return stateOrError.FlatMap(reduce);
     }
 }

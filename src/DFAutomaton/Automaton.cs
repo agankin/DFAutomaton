@@ -55,9 +55,9 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         return stateTransition =>
         {
             var (kind, nextStateOption, reduce) = stateTransition;
-            var automatonState = new AutomatonState<TTransition, TState>(stateValue, nextStateOption, push);
+            var automatonTransition = new AutomatonTransition<TTransition, TState>(stateValue, transition, nextStateOption, push);
 
-            var (nextStateValue, goToStateOption) = reduce(automatonState);
+            var (nextStateValue, goToStateOption) = reduce(automatonTransition);
 
             var resultNextStateOption = kind switch {
                 TransitionKind.FixedState => nextStateOption,

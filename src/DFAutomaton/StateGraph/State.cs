@@ -60,9 +60,9 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     {
         ValidateLinkingNotAccepted();
 
-        Reduce<TTransition, TState> reduce = automatonState =>
+        Reduce<TTransition, TState> reduce = automatonTransition =>
         {
-            var reducedValue = reduceValue(automatonState);
+            var reducedValue = reduceValue(automatonTransition);
             
             return new ReductionResult<TTransition, TState>(reducedValue, Option.None<IState<TTransition, TState>>());
         };

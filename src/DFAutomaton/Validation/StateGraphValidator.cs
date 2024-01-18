@@ -20,7 +20,7 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
         var someCannotReachAccepted = StateVisitor<TTransition, TState>.Visit(start, StopWhenCannotReachAccepted(canReachAcceptedStates));
         
         if (someCannotReachAccepted)
-            return Option.None<IState<TTransition, TState>, StateError>(StateError.NoAccepted);
+            return Option.None<IState<TTransition, TState>, StateError>(StateError.AcceptedIsUnreachable);
 
         return start.Some<IState<TTransition, TState>, StateError>();
     }

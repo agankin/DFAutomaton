@@ -20,7 +20,7 @@ public partial class AddTransitionTests
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
-            .Reduces(value, incValue);
+            .Reduces(StateActions.Inc, value, incValue);
     }
 
     [Test(Description = "Tests adding transition to fixed state and value reducer.")]
@@ -37,7 +37,7 @@ public partial class AddTransitionTests
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
-            .Reduces(value, incValue);
+            .Reduces(StateActions.Inc, value, incValue);
     }
 
     [Test(Description = "Tests linking existing state with transition to constant value.")]
@@ -57,7 +57,7 @@ public partial class AddTransitionTests
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
-            .Reduces(value, incValue);
+            .Reduces(StateActions.Inc, value, incValue);
     }
 
     [Test(Description = "Tests linking existing state with transition by reducer.")]
@@ -77,6 +77,6 @@ public partial class AddTransitionTests
             .IsSome()
             .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
-            .Reduces(value, incValue);
+            .Reduces(StateActions.Inc, value, incValue);
     }
 }
