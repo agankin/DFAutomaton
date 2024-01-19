@@ -46,7 +46,7 @@ public static class StateExtensions
     }
 
     /// <summary>
-    /// Adds transition to new fixed state with applying value reducer.
+    /// Adds transition to new fixed state with applying state value reducer.
     /// </summary>
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
@@ -58,6 +58,25 @@ public static class StateExtensions
         this State<TTransition, TState> current,
         TTransition transition,
         ReduceValue<TTransition, TState> reduce)
+        where TTransition : notnull
+    {
+        var newState = StateFactory<TTransition, TState>.SubState(current.GraphContext);
+        return current.LinkFixedState(transition, newState, reduce);
+    }
+
+    /// <summary>
+    /// Adds transition to new fixed state with applying automaton transition reducer.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="reduce">Automaton transition reducer.</param>
+    /// <returns>Next state.</returns>
+    public static State<TTransition, TState> ToNewFixedState<TTransition, TState>(
+        this State<TTransition, TState> current,
+        TTransition transition,
+        ReduceTransition<TTransition, TState> reduce)
         where TTransition : notnull
     {
         var newState = StateFactory<TTransition, TState>.SubState(current.GraphContext);
@@ -124,12 +143,37 @@ public static class StateExtensions
 
         return new AcceptedState<TTransition, TState>(acceptedState);
     }
+
+    /// <summary>
+    /// Adds transition to the accepted state with applying automaton transition reducer.
+    /// </summary>
+    /// <typeparam name="TTransition">Transition value type.</typeparam>
+    /// <typeparam name="TState">State value type.</typeparam>
+    /// <param name="current">Current state.</param>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="reduce">Automaton transition reducer.</param>
+    /// <returns>Accepted state.</returns>
+    public static AcceptedState<TTransition, TState> ToAccepted<TTransition, TState>(
+        this State<TTransition, TState> current,
+        TTransition transition,
+        ReduceTransition<TTransition, TState> reduce)
+        where TTransition : notnull
+    {
+        var acceptedState = current.GraphContext.AcceptedState;
+        current.LinkFixedState(transition, acceptedState, reduce);
+
+        return new AcceptedState<TTransition, TState>(acceptedState);
+    }
     
-    private static ReduceValue<TTransition, TState> Constant<TTransition, TState>(TState newValue)
-        where TTransition : notnull =>
-        _ => newValue;
+    private static ReduceTransition<TTransition, TState> Constant<TTransition, TState>(TState newValue)
+        where TTransition : notnull
+    {
+        return _ => newValue;
+    }
 
     private static IState<TTransition, TState> AsImmutable<TTransition, TState>(this State<TTransition, TState> current)
         where TTransition : notnull
-        => current;
+    {
+        return current;
+    }
 }

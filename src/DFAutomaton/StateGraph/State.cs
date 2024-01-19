@@ -47,28 +47,48 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     internal StateGraphContext<TTransition, TState> GraphContext { get; }
 
     /// <summary>
-    /// Adds transition to existing fixed next state applying state value reducer.
+    /// Adds transition to fixed next state applying value reducer.
     /// </summary>
     /// <param name="transition">Transition value.</param>
     /// <param name="nextState">Next automaton state.</param>
-    /// <param name="reduceValue">Automaton state value reducer.</param>
+    /// <param name="reduceValue">Automaton value reducer.</param>
     /// <returns>Next automaton state.</returns>
     public State<TTransition, TState> LinkFixedState(
         TTransition transition,
         State<TTransition, TState> nextState,
         ReduceValue<TTransition, TState> reduceValue)
     {
-        ValidateLinkingNotAccepted();
-
         Reduce<TTransition, TState> reduce = automatonTransition =>
         {
-            var reducedValue = reduceValue(automatonTransition);
+            var newStateValue = reduceValue(automatonTransition.Transition, automatonTransition.StateValueBefore);
+            var noDynamicGoToState = Option.None<IState<TTransition, TState>>();
             
-            return new ReductionResult<TTransition, TState>(reducedValue, Option.None<IState<TTransition, TState>>());
+            return new ReductionResult<TTransition, TState>(newStateValue, noDynamicGoToState);
         };
-        _transitionDict[transition] = new(TransitionKind.FixedState, nextState.Some(), reduce);
+        return LinkFixedState(transition, nextState, reduce);
+    }
 
-        return nextState;
+    /// <summary>
+    /// Adds transition to fixed next state applying state transition reducer.
+    /// </summary>
+    /// <param name="transition">Transition value.</param>
+    /// <param name="nextState">Next automaton state.</param>
+    /// <param name="reduceTransition">Automaton transition reducer.</param>
+    /// <returns>Next automaton state.</returns>
+    public State<TTransition, TState> LinkFixedState(
+        TTransition transition,
+        State<TTransition, TState> nextState,
+        ReduceTransition<TTransition, TState> reduceTransition)
+    {
+        Reduce<TTransition, TState> reduce = automatonTransition =>
+        {
+            var reducedValue = reduceTransition(automatonTransition);
+            var noDynamicGoToState = Option.None<IState<TTransition, TState>>();
+            
+            return new ReductionResult<TTransition, TState>(reducedValue, noDynamicGoToState);
+        };
+
+        return LinkFixedState(transition, nextState, reduce);
     }
     
     /// <summary>
@@ -79,13 +99,23 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     public void LinkDynamic(TTransition transition, Reduce<TTransition, TState> reduce)
     {
         ValidateLinkingNotAccepted();
-        _transitionDict[transition] = new(TransitionKind.DynamicGoTo, Option.None<State<TTransition, TState>>(), reduce);
+
+        var noFixedGoToState = Option.None<State<TTransition, TState>>();
+        _transitionDict[transition] = new(TransitionKind.DynamicGoTo, noFixedGoToState, reduce);
     }
 
     internal IReadOnlyDictionary<TTransition, Transition> GetTransitions() => _transitionDict;
 
     /// <inheritdoc/>
     public override string? ToString() => ((IState<TTransition, TState>)this).Format();
+
+    private State<TTransition, TState> LinkFixedState(TTransition transition, State<TTransition, TState> nextState, Reduce<TTransition, TState> reduce)
+    {
+        ValidateLinkingNotAccepted();
+        _transitionDict[transition] = new(TransitionKind.FixedState, nextState.Some(), reduce);
+
+        return nextState;
+    }
 
     private static IState<TTransition, TState>.Transition MapTransition(Transition transition)
     {

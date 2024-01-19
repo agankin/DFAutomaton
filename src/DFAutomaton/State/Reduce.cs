@@ -3,7 +3,7 @@ using Optional;
 namespace DFAutomaton;
 
 /// <summary>
-/// Automaton state reducer.
+/// General automaton state reducer.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
