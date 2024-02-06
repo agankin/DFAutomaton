@@ -1,9 +1,9 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// State graph context data available for each state.
+/// Contains context data available for each state.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
+/// <typeparam name="TTransition">Transitions type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 internal class StateGraphContext<TTransition, TState> where TTransition : notnull
 {

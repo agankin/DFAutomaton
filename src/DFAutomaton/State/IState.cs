@@ -3,19 +3,19 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// Automaton state.
+/// This interface provides readonly state members.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 public interface IState<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// State unique id.
+    /// Contains unique id within the scope of the containing state graph.
     /// </summary>
     long Id { get; }
     
     /// <summary>
-    /// Tag with some additional information attached to the state.
+    /// Contains a tag with additional information.
     /// </summary>
     object? Tag { get; }
 
@@ -25,15 +25,15 @@ public interface IState<TTransition, TState> where TTransition : notnull
     public StateType Type { get; }
 
     /// <summary>
-    /// Transition values to next states.
+    /// Contains transitions to next states.
     /// </summary>
     public IReadOnlyCollection<TTransition> Transitions { get; }
 
     /// <summary>
-    /// Get state transition by transition value.
+    /// Returns a state transition by a transition value.
     /// </summary>
     /// <param name="transition">Transition value.</param>
-    /// <returns>State transition.</returns>
+    /// <returns>Some state transition found by the provided transition value or None.</returns>
     Option<IState<TTransition, TState>.Transition> this[TTransition transition] { get; }
     
     /// <summary>
@@ -44,11 +44,11 @@ public interface IState<TTransition, TState> where TTransition : notnull
         : $"State {Id}: {Tag}";
 
     /// <summary>
-    /// State transition.
+    /// Contains state transition data.
     /// </summary>
     /// <param name="Kind">Transition kind.</param>
     /// <param name="State">Some next state for fixed transitions or None for dynamic transitions.</param>
-    /// <param name="Reduce">State reducer.</param>
+    /// <param name="Reduce">A function to reduce state value on transition.</param>
     public record Transition(
         TransitionKind Kind,
         Option<IState<TTransition, TState>> State,

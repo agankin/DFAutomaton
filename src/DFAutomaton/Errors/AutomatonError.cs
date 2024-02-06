@@ -1,13 +1,13 @@
 ﻿namespace DFAutomaton;
 
 /// <summary>
-/// Automaton execution error.
+/// Contains information about an automaton runtime error.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 /// <param name="Type">Error type.</param>
-/// <param name="State">State the error occured at.</param>
-/// <param name="Transition">Transition the error occured during.</param>
+/// <param name="State">An automaton state the error occured when transitioning from.</param>
+/// <param name="Transition">A transition caused the error.</param>
 public record AutomatonError<TTransition, TState>(
     AutomatonErrorType Type,
     IState<TTransition, TState> State,
@@ -16,17 +16,17 @@ public record AutomatonError<TTransition, TState>(
 where TTransition : notnull;
 
 /// <summary>
-/// Types of errors that an automaton may produce.
+/// Contains types of automaton runtime errors.
 /// </summary>
 public enum AutomatonErrorType
 {
     /// <summary>
-    /// Transition is not found.
+    /// A transition from a state does not exist.
     /// </summary>
     TransitionNotFound = 1,
     
     /// <summary>
-    /// Attempt of transferring from an accepted state.
+    /// An attempt of performing a transition from an accepted state.
     /// </summary>
     TransitionFromAccepted
 }

@@ -1,22 +1,22 @@
 ﻿namespace DFAutomaton;
 
 /// <summary>
-/// Automaton state type.
+/// Contains possible types of automaton states.
 /// </summary>
 public enum StateType
 {
     /// <summary>
-    /// Start state automaton execution starts from.
+    /// A start state that automaton execution starts at.
     /// </summary>
     Start = 1,
 
     /// <summary>
-    /// Intermediate state after that automaton must continue on.
+    /// An intermediate state at which an automaton expects next transitions.
     /// </summary>
     SubState,
 
     /// <summary>
-    /// Accepted state that automaton must finish on.
+    /// An accepted state at which an automaton finishes.
     /// </summary>
     Accepted
 }

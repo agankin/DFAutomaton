@@ -1,12 +1,12 @@
 ﻿namespace DFAutomaton.Utils;
 
 /// <summary>
-/// State id generator factory.
+/// The factory to create generators of sequential ids.
 /// </summary>
-internal static class StateIdGenerator
+internal static class SeqIdGenerator
 {
     /// <summary>
-    /// Creates new state id generator that produces sequential state ids.
+    /// Creates a new generator that produces sequentially incremened ids.
     /// </summary>
     public static Func<long> CreateNew()
     {

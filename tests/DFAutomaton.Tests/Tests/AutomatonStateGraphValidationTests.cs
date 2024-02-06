@@ -33,7 +33,7 @@ public class AutomatonStateGraphValidationTests
             .ToNewFixedState(Transition.ToThird, State.Third);
 
         var automatonOrError = builder.Build();
-        automatonOrError.IsError(StateError.NoAccepted);
+        automatonOrError.IsError(ValidationError.NoAccepted);
     }
 
     [Test(Description = "Tests validation for accepted state not reachable from a state.")]
@@ -50,7 +50,7 @@ public class AutomatonStateGraphValidationTests
         second.ToAccepted(Transition.ToAccepted, State.Accepted);
 
         var automatonOrError = builder.Build();
-        automatonOrError.IsError(StateError.AcceptedIsUnreachable);
+        automatonOrError.IsError(ValidationError.AcceptedIsUnreachable);
     }
 
     private enum State

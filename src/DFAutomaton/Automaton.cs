@@ -4,29 +4,29 @@ using Optional;
 namespace DFAutomaton;
 
 /// <summary>
-/// Automaton that executes over a sequence of transitions reducing provided start value.
+/// Automaton that can be run over a sequence of transitions transforming a start state value into an accepted state value.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 public class Automaton<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Creates new automaton instance.
+    /// Creates <see cref="Automaton{TTransition, TState}"/>.
     /// </summary>
-    /// <param name="start">Automaton start state.</param>
+    /// <param name="start">A start state of an automaton state graph.</param>
     public Automaton(IState<TTransition, TState> start) => Start = start;
 
     /// <summary>
-    /// Automaton start state.
+    /// The start state of the automaton.
     /// </summary>
     public IState<TTransition, TState> Start { get; }
 
     /// <summary>
-    /// Executes automaton over a sequence of transitions reducing provided start value.
+    /// Runs automaton over a sequence of transitions reducing the provided start value.
     /// </summary>
     /// <param name="startValue">Start value.</param>
     /// <param name="transitions">Sequence of transitions.</param>
-    /// <returns>Reduced automaton value after applying all transitions or error occured during the automaton execution.</returns>
+    /// <returns>Some reduced value after applying all transitions or error occured during the run.</returns>
     public Option<TState, AutomatonError<TTransition, TState>> Run(TState startValue, IEnumerable<TTransition> transitions)
     {
         var initialState = AutomatonRunState.State(Start, startValue);

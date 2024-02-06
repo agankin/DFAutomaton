@@ -1,7 +1,7 @@
 ﻿namespace DFAutomaton;
 
 /// <summary>
-/// Accepted state.
+/// Automaton accepted state.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
@@ -12,12 +12,12 @@ public class AcceptedState<TTransition, TState> where TTransition : notnull
     internal State<TTransition, TState> State { get; }
 
     /// <summary>
-    /// State Id.
+    /// Contains unique id within the scope of the containing state graph.
     /// </summary>
     public long Id => State.Id;
 
     /// <summary>
-    /// Tag with some additional information attached to the state. 
+    /// Contains a tag with additional information. 
     /// </summary>
     public object? Tag
     {

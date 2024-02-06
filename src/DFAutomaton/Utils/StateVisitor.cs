@@ -1,21 +1,22 @@
-﻿using Optional;
-using Optional.Unsafe;
+﻿using Optional.Unsafe;
 
 namespace DFAutomaton;
 
 /// <summary>
-/// Utility to traverse through a states graph.
+/// The utility to traverse a state graph.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 internal static class StateVisitor<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Traverses through state graph.
+    /// Traverses a state graph calling a visitor function against each node.
     /// </summary>
-    /// <param name="start">State graph start state.</param>
-    /// <param name="visit">Visit function.</param>
-    /// <returns>True if was stopped by visit function, otherwise false.</returns>
+    /// <param name="start">The start state of a state graph.</param>
+    /// <param name="visit">A visitor function.</param>
+    /// <returns>
+    /// Boolean value. True value denotes the visitor function returned VisitResult.Stop at a node and traversal process was stopped. Otherwise returns false.
+    /// </returns>
     public static bool Visit(IState<TTransition, TState> start, Func<IState<TTransition, TState>, VisitResult> visit)
     {
         var visitedStates = new HashSet<IState<TTransition, TState>>();
@@ -49,7 +50,7 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
 }
 
 /// <summary>
-/// Visit function result.
+/// Contains possible results of visitor functions calls.
 /// </summary>
 internal enum VisitResult
 {

@@ -1,7 +1,7 @@
 ﻿using Optional.Unsafe;
 
 namespace DFAutomaton.Benchmarks
-{
+{  
     internal class PiGregorySeriesAutomaton
     {
         public static Automaton<int, double> Create(int serieMembersCount)

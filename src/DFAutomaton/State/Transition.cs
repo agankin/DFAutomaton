@@ -3,14 +3,14 @@ using Optional;
 namespace DFAutomaton;
 
 /// <summary>
-/// State transition.
+/// Contains information about transition to a next state.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 /// <typeparam name="TDFAState">Automaton state type.</typeparam>
-/// <param name="Kind">Transition kind.</param>
-/// <param name="State">Next automaton state if fixed transition or none if dynamic.</param>
-/// <param name="Reduce">Automaton state reducer.</param>
+/// <param name="Kind">Transition kind: fixed or dynamic.</param>
+/// <param name="State">Some next state for fixed transitions or None for dynamic transitions.</param>
+/// <param name="Reduce">Automaton transition reducer.</param>
 public record Transition<TTransition, TState, TDFAState>(
     TransitionKind Kind,
     Option<TDFAState> State,
@@ -25,12 +25,12 @@ where TDFAState : IState<TTransition, TState>;
 public enum TransitionKind
 {
     /// <summary>
-    /// Transition to fixed state.
+    /// A transition to a fixed state.
     /// </summary>
     FixedState = 1,
 
     /// <summary>
-    /// Dynamic transition.
+    /// A dynamic transition.
     /// </summary>
     DynamicGoTo
 }

@@ -24,22 +24,22 @@ public class AutomatonTransition<TTransition, TState> where TTransition : notnul
     }
 
     /// <summary>
-    /// Automaton value before transition.
+    /// Contains a state value before transition.
     /// </summary>
     public TState StateValueBefore { get; }
 
     /// <summary>
-    /// Current transition.
+    /// Contains the current transition value.
     /// </summary>
     public TTransition Transition { get; }
     
     /// <summary>
-    /// Fixed next state the automaton transiting to or None for dynamic transition.
+    /// Contains Some next state the automaton transiting to for a fixed transition or None for dynamic transition.
     /// </summary>
     public Option<IState<TTransition, TState>> TransitingTo { get; private init; }
 
     /// <summary>
-    /// Prepends transition value to be retrieved next during automaton execution.
+    /// Pushes the provided transition value ahead of transition sequence to be returned next.
     /// </summary>
     /// <param name="transition">Transition value.</param>
     public void Prepend(TTransition transition) => _prependNextTransition(transition);

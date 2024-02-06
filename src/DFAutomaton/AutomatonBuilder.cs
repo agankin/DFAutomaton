@@ -4,7 +4,7 @@ using Optional;
 namespace DFAutomaton;
 
 /// <summary>
-/// Automaton builder.
+/// Builder for building automatons.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
@@ -13,14 +13,14 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     private AutomatonBuilder(State<TTransition, TState> start) => Start = start;
 
     /// <summary>
-    /// Start state.
+    /// The start state.
     /// </summary>
     public State<TTransition, TState> Start { get; }
 
     /// <summary>
-    /// Creates new instance.
+    /// Creates a new instance.
     /// </summary>
-    /// <returns>New instance.</returns> 
+    /// <returns>Created new instance.</returns> 
     public static AutomatonBuilder<TTransition, TState> Create()
     {
         var start = StateFactory<TTransition, TState>.Start();
@@ -28,11 +28,11 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     }
 
     /// <summary>
-    /// Builds automaton.
+    /// Builds a new automaton.
     /// </summary>
-    /// <param name="configure">Validation configuration function.</param>
-    /// <returns>Automaton or error.</returns>
-    public Option<Automaton<TTransition, TState>, StateError> Build(Configure<ValidationConfiguration>? configure = null)
+    /// <param name="configure">Validation configuration change delegate.</param>
+    /// <returns>Some new automaton or error.</returns>
+    public Option<Automaton<TTransition, TState>, ValidationError> Build(Configure<ValidationConfiguration>? configure = null)
     {
         var configuration = (configure ?? (config => config))(ValidationConfiguration.Default);
         var startOrError = Start.Complete(configuration);

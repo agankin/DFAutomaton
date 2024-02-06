@@ -4,17 +4,17 @@ using Optional.Unsafe;
 namespace DFAutomaton.Utils;
 
 /// <summary>
-/// States graph formatter that produces state graph text representation.
+/// The formatter for obtaining text representations of state graphs.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 public static class StatesGraphFormatter<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Produces text representation of a provided state graph.
+    /// Returns a text representation of the provided state graph.
     /// </summary>
-    /// <param name="start">Start state of a state graph.</param>
-    /// <returns>Text representation of a provided state graph.</returns>
+    /// <param name="start">The start state of a state graph.</param>
+    /// <returns>Text representation of the provided state graph.</returns>
     public static string Format(IState<TTransition, TState> start)
     {
         var formattedStates = new HashSet<IState<TTransition, TState>>();

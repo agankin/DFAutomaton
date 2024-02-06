@@ -47,12 +47,12 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     internal StateGraphContext<TTransition, TState> GraphContext { get; }
 
     /// <summary>
-    /// Adds transition to fixed next state applying value reducer.
+    /// Adds fixed transition to the provided next state.
     /// </summary>
     /// <param name="transition">Transition value.</param>
     /// <param name="nextState">Next automaton state.</param>
     /// <param name="reduceValue">Automaton value reducer.</param>
-    /// <returns>Next automaton state.</returns>
+    /// <returns>The provided next automaton state.</returns>
     public State<TTransition, TState> LinkFixedState(
         TTransition transition,
         State<TTransition, TState> nextState,
@@ -65,16 +65,17 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
             
             return new ReductionResult<TTransition, TState>(newStateValue, noDynamicGoToState);
         };
+
         return LinkFixedState(transition, nextState, reduce);
     }
 
     /// <summary>
-    /// Adds transition to fixed next state applying state transition reducer.
+    /// Adds fixed transition to the provided next state.
     /// </summary>
     /// <param name="transition">Transition value.</param>
     /// <param name="nextState">Next automaton state.</param>
     /// <param name="reduceTransition">Automaton transition reducer.</param>
-    /// <returns>Next automaton state.</returns>
+    /// <returns>The provided next automaton state.</returns>
     public State<TTransition, TState> LinkFixedState(
         TTransition transition,
         State<TTransition, TState> nextState,
@@ -92,10 +93,10 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     }
     
     /// <summary>
-    /// Adds dynamic transition to next automaton state calculated by state reducer.
+    /// Adds dynamic transition to an automaton state returned from the provided transition reducer.
     /// </summary>
     /// <param name="transition">Transition value.</param>
-    /// <param name="reduce">Automaton state reducer.</param>
+    /// <param name="reduce">Automaton transition reducer.</param>
     public void LinkDynamic(TTransition transition, Reduce<TTransition, TState> reduce)
     {
         ValidateLinkingNotAccepted();
@@ -132,11 +133,11 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     }
 
     /// <summary>
-    /// State transition.
+    /// Contains state transition data.
     /// </summary>
     /// <param name="Kind">Transition kind.</param>
-    /// <param name="State">Some next state for fixed transition or None for dynamic transition.</param>
-    /// <param name="Reduce">Automaton state reducer.</param>
+    /// <param name="State">Some next state for fixed transitions or None for dynamic transitions.</param>
+    /// <param name="Reduce">Automaton transition reducer.</param>
     public record Transition(
         TransitionKind Kind,
         Option<State<TTransition, TState>> State,

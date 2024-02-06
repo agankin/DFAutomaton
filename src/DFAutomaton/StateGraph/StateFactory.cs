@@ -1,16 +1,16 @@
 ﻿namespace DFAutomaton;
 
 /// <summary>
-/// State factory.
+/// The factory to create automaton states.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 internal static class StateFactory<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Creates start state.
+    /// Creates a start state.
     /// </summary>
-    /// <returns>Start state.</returns>
+    /// <returns>Created start state.</returns>
     public static State<TTransition, TState> Start()
     {
         var graphContext = new StateGraphContext<TTransition, TState>();
@@ -22,10 +22,10 @@ internal static class StateFactory<TTransition, TState> where TTransition : notn
     }
     
     /// <summary>
-    /// Creates intermediate state.
+    /// Creates a new intermediate state.
     /// </summary>
     /// <param name="graphContext">State graph context.</param>
-    /// <returns>Intermediate state.</returns>
+    /// <returns>Created intermediate state.</returns>
     public static State<TTransition, TState> SubState(StateGraphContext<TTransition, TState> graphContext) =>
         new State<TTransition, TState>(StateType.SubState, graphContext);
 
