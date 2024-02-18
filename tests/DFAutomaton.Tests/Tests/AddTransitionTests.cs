@@ -13,7 +13,7 @@ public partial class AddTransitionTests
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
 
-        var incState = start.ToNewFixedState(StateActions.Inc, incValue);
+        var incState = start.TransitsBy(StateActions.Inc).WithReducing(incValue).ToNew();
 
         incState.Is(StateType.SubState);
         start[StateActions.Inc]
@@ -27,7 +27,7 @@ public partial class AddTransitionTests
     public void Add_transition_to_fixed_state_with_reducer()
     {
         var start = StateFactory<StateActions, State>.Start();
-        var incState = start.ToNewFixedState(StateActions.Inc, StateReducers.Inc);
+        var incState = start.TransitsBy(StateActions.Inc).WithReducing(StateReducers.Inc).ToNew();
         
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
@@ -44,12 +44,12 @@ public partial class AddTransitionTests
     public void Link_fixed_state_with_constant_value_transition()
     {
         var start = StateFactory<StateActions, State>.Start();
-        var incState = StateFactory<StateActions, State>.SubState(start.GraphContext);
+        var incState = StateFactory<StateActions, State>.SubState(start.OwningGraph);
         
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
         
-        var linkedState = start.LinkFixedState(StateActions.Inc, incState, incValue);
+        var linkedState = start.TransitsBy(StateActions.Inc).WithReducing(incValue).To(incState);
         Assert.AreEqual(incState, linkedState);
         linkedState.Is(StateType.SubState);
         
@@ -64,9 +64,9 @@ public partial class AddTransitionTests
     public void Link_fixed_state_with_value_transition_by_reducer()
     {
         var start = StateFactory<StateActions, State>.Start();
-        var incState = StateFactory<StateActions, State>.SubState(start.GraphContext);
+        var incState = StateFactory<StateActions, State>.SubState(start.OwningGraph);
         
-        var linkedState = start.LinkFixedState(StateActions.Inc, incState, StateReducers.Inc);
+        var linkedState = start.TransitsBy(StateActions.Inc).WithReducing(StateReducers.Inc).To(incState);
         Assert.AreEqual(incState, linkedState);
         linkedState.Is(StateType.SubState);
 

@@ -1,9 +1,9 @@
 namespace DFAutomaton.Utils;
 
 /// <summary>
-/// Invoked to change configuration.
+/// The delegate to be invoked for changing configuration values.
 /// </summary>
 /// <typeparam name="TConfiguration">Configuration type.</typeparam>
-/// <param name="configuration">Configuration.</param>
-/// <returns>Changed configuration.</returns>
+/// <param name="configuration">A configuration initial value.</param>
+/// <returns>The configuration value after changes made.</returns>
 public delegate TConfiguration Configure<TConfiguration>(TConfiguration configuration);

@@ -4,7 +4,7 @@ using Optional;
 namespace DFAutomaton.Utils;
 
 /// <summary>
-/// Enumerator for transitions with possibility to push new transition values ahead.
+/// The enumerator for transitions with possibility to push new transition ahead.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
@@ -26,7 +26,7 @@ internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
     object? IEnumerator.Current => Current;
 
     /// <summary>
-    /// Pushes transition value ahead of the sequence of next transitions to be returned first.
+    /// Pushes a transition value ahead of a sequence of next transitions to be returned first.
     /// </summary>
     /// <param name="transition">Transition value.</param>
     public void Push(TTransition transition) => _emitedQueue.Enqueue(transition);

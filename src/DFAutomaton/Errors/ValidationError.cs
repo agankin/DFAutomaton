@@ -6,12 +6,12 @@
 public enum ValidationError
 {
     /// <summary>
-    /// The state graph contains no accepted states. 
+    /// The state graph contains no accepted state. 
     /// </summary>
     NoAccepted = 1,
     
     /// <summary>
-    /// In the state graph no accepted state can be reached from a state.
+    /// In the state graph the accepted state cannot be reached from a state.
     /// </summary>
     AcceptedIsUnreachable
 }

@@ -3,17 +3,17 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// The validator for automaton state graphs.
+/// Contains methods for automaton state graph validation.
 /// </summary>
 internal static class StateGraphValidator<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Validates the provided state graph contains at least one accepted state.
+    /// Validates the provided state graph contains the accepted state.
     /// </summary>
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
-    /// <returns>The provided state graph start state or validation error.</returns>
+    /// <returns>Some with the provided start state or None with a validation error.</returns>
     public static Option<IState<TTransition, TState>, ValidationError> ValidateHasAccepted(IState<TTransition, TState> start)
     {
         var acceptedReached = StateVisitor<TTransition, TState>.Visit(start, StopWhenReachedAccepted);
@@ -25,12 +25,12 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
     }
 
     /// <summary>
-    /// Validates that any state can reach an accepted state (only for states with static transitions).
+    /// Validates that any state can reach the accepted state (checks only states with static transitions).
     /// </summary>
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
-    /// <returns>The provided state graph start state or validation error.</returns>
+    /// <returns>Some with the provided start state or None with a validation error.</returns>
     public static Option<IState<TTransition, TState>, ValidationError> ValidateAnyReachAccepted(IState<TTransition, TState> start)
     {
         var canReachAcceptedStates = new HashSet<IState<TTransition, TState>>();

@@ -1,23 +1,23 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// Contains configuration for state graphs validation.
+/// Contains configuration for a state graph validation.
 /// </summary>
 public record ValidationConfiguration
 {
     /// <summary>
-    /// Default instance.
+    /// The default instance.
     /// </summary>
     internal static readonly ValidationConfiguration Default = new();
 
     /// <summary>
-    /// Flag to validate that any state must reach accepted. True by default.
+    /// Contains a flag to validate that any state reachs the accepted state. True by default.
     /// </summary>
     internal bool ValidateAnyReachesAccepted { get; private init; } = true;
 
     /// <summary>
-    /// Turns off validation of any state in a graph must reach accepted.
+    /// Turns off validation of any state reachs the accepted state.
     /// </summary>
-    /// <returns>New configuration with turned off validation of any state in a graph must reach accepted.</returns>
+    /// <returns>New instance with the change applied.</returns>
     public ValidationConfiguration TurnOffAnyReachesAcceptedValidation() => this with { ValidateAnyReachesAccepted = false };
 }

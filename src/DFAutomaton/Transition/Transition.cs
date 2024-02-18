@@ -20,7 +20,7 @@ where TTransition : notnull
 where TDFAState : IState<TTransition, TState>;
 
 /// <summary>
-/// Transition kind.
+/// Contains kinds of transitions.
 /// </summary>
 public enum TransitionKind
 {

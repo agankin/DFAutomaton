@@ -20,7 +20,7 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Creates a new instance.
     /// </summary>
-    /// <returns>Created new instance.</returns> 
+    /// <returns>The created new instance.</returns> 
     public static AutomatonBuilder<TTransition, TState> Create()
     {
         var start = StateFactory<TTransition, TState>.Start();
@@ -30,12 +30,12 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Builds a new automaton.
     /// </summary>
-    /// <param name="configure">Validation configuration change delegate.</param>
-    /// <returns>Some new automaton or error.</returns>
+    /// <param name="configure">The delegate to setup a build configuration.</param>
+    /// <returns>Some with a new automaton or None with an error.</returns>
     public Option<Automaton<TTransition, TState>, ValidationError> Build(Configure<ValidationConfiguration>? configure = null)
     {
         var configuration = (configure ?? (config => config))(ValidationConfiguration.Default);
-        var startOrError = Start.Complete(configuration);
+        var startOrError = Start.Build(configuration);
 
         return startOrError.Map<Automaton<TTransition, TState>>(start => new(start));
     }

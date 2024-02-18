@@ -45,14 +45,6 @@ public static class AssertTransitionExtensions
         return transition;
     }
 
-    public static State<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
-        this State<TTransition, TState>.Transition transition,
-        AcceptedState<TTransition, TState> expectedState)
-        where TTransition : notnull
-    {
-        return transition.TransitsTo(expectedState.State);
-    }
-
     public static IState<TTransition, TState>.Transition Reduces<TTransition, TState>(
         this IState<TTransition, TState>.Transition stateTransition,
         TTransition transition,

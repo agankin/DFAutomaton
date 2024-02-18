@@ -16,12 +16,11 @@ public class StateGraph
         var builder = AutomatonBuilder<Actions, StateOrError>.Create();
         var collectingGoods = builder.Start;
 
-        collectingGoods.LinkFixedState(Actions.PutBreadToCart, collectingGoods, Reducers.PutBreadToCart);
-        collectingGoods.LinkFixedState(Actions.PutButterToCart, collectingGoods, Reducers.PutButterToCart);
-        
         collectingGoods
-            .ToNewFixedState(Actions.PayForGoods, Reducers.Pay)
-            .ToAccepted(Actions.ReceiveGoods, Reducers.Purchase);
+            .TransitsBy(Actions.PutBreadToCart).WithReducing(Reducers.PutBreadToCart).ToSelf()
+            .TransitsBy(Actions.PutButterToCart).WithReducing(Reducers.PutButterToCart).ToSelf()
+            .TransitsBy(Actions.PayForGoods).WithReducing(Reducers.Pay).ToNew()
+            .TransitsBy(Actions.ReceiveGoods).WithReducing(Reducers.Purchase).ToAccepted();
 
         return builder;
     }

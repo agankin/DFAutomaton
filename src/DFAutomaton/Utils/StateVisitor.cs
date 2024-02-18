@@ -2,11 +2,6 @@
 
 namespace DFAutomaton;
 
-/// <summary>
-/// The utility to traverse a state graph.
-/// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
 internal static class StateVisitor<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
@@ -15,7 +10,7 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
     /// <param name="start">The start state of a state graph.</param>
     /// <param name="visit">A visitor function.</param>
     /// <returns>
-    /// Boolean value. True value denotes the visitor function returned VisitResult.Stop at a node and traversal process was stopped. Otherwise returns false.
+    /// Boolean value. True value denotes the visitor function returned VisitResult.Stop at a node stopping traversal process. Otherwise returns false.
     /// </returns>
     public static bool Visit(IState<TTransition, TState> start, Func<IState<TTransition, TState>, VisitResult> visit)
     {

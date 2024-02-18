@@ -11,11 +11,10 @@ public class AutomatonStateGraphValidationTests
         var builder = AutomatonBuilder<Transition, State>.Create();
         var first = builder.Start;
 
-        first
-            .LinkFixedState(Transition.ToFirst, first, State.First)
-            .ToNewFixedState(Transition.ToSecond, State.Second)
-            .ToNewFixedState(Transition.ToThird, State.Third)
-            .ToAccepted(Transition.ToAccepted, State.Accepted);
+        first.TransitsBy(Transition.ToFirst).WithReducing(State.First).ToSelf()
+            .TransitsBy(Transition.ToSecond).WithReducing(State.Second).ToNew()
+            .TransitsBy(Transition.ToThird).WithReducing(State.Third).ToNew()
+            .TransitsBy(Transition.ToAccepted).WithReducing(State.Accepted).ToAccepted();
 
         var automatonOrError = builder.Build();
         automatonOrError.IsSome();
@@ -28,9 +27,9 @@ public class AutomatonStateGraphValidationTests
         var first = builder.Start;
 
         first
-            .LinkFixedState(Transition.ToFirst, first, State.First)
-            .ToNewFixedState(Transition.ToSecond, State.Second)
-            .ToNewFixedState(Transition.ToThird, State.Third);
+            .TransitsBy(Transition.ToFirst).WithReducing(State.First).ToSelf()
+            .TransitsBy(Transition.ToSecond).WithReducing(State.Second).ToNew()
+            .TransitsBy(Transition.ToThird).WithReducing(State.Third).ToNew();
 
         var automatonOrError = builder.Build();
         automatonOrError.IsError(ValidationError.NoAccepted);
@@ -43,11 +42,11 @@ public class AutomatonStateGraphValidationTests
         var first = builder.Start;
 
         var second = first
-            .LinkFixedState(Transition.ToFirst, first, State.First)
-            .ToNewFixedState(Transition.ToSecond, State.Second);
+            .TransitsBy(Transition.ToFirst).WithReducing(State.First).ToSelf()
+            .TransitsBy(Transition.ToSecond).WithReducing(State.Second).ToNew();
 
-        second.ToNewFixedState(Transition.ToThird, State.Third);
-        second.ToAccepted(Transition.ToAccepted, State.Accepted);
+        second.TransitsBy(Transition.ToThird).WithReducing(State.Third).ToNew();
+        second.TransitsBy(Transition.ToAccepted).WithReducing(State.Accepted).ToAccepted();
 
         var automatonOrError = builder.Build();
         automatonOrError.IsError(ValidationError.AcceptedIsUnreachable);

@@ -3,14 +3,14 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// This interface provides readonly state members.
+/// This interface provides only readonly state members.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 public interface IState<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Contains unique id within the scope of the containing state graph.
+    /// Contains an identifier that is unique within the scope of the containing state graph.
     /// </summary>
     long Id { get; }
     
@@ -20,7 +20,7 @@ public interface IState<TTransition, TState> where TTransition : notnull
     object? Tag { get; }
 
     /// <summary>
-    /// State type.
+    /// Contains the state type.
     /// </summary>
     public StateType Type { get; }
 
@@ -32,12 +32,12 @@ public interface IState<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Returns a state transition by a transition value.
     /// </summary>
-    /// <param name="transition">Transition value.</param>
-    /// <returns>Some state transition found by the provided transition value or None.</returns>
+    /// <param name="transition">A transition value.</param>
+    /// <returns>Some state transition for the provided transition value or None.</returns>
     Option<IState<TTransition, TState>.Transition> this[TTransition transition] { get; }
     
     /// <summary>
-    /// Returns text representation of the state.
+    /// Returns a text representation of the state.
     /// </summary>
     public string Format() => string.IsNullOrEmpty(Tag?.ToString())
         ? $"State {Id}"
@@ -46,7 +46,7 @@ public interface IState<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Contains state transition data.
     /// </summary>
-    /// <param name="Kind">Transition kind.</param>
+    /// <param name="Kind">The transition kind.</param>
     /// <param name="State">Some next state for fixed transitions or None for dynamic transitions.</param>
     /// <param name="Reduce">A function to reduce state value on transition.</param>
     public record Transition(

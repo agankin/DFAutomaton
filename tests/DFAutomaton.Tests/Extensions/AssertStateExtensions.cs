@@ -17,10 +17,4 @@ public static class AssertStateExtensions
         Assert.AreEqual(expectedType, state.Type);
         return state;
     }
-
-    public static State<TTransition, TState> Is<TTransition, TState>(this AcceptedState<TTransition, TState> state, StateType expectedType)
-        where TTransition : notnull
-    {
-        return state.State.Is(expectedType);
-    }
 }

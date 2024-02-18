@@ -59,7 +59,7 @@ public class AutomatonTests
 
         automaton.Run(initialState, transitions)
             .IsError()
-            .HasType(AutomatonErrorType.TransitionNotFound)
+            .HasType(AutomatonErrorType.TransitionNotExists)
             .OccuredOn(Actions.ReceiveGoods)
             .State
                 .Is(StateType.Start);
