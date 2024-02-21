@@ -17,10 +17,10 @@ public class StateGraph
         var collectingGoods = builder.Start;
 
         collectingGoods
-            .TransitsBy(Actions.PutBreadToCart).WithReducing(Reducers.PutBreadToCart).ToSelf()
-            .TransitsBy(Actions.PutButterToCart).WithReducing(Reducers.PutButterToCart).ToSelf()
-            .TransitsBy(Actions.PayForGoods).WithReducing(Reducers.Pay).ToNew()
-            .TransitsBy(Actions.ReceiveGoods).WithReducing(Reducers.Purchase).ToAccepted();
+            .TransitsBy(Actions.PutBreadToCart).WithReducingBy(Reducers.PutBreadToCart).ToSelf()
+            .TransitsBy(Actions.PutButterToCart).WithReducingBy(Reducers.PutButterToCart).ToSelf()
+            .TransitsBy(Actions.PayForGoods).WithReducingBy(Reducers.Pay).ToNew()
+            .TransitsBy(Actions.ReceiveGoods).WithReducingBy(Reducers.Purchase).ToAccepted();
 
         return builder;
     }

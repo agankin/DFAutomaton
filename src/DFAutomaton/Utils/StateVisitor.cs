@@ -38,7 +38,7 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
     private static IEnumerable<IState<TTransition, TState>> GetNextStates(IState<TTransition, TState> state)
     {
         return state.Transitions
-            .Select(transition => state[transition].ValueOrFailure().State)
+            .Select(transition => state[transition].ValueOrFailure().ToState)
             .Where(state => state.HasValue)
             .Select(state => state.ValueOrFailure());
     }

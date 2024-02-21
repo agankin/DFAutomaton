@@ -3,44 +3,36 @@ using Optional;
 namespace DFAutomaton;
 
 /// <summary>
-/// Automaton transition.
+/// Contains automaton transition data.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 public class AutomatonTransition<TTransition, TState> where TTransition : notnull
 {
-    private Action<TTransition> _prependNextTransition { get; init; }
+    private readonly Action<TTransition> _yieldNext;
 
-    internal AutomatonTransition(
-        TState stateValueBefore,
-        TTransition transition,
-        Option<IState<TTransition, TState>> transitingTo,
-        Action<TTransition> prependNextTransition)
-    {
-        StateValueBefore = stateValueBefore;
-        Transition = transition;
-        TransitingTo = transitingTo;
-        _prependNextTransition = prependNextTransition;
-    }
+    internal AutomatonTransition(Action<TTransition> yieldNext) => _yieldNext = yieldNext;
 
     /// <summary>
-    /// Contains a state value before transition.
+    /// Contains Some next state the automaton transiting to on fixed transition or None on dynamic transition.
     /// </summary>
-    public TState StateValueBefore { get; }
+    public Option<IState<TTransition, TState>> TransitsTo { get; internal set; }
 
     /// <summary>
-    /// Contains the current transition value.
+    /// A next state set inside a reducer dynamic transitions.
     /// </summary>
-    public TTransition Transition { get; }
-    
-    /// <summary>
-    /// Contains Some next state the automaton transiting to by a fixed transition or None for dynamic transition.
-    /// </summary>
-    public Option<IState<TTransition, TState>> TransitingTo { get; private init; }
+    internal Option<IState<TTransition, TState>> DynamiclyGoToState { get; private set; }
 
     /// <summary>
-    /// Pushes the provided transition value ahead of the transition sequence to be returned next.
+    /// Yields the provided transition value to be handled by the automaton before the initially provided transition sequence values
+    /// but after the previously yielded values.
     /// </summary>
-    /// <param name="transition">Transition value.</param>
-    public void Prepend(TTransition transition) => _prependNextTransition(transition);
+    /// <param name="transition">A transition value.</param>
+    public void YieldNext(TTransition transition) => _yieldNext(transition);
+
+    /// <summary>
+    /// Orders the automaton to go to the provided state on the current transition. Calls ignored for fixed transitions.
+    /// </summary>
+    /// <param name="goToState">A state the automaton must dynamicly go to on dynamic transition.</param>
+    public void DynamiclyGoTo(Option<IState<TTransition, TState>> state) => DynamiclyGoToState  = state;
 }

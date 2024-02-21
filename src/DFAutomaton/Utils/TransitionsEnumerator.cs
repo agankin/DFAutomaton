@@ -10,7 +10,7 @@ namespace DFAutomaton.Utils;
 internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
 {
     private readonly IEnumerator<TTransition> _transitionsEnumerator;
-    private readonly Queue<TTransition> _emitedQueue = new();
+    private readonly Queue<TTransition> _yieldedQueue = new();
 
     private Option<TTransition> _current = Option.None<TTransition>();
 
@@ -26,15 +26,16 @@ internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
     object? IEnumerator.Current => Current;
 
     /// <summary>
-    /// Pushes a transition value ahead of a sequence of next transitions to be returned first.
+    /// Yields the provided transition value to be handled by the automaton before the initially provided transition sequence values
+    /// but after the previously yielded values.
     /// </summary>
-    /// <param name="transition">Transition value.</param>
-    public void Push(TTransition transition) => _emitedQueue.Enqueue(transition);
+    /// <param name="transition">A transition value.</param>
+    public void YieldNext(TTransition transition) => _yieldedQueue.Enqueue(transition);
 
     /// <inheritdoc/>
     public bool MoveNext()
     {
-        if (_emitedQueue.TryDequeue(out var transition))
+        if (_yieldedQueue.TryDequeue(out var transition))
         {
             _current = transition.Some();
             return true;

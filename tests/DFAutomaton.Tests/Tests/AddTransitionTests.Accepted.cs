@@ -12,11 +12,10 @@ public partial class AddTransitionTests
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
 
-        start.TransitsBy(StateActions.Inc).WithReducing(incValue).ToAccepted();
+        start.TransitsBy(StateActions.Inc).WithReducingTo(incValue).ToAccepted();
 
         start[StateActions.Inc]
             .IsSome()
-            .TransitsTo(TransitionKind.FixedState)
             .Reduces(StateActions.Inc, value, incValue);
     }
 
@@ -24,14 +23,13 @@ public partial class AddTransitionTests
     public void Add_transition_to_accepted_with_reducer()
     {
         var start = StateFactory<StateActions, State>.Start();
-        start.TransitsBy(StateActions.Inc).WithReducing(StateReducers.Inc).ToAccepted();
+        start.TransitsBy(StateActions.Inc).WithReducingBy(StateReducers.Inc).ToAccepted();
         
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
 
         start[StateActions.Inc]
             .IsSome()
-            .TransitsTo(TransitionKind.FixedState)
             .Reduces(StateActions.Inc, value, incValue);
     }
 }

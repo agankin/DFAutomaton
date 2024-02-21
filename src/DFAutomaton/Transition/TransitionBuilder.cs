@@ -17,31 +17,19 @@ public record TransitionBuilder<TTransition, TState>(
     /// </summary>
     /// <param name="toValue">A state value after the transition performed.</param>
     /// <returns>The created fixed transition builder.</returns>
-    public FixedTransitionConfiguration<TTransition, TState> WithReducing(TState toValue)
+    public FixedTransitionConfiguration<TTransition, TState> WithReducingTo(TState toValue)
     {
-        var reduce = ReducerFactory.Create<TTransition, TState>(toValue);
+        Reduce<TTransition, TState> reduce = (_, _) => toValue;
         return new(FromState, Transition, reduce);
     }
 
     /// <summary>
     /// Creates a new fixed transition builder.
     /// </summary>
-    /// <param name="reduceValue">A state value reducer.</param>
+    /// <param name="reduceValue">A reducer.</param>
     /// <returns>The created fixed transition builder.</returns>
-    public FixedTransitionConfiguration<TTransition, TState> WithReducing(ReduceValue<TTransition, TState> reduceValue)
+    public FixedTransitionConfiguration<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reduce)
     {
-        var reduce = ReducerFactory.Create(reduceValue);
-        return new(FromState, Transition, reduce);
-    }
-
-    /// <summary>
-    /// Creates a new fixed transition builder.
-    /// </summary>
-    /// <param name="reduceTransition">A state value reducer.</param>
-    /// <returns>The created fixed transition builder.</returns>
-    public FixedTransitionConfiguration<TTransition, TState> WithReducing(ReduceTransition<TTransition, TState> reduceTransition)
-    {
-        var reduce = ReducerFactory.Create(reduceTransition);
         return new(FromState, Transition, reduce);
     }
 

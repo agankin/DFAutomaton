@@ -32,7 +32,7 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     public IReadOnlyCollection<TTransition> Transitions => new HashSet<TTransition>(_transitionDict.Keys);
 
     /// <inheritdoc/>
-    public Option<Transition> this[TTransition transition] => _transitionDict.GetValueOrNone(transition);
+    public Option<State<TTransition, TState>.Transition> this[TTransition transition] => _transitionDict.GetValueOrNone(transition);
 
     /// <summary>
     /// Returns an instance of transition configuration for building transition from this state.
@@ -40,21 +40,16 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     public TransitionBuilder<TTransition, TState> TransitsBy(TTransition transition) => new(this, transition);
 
     /// <inheritdoc/>
-    Option<IState<TTransition, TState>.Transition> IState<TTransition, TState>.this[TTransition transition]
-    {
-        get
-        {
-            var stateTransition = _transitionDict.GetValueOrNone(transition);
-            return stateTransition.Map(MapTransition);
-        }
-    }
+    Option<Transition<TTransition, TState>> IState<TTransition, TState>.this[TTransition transition] =>
+        _transitionDict.GetValueOrNone(transition).Map<Transition<TTransition, TState>>(
+            t => new(t.ToState.Map<IState<TTransition, TState>>(s => s), t.Reduce));
 
     internal StateGraph<TTransition, TState> OwningGraph { get; }
 
     internal State<TTransition, TState> AddFixedTransition(TTransition transition, State<TTransition, TState> toState, Reduce<TTransition, TState> reduce)
     {
         ValidateLinkingNotAccepted();
-        _transitionDict[transition] = new(TransitionKind.FixedState, toState.Some(), reduce);
+        _transitionDict[transition] = new(toState.Some(), reduce);
 
         return toState;
     }
@@ -63,22 +58,14 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     {
         ValidateLinkingNotAccepted();
 
-        var noFixedGoToState = Option.None<State<TTransition, TState>>();
-        _transitionDict[transition] = new(TransitionKind.DynamicGoTo, noFixedGoToState, reduce);
+        var noneGoToState = Option.None<State<TTransition, TState>>();
+        _transitionDict[transition] = new(noneGoToState, reduce);
     }
 
     internal IReadOnlyDictionary<TTransition, Transition> GetTransitions() => _transitionDict;
 
     /// <inheritdoc/>
     public override string? ToString() => ((IState<TTransition, TState>)this).Format();
-
-    private static IState<TTransition, TState>.Transition MapTransition(Transition transition)
-    {
-        var (kind, nextStateOption, reduce) = transition;
-        var mappedNextStateOption = transition.State.Map<IState<TTransition, TState>>(_ => _);
-        
-        return new(kind, mappedNextStateOption, reduce);
-    }
 
     private void ValidateLinkingNotAccepted()
     {
@@ -87,14 +74,12 @@ public class State<TTransition, TState> : IState<TTransition, TState> where TTra
     }
 
     /// <summary>
-    /// Contains state transition data.
+    /// Contains information about transition to a next state.
     /// </summary>
-    /// <param name="Kind">The transition kind.</param>
-    /// <param name="State">Some next state for fixed transitions or None for dynamic transitions.</param>
+    /// <param name="ToState">Some next state for fixed transitions or None for dynamic transitions.</param>
     /// <param name="Reduce">A function to reduce state value on transition.</param>
-    public record Transition(
-        TransitionKind Kind,
-        Option<State<TTransition, TState>> State,
+    public readonly record struct Transition(
+        Option<State<TTransition, TState>> ToState,
         Reduce<TTransition, TState> Reduce
-    ) : Transition<TTransition, TState, State<TTransition, TState>>(Kind, State, Reduce);
+    );
 }

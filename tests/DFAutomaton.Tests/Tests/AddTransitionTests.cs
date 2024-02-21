@@ -13,12 +13,11 @@ public partial class AddTransitionTests
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
 
-        var incState = start.TransitsBy(StateActions.Inc).WithReducing(incValue).ToNew();
+        var incState = start.TransitsBy(StateActions.Inc).WithReducingTo(incValue).ToNew();
 
         incState.Is(StateType.SubState);
         start[StateActions.Inc]
             .IsSome()
-            .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
             .Reduces(StateActions.Inc, value, incValue);
     }
@@ -27,7 +26,7 @@ public partial class AddTransitionTests
     public void Add_transition_to_fixed_state_with_reducer()
     {
         var start = StateFactory<StateActions, State>.Start();
-        var incState = start.TransitsBy(StateActions.Inc).WithReducing(StateReducers.Inc).ToNew();
+        var incState = start.TransitsBy(StateActions.Inc).WithReducingBy(StateReducers.Inc).ToNew();
         
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
@@ -35,7 +34,6 @@ public partial class AddTransitionTests
         incState.Is(StateType.SubState);
         start[StateActions.Inc]
             .IsSome()
-            .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
             .Reduces(StateActions.Inc, value, incValue);
     }
@@ -49,13 +47,12 @@ public partial class AddTransitionTests
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
         
-        var linkedState = start.TransitsBy(StateActions.Inc).WithReducing(incValue).To(incState);
+        var linkedState = start.TransitsBy(StateActions.Inc).WithReducingTo(incValue).To(incState);
         Assert.AreEqual(incState, linkedState);
         linkedState.Is(StateType.SubState);
         
         start[StateActions.Inc]
             .IsSome()
-            .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
             .Reduces(StateActions.Inc, value, incValue);
     }
@@ -66,7 +63,7 @@ public partial class AddTransitionTests
         var start = StateFactory<StateActions, State>.Start();
         var incState = StateFactory<StateActions, State>.SubState(start.OwningGraph);
         
-        var linkedState = start.TransitsBy(StateActions.Inc).WithReducing(StateReducers.Inc).To(incState);
+        var linkedState = start.TransitsBy(StateActions.Inc).WithReducingBy(StateReducers.Inc).To(incState);
         Assert.AreEqual(incState, linkedState);
         linkedState.Is(StateType.SubState);
 
@@ -75,7 +72,6 @@ public partial class AddTransitionTests
 
         start[StateActions.Inc]
             .IsSome()
-            .TransitsTo(TransitionKind.FixedState)
             .TransitsTo(incState)
             .Reduces(StateActions.Inc, value, incValue);
     }

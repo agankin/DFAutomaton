@@ -5,30 +5,12 @@ namespace DFAutomaton.Tests;
 
 public static class AssertTransitionExtensions
 {
-    public static IState<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
-        this IState<TTransition, TState>.Transition transition,
-        TransitionKind expectedKind)
-        where TTransition : notnull
-    {
-        Assert.AreEqual(expectedKind, transition.Kind);
-        return transition;
-    }
-
-    public static State<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
-        this State<TTransition, TState>.Transition transition,
-        TransitionKind expectedKind)
-        where TTransition : notnull
-    {
-        Assert.AreEqual(expectedKind, transition.Kind);
-        return transition;
-    }
-
-    public static IState<TTransition, TState>.Transition TransitsTo<TTransition, TState>(
-        this IState<TTransition, TState>.Transition transition,
+    public static Transition<TTransition, TState> TransitsTo<TTransition, TState>(
+        this Transition<TTransition, TState> transition,
         IState<TTransition, TState> expectedState)
         where TTransition : notnull
     {
-        var transitionState = transition.State.IsSome();
+        var transitionState = transition.ToState.IsSome();
         Assert.AreEqual(expectedState, transitionState);
         
         return transition;
@@ -39,26 +21,20 @@ public static class AssertTransitionExtensions
         State<TTransition, TState> expectedState)
         where TTransition : notnull
     {
-        var transitionState = transition.State.IsSome();
+        var transitionState = transition.ToState.IsSome();
         Assert.AreEqual(expectedState, transitionState);
         
         return transition;
     }
 
-    public static IState<TTransition, TState>.Transition Reduces<TTransition, TState>(
-        this IState<TTransition, TState>.Transition stateTransition,
+    public static Transition<TTransition, TState> Reduces<TTransition, TState>(
+        this Transition<TTransition, TState> stateTransition,
         TTransition transition,
         TState beforeReduce,
         TState expectedAfterReduce)
         where TTransition : notnull
     {
-        var automatonTransition = new AutomatonTransition<TTransition, TState>(
-            beforeReduce,
-            transition,
-            Option.None<IState<TTransition, TState>>(),
-            _ => {});
-        var actualAfterReduce = stateTransition.Reduce(automatonTransition).StateValue;
-        
+        var actualAfterReduce = stateTransition.Reduce(beforeReduce, transition);   
         Assert.AreEqual(expectedAfterReduce, actualAfterReduce);
         
         return stateTransition;
@@ -71,13 +47,7 @@ public static class AssertTransitionExtensions
         TState expectedAfterReduce)
         where TTransition : notnull
     {
-        var automatonTransition = new AutomatonTransition<TTransition, TState>(
-            beforeReduce,
-            transition,
-            Option.None<IState<TTransition, TState>>(),
-            _ => {});
-        var actualAfterReduce = stateTransition.Reduce(automatonTransition).StateValue;
-        
+        var actualAfterReduce = stateTransition.Reduce(beforeReduce, transition);
         Assert.AreEqual(expectedAfterReduce, actualAfterReduce);
         
         return stateTransition;

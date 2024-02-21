@@ -39,7 +39,7 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
 
         yield return string.Empty;
 
-        var nextStates = state.Transitions.Select(transition => state[transition].ValueOrFailure().State)
+        var nextStates = state.Transitions.Select(transition => state[transition].ValueOrFailure().ToState)
             .Where(nextState => nextState.HasValue)
             .Select(nextStateOption => nextStateOption.ValueOrFailure());
         var nextStatesLines = nextStates.SelectMany(nextState => GetStateLines(nextState, formattedStates));
@@ -51,7 +51,7 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
     {
         return transition =>
         {
-            var (_, toState, _) = fromState[transition].ValueOrFailure();
+            var (toState, _) = fromState[transition].ValueOrFailure();
 
             return FormatTransition(transition, toState);
         };
