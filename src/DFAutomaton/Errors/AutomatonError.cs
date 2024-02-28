@@ -10,7 +10,7 @@
 /// <param name="Transition">A transition caused the error.</param>
 public record AutomatonError<TTransition, TState>(
     AutomatonErrorType Type,
-    IState<TTransition, TState> State,
+    State<TTransition, TState> State,
     TTransition Transition
 )
 where TTransition : notnull;

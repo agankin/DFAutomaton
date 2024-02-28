@@ -7,14 +7,15 @@ public partial class AddTransitionTests
     [Test(Description = "Tests adding transition to accepted state and constant value.")]
     public void Add_transition_to_accepted_with_constant_value()
     {
-        var start = StateFactory<StateActions, State>.Start();
+        var stateGraph = new StateGraph<StateActions, State>();
+        var startState = stateGraph.StartState;
 
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
 
-        start.TransitsBy(StateActions.Inc).WithReducingTo(incValue).ToAccepted();
+        startState.TransitsBy(StateActions.Inc).WithReducingTo(incValue).ToAccepted();
 
-        start[StateActions.Inc]
+        startState[StateActions.Inc]
             .IsSome()
             .Reduces(StateActions.Inc, value, incValue);
     }
@@ -22,13 +23,15 @@ public partial class AddTransitionTests
     [Test(Description = "Tests adding transition to accepted state and value reducer.")]
     public void Add_transition_to_accepted_with_reducer()
     {
-        var start = StateFactory<StateActions, State>.Start();
-        start.TransitsBy(StateActions.Inc).WithReducingBy(StateReducers.Inc).ToAccepted();
+        var stateGraph = new StateGraph<StateActions, State>();
+        var startState = stateGraph.StartState;
+        
+        startState.TransitsBy(StateActions.Inc).WithReducingBy(StateReducers.Inc).ToAccepted();
         
         var value = new State(StateValue.Initial);
         var incValue = new State(StateValue.Incremented);
 
-        start[StateActions.Inc]
+        startState[StateActions.Inc]
             .IsSome()
             .Reduces(StateActions.Inc, value, incValue);
     }

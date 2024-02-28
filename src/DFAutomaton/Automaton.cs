@@ -10,16 +10,13 @@ namespace DFAutomaton;
 /// <typeparam name="TState">State value type.</typeparam>
 public class Automaton<TTransition, TState> where TTransition : notnull
 {
+    public State<TTransition, TState> _start;
+
     /// <summary>
     /// Creates <see cref="Automaton{TTransition, TState}"/>.
     /// </summary>
     /// <param name="start">The start state of an automaton.</param>
-    public Automaton(IState<TTransition, TState> start) => Start = start;
-
-    /// <summary>
-    /// The start state of the automaton.
-    /// </summary>
-    public IState<TTransition, TState> Start { get; }
+    public Automaton(State<TTransition, TState> start) => _start = start;
 
     /// <summary>
     /// Contains a current transition at the run time.
@@ -34,7 +31,7 @@ public class Automaton<TTransition, TState> where TTransition : notnull
     /// <returns>Some with a reduced value after applying all transitions or None with an error occured.</returns>
     public Option<TState, AutomatonError<TTransition, TState>> Run(TState startValue, IEnumerable<TTransition> transitions)
     {
-        var initialState = AutomatonState.State(Start, startValue);
+        var initialState = AutomatonState.State(_start, startValue);
         var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
 
         CurrentTransition.Value = new(transitionsEnumerator.YieldNext);
@@ -74,7 +71,7 @@ public class Automaton<TTransition, TState> where TTransition : notnull
             .ValueOr(() => GetTransitionNotFoundError(stateValue.State, transition));
     }
 
-    private static AutomatonState<TTransition, TState> GetTransitionNotFoundError(IState<TTransition, TState> state, TTransition transition)
+    private static AutomatonState<TTransition, TState> GetTransitionNotFoundError(State<TTransition, TState> state, TTransition transition)
     {
         var errorType = state.Type == StateType.Accepted
             ? AutomatonErrorType.TransitionFromAccepted

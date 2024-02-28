@@ -1,5 +1,4 @@
 ﻿using Optional;
-using Optional.Collections;
 
 namespace DFAutomaton;
 
@@ -8,78 +7,94 @@ namespace DFAutomaton;
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
-public class State<TTransition, TState> : IState<TTransition, TState> where TTransition : notnull
+public readonly record struct State<TTransition, TState> where TTransition : notnull
 {
-    private readonly Dictionary<TTransition, State<TTransition, TState>.Transition> _transitionDict = new();
-
-    internal State(StateType type, StateGraph<TTransition, TState> owningGraph)
+    private readonly StateId _id;
+    
+    internal State(StateId id, StateGraph<TTransition, TState> owningGraph)
     {
-        Id = owningGraph.GenerateNextId();
-        Type = type;
+        _id = id;
         OwningGraph = owningGraph;
     }
 
-    /// <inheritdoc/>
-    public long Id { get; }
+    /// <summary>
+    /// Contains an identifier that is unique within the scope of the containing state graph.
+    /// </summary>
+    public uint Id => _id;
 
-    /// <inheritdoc/>
-    public object? Tag { get; set; }
+    /// <summary>
+    /// Contains a tag with additional information.
+    /// </summary>
+    public object? Tag => OwningGraph.GetTag(_id);
 
-    /// <inheritdoc/>
-    public StateType Type { get; }
+    /// <summary>
+    /// Contains the state type.
+    /// </summary>
+    public StateType Type => _id.GetStateType();
 
-    /// <inheritdoc/>
-    public IReadOnlyCollection<TTransition> Transitions => new HashSet<TTransition>(_transitionDict.Keys);
+    /// <summary>
+    /// Contains transitions to next states.
+    /// </summary>
+    public IReadOnlyCollection<TTransition> Transitions => OwningGraph.GetTransitions(_id);
 
-    /// <inheritdoc/>
-    public Option<State<TTransition, TState>.Transition> this[TTransition transition] => _transitionDict.GetValueOrNone(transition);
+    /// <summary>
+    /// Returns a state transition by a transition value.
+    /// </summary>
+    /// <param name="transition">A transition value.</param>
+    /// <returns>Some state transition for the provided transition value or None if the transition doesn't exist.</returns>
+    public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetStateTransition(_id, transition);
 
     /// <summary>
     /// Returns an instance of transition configuration for building transition from this state.
     /// </summary>
     public TransitionBuilder<TTransition, TState> TransitsBy(TTransition transition) => new(this, transition);
 
-    /// <inheritdoc/>
-    Option<Transition<TTransition, TState>> IState<TTransition, TState>.this[TTransition transition] =>
-        _transitionDict.GetValueOrNone(transition).Map<Transition<TTransition, TState>>(
-            t => new(t.ToState.Map<IState<TTransition, TState>>(s => s), t.Reduce));
+    /// <summary>
+    /// Returns a text representation of the state.
+    /// </summary>
+    public string Format() => string.IsNullOrEmpty(Tag?.ToString())
+        ? $"State {Id}"
+        : $"State {Id}: {Tag}";
 
     internal StateGraph<TTransition, TState> OwningGraph { get; }
 
-    internal State<TTransition, TState> AddFixedTransition(TTransition transition, State<TTransition, TState> toState, Reduce<TTransition, TState> reduce)
+    internal State<TTransition, TState> AddFixedTransition(uint toStateId, TTransition transition, Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
-        _transitionDict[transition] = new(toState.Some(), reduce);
 
-        return toState;
+        return AddFixedTransitionCore(toStateId, transition, reducer);
+    }
+
+    internal State<TTransition, TState> AddFixedTransitionToNewState(TTransition transition, Reduce<TTransition, TState> reducer)
+    {
+        ValidateLinkingNotAccepted();
+
+        var toState = OwningGraph.CreateState();
+        return AddFixedTransitionCore(toState.Id, transition, reducer);
     }
     
-    internal void AddDynamicTransition(TTransition transition, Reduce<TTransition, TState> reduce)
+    internal void AddDynamicTransition(TTransition transition, Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
 
         var noneGoToState = Option.None<State<TTransition, TState>>();
-        _transitionDict[transition] = new(noneGoToState, reduce);
+        var stateTransition = new Transition<TTransition, TState>(noneGoToState, reducer);
+        
+        OwningGraph.AddStateTransition(_id, transition, stateTransition);
     }
 
-    internal IReadOnlyDictionary<TTransition, Transition> GetTransitions() => _transitionDict;
+    private State<TTransition, TState> AddFixedTransitionCore(uint toStateId, TTransition transition, Reduce<TTransition, TState> reducer)
+    {
+        var toState = OwningGraph[toStateId];
+        var stateTransition = new Transition<TTransition, TState>(toState.Some(), reducer);
+        OwningGraph.AddStateTransition(_id, transition, stateTransition);
 
-    /// <inheritdoc/>
-    public override string? ToString() => ((IState<TTransition, TState>)this).Format();
-
+        return OwningGraph[toStateId];
+    }
+    
     private void ValidateLinkingNotAccepted()
     {
         if (Type == StateType.Accepted)
             throw new InvalidOperationException("Cannot link a state to the accepted state.");
     }
-
-    /// <summary>
-    /// Contains information about transition to a next state.
-    /// </summary>
-    /// <param name="ToState">Some next state for fixed transitions or None for dynamic transitions.</param>
-    /// <param name="Reduce">A function to reduce state value on transition.</param>
-    public readonly record struct Transition(
-        Option<State<TTransition, TState>> ToState,
-        Reduce<TTransition, TState> Reduce
-    );
 }

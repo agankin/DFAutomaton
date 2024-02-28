@@ -23,7 +23,9 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// <returns>The created new instance.</returns> 
     public static AutomatonBuilder<TTransition, TState> Create()
     {
-        var start = StateFactory<TTransition, TState>.Start();
+        var stateGraph = new StateGraph<TTransition, TState>();
+        var start = stateGraph.StartState;
+        
         return new AutomatonBuilder<TTransition, TState>(start);
     }
 

@@ -6,7 +6,7 @@ internal readonly record struct AutomatonState<TTransition, TState> where TTrans
 {
     private Option<StateValue, AutomatonError<TTransition, TState>> StateValueOrError { get; init; }
 
-    public static AutomatonState<TTransition, TState> AtState(IState<TTransition, TState> state, TState value)
+    public static AutomatonState<TTransition, TState> AtState(State<TTransition, TState> state, TState value)
     {
         var stateValue = new StateValue(state, value);
         return new() { StateValueOrError = stateValue.Some<StateValue, AutomatonError<TTransition, TState>>() };
@@ -25,14 +25,14 @@ internal readonly record struct AutomatonState<TTransition, TState> where TTrans
     public Option<TState, AutomatonError<TTransition, TState>> GetValueOrError() => StateValueOrError.Map(state => state.Value);
 
     public readonly record struct StateValue(
-        IState<TTransition, TState> State,
+        State<TTransition, TState> State,
         TState Value
     );
 }
 
 internal record AutomatonState
 {
-    public static AutomatonState<TTransition, TState> State<TTransition, TState>(IState<TTransition, TState> state, TState stateValue)
+    public static AutomatonState<TTransition, TState> State<TTransition, TState>(State<TTransition, TState> state, TState stateValue)
         where TTransition : notnull
     {
         return AutomatonState<TTransition, TState>.AtState(state, stateValue);

@@ -16,12 +16,12 @@ public class AutomatonTransition<TTransition, TState> where TTransition : notnul
     /// <summary>
     /// Contains Some next state the automaton transiting to on fixed transition or None on dynamic transition.
     /// </summary>
-    public Option<IState<TTransition, TState>> TransitsTo { get; internal set; }
+    public Option<State<TTransition, TState>> TransitsTo { get; internal set; }
 
     /// <summary>
     /// A next state set inside a reducer dynamic transitions.
     /// </summary>
-    internal Option<IState<TTransition, TState>> DynamiclyGoToState { get; private set; }
+    internal Option<State<TTransition, TState>> DynamiclyGoToState { get; private set; }
 
     /// <summary>
     /// Yields the provided transition value to be handled by the automaton before the initially provided transition sequence values
@@ -34,5 +34,5 @@ public class AutomatonTransition<TTransition, TState> where TTransition : notnul
     /// Orders the automaton to go to the provided state on the current transition. Calls ignored for fixed transitions.
     /// </summary>
     /// <param name="goToState">A state the automaton must dynamicly go to on dynamic transition.</param>
-    public void DynamiclyGoTo(Option<IState<TTransition, TState>> state) => DynamiclyGoToState  = state;
+    public void DynamiclyGoTo(Option<State<TTransition, TState>> state) => DynamiclyGoToState  = state;
 }

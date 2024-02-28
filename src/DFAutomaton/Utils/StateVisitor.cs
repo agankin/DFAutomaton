@@ -12,10 +12,10 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
     /// <returns>
     /// Boolean value. True value denotes the visitor function returned VisitResult.Stop at a node stopping traversal process. Otherwise returns false.
     /// </returns>
-    public static bool Visit(IState<TTransition, TState> start, Func<IState<TTransition, TState>, VisitResult> visit)
+    public static bool Visit(State<TTransition, TState> start, Func<State<TTransition, TState>, VisitResult> visit)
     {
-        var visitedStates = new HashSet<IState<TTransition, TState>>();
-        var statesToVisit = new Stack<IState<TTransition, TState>>();
+        var visitedStates = new HashSet<State<TTransition, TState>>();
+        var statesToVisit = new Stack<State<TTransition, TState>>();
 
         statesToVisit.Push(start);
 
@@ -35,7 +35,7 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
         return false;
     }
 
-    private static IEnumerable<IState<TTransition, TState>> GetNextStates(IState<TTransition, TState> state)
+    private static IEnumerable<State<TTransition, TState>> GetNextStates(State<TTransition, TState> state)
     {
         return state.Transitions
             .Select(transition => state[transition].ValueOrFailure().ToState)

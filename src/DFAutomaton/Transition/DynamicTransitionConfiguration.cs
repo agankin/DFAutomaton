@@ -15,6 +15,6 @@ public record DynamicTransitionConfiguration<TTransition, TState>(
     /// <summary>
     /// Creates a new dynamic transition and completes build.
     /// </summary>
-    /// <param name="reduce">An automaton transition reducer.</param>
-    public void WithReducing(Reduce<TTransition, TState> reduce) => FromState.AddDynamicTransition(Transition, reduce);
+    /// <param name="reducer">An automaton transition reducer.</param>
+    public void WithReducing(Reduce<TTransition, TState> reducer) => FromState.AddDynamicTransition(Transition, reducer);
 }

@@ -4,7 +4,7 @@ namespace DFAutomaton;
 
 internal static class GraphBuilder
 {
-    public static Option<IState<TTransition, TState>, ValidationError> Build<TTransition, TState>(this State<TTransition, TState> startState, ValidationConfiguration configuration)
+    public static Option<State<TTransition, TState>, ValidationError> Build<TTransition, TState>(this State<TTransition, TState> startState, ValidationConfiguration configuration)
         where TTransition : notnull
     {
         var start = startState.AsImmutable();
@@ -12,10 +12,10 @@ internal static class GraphBuilder
         return configuration.ValidateAnyReachesAccepted
             ? StateGraphValidator<TTransition, TState>.ValidateHasAccepted(start)
                 .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(start))
-            : start.Some<IState<TTransition, TState>, ValidationError>();
+            : start.Some<State<TTransition, TState>, ValidationError>();
     }
 
-    private static IState<TTransition, TState> AsImmutable<TTransition, TState>(this State<TTransition, TState> current)
+    private static State<TTransition, TState> AsImmutable<TTransition, TState>(this State<TTransition, TState> current)
         where TTransition : notnull
     {
         return current;

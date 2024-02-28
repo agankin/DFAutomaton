@@ -19,18 +19,18 @@ public record TransitionBuilder<TTransition, TState>(
     /// <returns>The created fixed transition builder.</returns>
     public FixedTransitionConfiguration<TTransition, TState> WithReducingTo(TState toValue)
     {
-        Reduce<TTransition, TState> reduce = (_, _) => toValue;
-        return new(FromState, Transition, reduce);
+        Reduce<TTransition, TState> reducer = (_, _) => toValue;
+        return new(FromState, Transition, reducer);
     }
 
     /// <summary>
     /// Creates a new fixed transition builder.
     /// </summary>
-    /// <param name="reduceValue">A reducer.</param>
+    /// <param name="reducer">A reducer.</param>
     /// <returns>The created fixed transition builder.</returns>
-    public FixedTransitionConfiguration<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reduce)
+    public FixedTransitionConfiguration<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer)
     {
-        return new(FromState, Transition, reduce);
+        return new(FromState, Transition, reducer);
     }
 
     /// <summary>

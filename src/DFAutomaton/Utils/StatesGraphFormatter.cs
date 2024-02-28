@@ -15,20 +15,19 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
     /// </summary>
     /// <param name="start">The start state of a state graph.</param>
     /// <returns>A text representation of the provided state graph.</returns>
-    public static string Format(IState<TTransition, TState> start)
+    public static string Format(State<TTransition, TState> start)
     {
-        var formattedStates = new HashSet<IState<TTransition, TState>>();
+        var formattedStates = new HashSet<State<TTransition, TState>>();
         var lines = GetStateLines(start, formattedStates);
 
         return string.Join(Environment.NewLine, lines);
     }
 
-    private static IEnumerable<string> GetStateLines(
-        IState<TTransition, TState> state,
-        ISet<IState<TTransition, TState>> formattedStates)
+    private static IEnumerable<string> GetStateLines(State<TTransition, TState> state, ISet<State<TTransition, TState>> formattedStates)
     {
         if (formattedStates.Contains(state))
             yield break;
+
         formattedStates.Add(state);
 
         yield return FormatState(state);
@@ -47,7 +46,7 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
             yield return nextStateLine;
     }
 
-    private static Func<TTransition, string> FormatTransition(IState<TTransition, TState> fromState)
+    private static Func<TTransition, string> FormatTransition(State<TTransition, TState> fromState)
     {
         return transition =>
         {
@@ -57,9 +56,9 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
         };
     }
 
-    private static string FormatState(IState<TTransition, TState> state) => state.Format();
+    private static string FormatState(State<TTransition, TState> state) => state.Format();
 
-    private static string FormatTransition(TTransition transition, Option<IState<TTransition, TState>> toStateOption)
+    private static string FormatTransition(TTransition transition, Option<State<TTransition, TState>> toStateOption)
     {
         var toStateFormatted = toStateOption.Map(toState => toState.Id.ToString()).ValueOr("DYNAMIC GOTO");
         return $"    {transition} -> State {toStateFormatted}";

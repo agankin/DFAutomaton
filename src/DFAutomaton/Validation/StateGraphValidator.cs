@@ -14,14 +14,14 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
     /// <returns>Some with the provided start state or None with a validation error.</returns>
-    public static Option<IState<TTransition, TState>, ValidationError> ValidateHasAccepted(IState<TTransition, TState> start)
+    public static Option<State<TTransition, TState>, ValidationError> ValidateHasAccepted(State<TTransition, TState> start)
     {
         var acceptedReached = StateVisitor<TTransition, TState>.Visit(start, StopWhenReachedAccepted);
         
         if (!acceptedReached)
-            return Option.None<IState<TTransition, TState>, ValidationError>(ValidationError.NoAccepted);
+            return Option.None<State<TTransition, TState>, ValidationError>(ValidationError.NoAccepted);
 
-        return start.Some<IState<TTransition, TState>, ValidationError>();
+        return start.Some<State<TTransition, TState>, ValidationError>();
     }
 
     /// <summary>
@@ -31,31 +31,31 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
     /// <returns>Some with the provided start state or None with a validation error.</returns>
-    public static Option<IState<TTransition, TState>, ValidationError> ValidateAnyReachAccepted(IState<TTransition, TState> start)
+    public static Option<State<TTransition, TState>, ValidationError> ValidateAnyReachAccepted(State<TTransition, TState> start)
     {
-        var canReachAcceptedStates = new HashSet<IState<TTransition, TState>>();
+        var canReachAcceptedStates = new HashSet<State<TTransition, TState>>();
         var someCannotReachAccepted = StateVisitor<TTransition, TState>.Visit(start, StopWhenCannotReachAccepted(canReachAcceptedStates));
         
         if (someCannotReachAccepted)
-            return Option.None<IState<TTransition, TState>, ValidationError>(ValidationError.AcceptedIsUnreachable);
+            return Option.None<State<TTransition, TState>, ValidationError>(ValidationError.AcceptedIsUnreachable);
 
-        return start.Some<IState<TTransition, TState>, ValidationError>();
+        return start.Some<State<TTransition, TState>, ValidationError>();
     }
 
-    private static VisitResult StopWhenReachedAccepted(IState<TTransition, TState> state) =>
+    private static VisitResult StopWhenReachedAccepted(State<TTransition, TState> state) =>
         state.Type == StateType.Accepted ? VisitResult.Stop : VisitResult.Continue;
 
-    private static Func<IState<TTransition, TState>, VisitResult> StopWhenCannotReachAccepted(ISet<IState<TTransition, TState>> canReachAcceptedStates)
+    private static Func<State<TTransition, TState>, VisitResult> StopWhenCannotReachAccepted(ISet<State<TTransition, TState>> canReachAcceptedStates)
     {
         return state => CanReachAccepted(state, canReachAcceptedStates) ? VisitResult.Continue : VisitResult.Stop;
     }
 
-    private static bool CanReachAccepted(IState<TTransition, TState> state, ISet<IState<TTransition, TState>> canReachAcceptedStates)
+    private static bool CanReachAccepted(State<TTransition, TState> state, ISet<State<TTransition, TState>> canReachAcceptedStates)
     {
         if (canReachAcceptedStates.Contains(state))
             return true;
 
-        var visitedStates = new HashSet<IState<TTransition, TState>>();
+        var visitedStates = new HashSet<State<TTransition, TState>>();
         var canReachAccepted = StateVisitor<TTransition, TState>.Visit(state, StopWhenAccepted(visitedStates));
 
         if (canReachAccepted)
@@ -64,7 +64,7 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
         return canReachAccepted;
     }
 
-    private static Func<IState<TTransition, TState>, VisitResult> StopWhenAccepted(ISet<IState<TTransition, TState>> visitedStates)
+    private static Func<State<TTransition, TState>, VisitResult> StopWhenAccepted(ISet<State<TTransition, TState>> visitedStates)
     {
         return state =>
         {
