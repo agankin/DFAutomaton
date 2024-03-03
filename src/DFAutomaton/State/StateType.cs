@@ -6,7 +6,7 @@
 public enum StateType
 {
     /// <summary>
-    /// A start state that an automaton execution starts at.
+    /// The start state that an automaton execution starts at.
     /// </summary>
     Start = 1,
 
@@ -16,7 +16,7 @@ public enum StateType
     SubState,
 
     /// <summary>
-    /// An accepted state at which an automaton finishes.
+    /// The accepted state at which an automaton finishes.
     /// </summary>
     Accepted
 }

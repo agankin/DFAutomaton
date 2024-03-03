@@ -2,6 +2,9 @@
 
 namespace DFAutomaton;
 
+internal delegate VisitResult Visit<TTransition, TState>(State<TTransition, TState> state)
+    where TTransition : notnull;
+
 internal static class StateVisitor<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
@@ -12,7 +15,7 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
     /// <returns>
     /// Boolean value. True value denotes the visitor function returned VisitResult.Stop at a node stopping traversal process. Otherwise returns false.
     /// </returns>
-    public static bool Visit(State<TTransition, TState> start, Func<State<TTransition, TState>, VisitResult> visit)
+    public static bool Visit(State<TTransition, TState> start, Visit<TTransition, TState> visit)
     {
         var visitedStates = new HashSet<State<TTransition, TState>>();
         var statesToVisit = new Stack<State<TTransition, TState>>();

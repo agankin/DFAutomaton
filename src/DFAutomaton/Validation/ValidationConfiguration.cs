@@ -11,13 +11,13 @@ public record ValidationConfiguration
     internal static readonly ValidationConfiguration Default = new();
 
     /// <summary>
-    /// Contains a flag to validate that any state reachs the accepted state. True by default.
+    /// Contains a flag to validate that any state reaches the accepted state. True by default.
     /// </summary>
     internal bool ValidateAnyReachesAccepted { get; private init; } = true;
 
     /// <summary>
-    /// Turns off validation of any state reachs the accepted state.
+    /// Turns off validation of any state reaches the accepted state.
     /// </summary>
-    /// <returns>New instance with the change applied.</returns>
+    /// <returns>A new instance with the changes applied.</returns>
     public ValidationConfiguration TurnOffAnyReachesAcceptedValidation() => this with { ValidateAnyReachesAccepted = false };
 }

@@ -7,7 +7,7 @@ namespace DFAutomaton;
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
-public readonly record struct State<TTransition, TState> where TTransition : notnull
+public readonly struct State<TTransition, TState> where TTransition : notnull
 {
     private readonly StateId _id;
     
@@ -25,7 +25,14 @@ public readonly record struct State<TTransition, TState> where TTransition : not
     /// <summary>
     /// Contains a tag with additional information.
     /// </summary>
-    public object? Tag => OwningGraph.GetTag(_id);
+    /// <remarks>
+    /// This information will be included in the text representation of the state returned from <see cref="Format"/> method.
+    /// </remarks>
+    public object? Tag
+    {
+        get => OwningGraph.GetTag(_id);
+        set => OwningGraph.SetTag(_id, value);
+    }
 
     /// <summary>
     /// Contains the state type.
@@ -45,7 +52,7 @@ public readonly record struct State<TTransition, TState> where TTransition : not
     public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetStateTransition(_id, transition);
 
     /// <summary>
-    /// Returns an instance of transition configuration for building transition from this state.
+    /// Returns an instance of transition builder for building transition from this state.
     /// </summary>
     public TransitionBuilder<TTransition, TState> TransitsBy(TTransition transition) => new(this, transition);
 
@@ -62,15 +69,11 @@ public readonly record struct State<TTransition, TState> where TTransition : not
     {
         ValidateLinkingNotAccepted();
 
-        return AddFixedTransitionCore(toStateId, transition, reducer);
-    }
+        var toState = OwningGraph[toStateId];
+        var stateTransition = new Transition<TTransition, TState>(toState.Some(), reducer);
+        OwningGraph.AddStateTransition(_id, transition, stateTransition);
 
-    internal State<TTransition, TState> AddFixedTransitionToNewState(TTransition transition, Reduce<TTransition, TState> reducer)
-    {
-        ValidateLinkingNotAccepted();
-
-        var toState = OwningGraph.CreateState();
-        return AddFixedTransitionCore(toState.Id, transition, reducer);
+        return OwningGraph[toStateId];
     }
     
     internal void AddDynamicTransition(TTransition transition, Reduce<TTransition, TState> reducer)
@@ -82,19 +85,10 @@ public readonly record struct State<TTransition, TState> where TTransition : not
         
         OwningGraph.AddStateTransition(_id, transition, stateTransition);
     }
-
-    private State<TTransition, TState> AddFixedTransitionCore(uint toStateId, TTransition transition, Reduce<TTransition, TState> reducer)
-    {
-        var toState = OwningGraph[toStateId];
-        var stateTransition = new Transition<TTransition, TState>(toState.Some(), reducer);
-        OwningGraph.AddStateTransition(_id, transition, stateTransition);
-
-        return OwningGraph[toStateId];
-    }
     
     private void ValidateLinkingNotAccepted()
     {
         if (Type == StateType.Accepted)
-            throw new InvalidOperationException("Cannot link a state to the accepted state.");
+            throw new InvalidOperationException("Cannot add transition from the accepted state.");
     }
 }

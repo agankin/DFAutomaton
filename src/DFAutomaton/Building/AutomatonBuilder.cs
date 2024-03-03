@@ -4,7 +4,7 @@ using Optional;
 namespace DFAutomaton;
 
 /// <summary>
-/// Builder for building automatons.
+/// A builder for building automata.
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
@@ -32,13 +32,26 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Builds a new automaton.
     /// </summary>
-    /// <param name="configure">The delegate to setup a build configuration.</param>
-    /// <returns>Some with a new automaton or None with an error.</returns>
-    public Option<Automaton<TTransition, TState>, ValidationError> Build(Configure<ValidationConfiguration>? configure = null)
+    /// <param name="configure">A delegate to setup the build configuration.</param>
+    /// <returns>The result of the build.</returns>
+    public BuildResult<TTransition, TState> Build(Configure<ValidationConfiguration>? configure = null)
     {
         var configuration = (configure ?? (config => config))(ValidationConfiguration.Default);
-        var startOrError = Start.Build(configuration);
+        var result = Validate(Start, configuration);
 
-        return startOrError.Map<Automaton<TTransition, TState>>(start => new(start));
+        return result.Value.Match<BuildResult<TTransition, TState>>(
+            startState => new Automaton<TTransition, TState>(startState),
+            error => error);
+    }
+
+    private static ValidationResult<TTransition, TState> Validate(State<TTransition, TState> startState, ValidationConfiguration configuration)
+    {
+        if (configuration.ValidateAnyReachesAccepted)
+        {
+            return StateGraphValidator<TTransition, TState>.ValidateHasAccepted(startState).Value
+                .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState).Value);
+        }
+
+        return startState.Some<State<TTransition, TState>, ValidationError>();
     }
 }

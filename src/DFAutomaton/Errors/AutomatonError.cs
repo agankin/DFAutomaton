@@ -1,4 +1,6 @@
-﻿namespace DFAutomaton;
+﻿using Optional;
+
+namespace DFAutomaton;
 
 /// <summary>
 /// Contains information about an automaton runtime error.
@@ -6,27 +8,54 @@
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 /// <param name="Type">The error type.</param>
-/// <param name="State">An automaton state the error occured when transitioning from.</param>
+/// <param name="WhenTransitioningFrom">
+/// Some automaton state the error occured when transitioning from.
+/// </param>
 /// <param name="Transition">A transition caused the error.</param>
+/// <param name="RuntimeException">
+/// Some exception for <see cref="AutomatonErrorType.ReducerError"/> and <see cref="AutomatonErrorType.RunError"/> or None for other types.
+/// </param>
 public record AutomatonError<TTransition, TState>(
     AutomatonErrorType Type,
-    State<TTransition, TState> State,
-    TTransition Transition
+    Option<State<TTransition, TState>> WhenTransitioningFrom,
+    Option<TTransition> Transition,
+    Option<Exception> RuntimeException
 )
-where TTransition : notnull;
-
-/// <summary>
-/// Contains types of automaton runtime errors.
-/// </summary>
-public enum AutomatonErrorType
+where TTransition : notnull
 {
-    /// <summary>
-    /// A transition from a state does not exist.
-    /// </summary>
-    TransitionNotExists = 1,
-    
-    /// <summary>
-    /// An attempt of performing a transition from an accepted state.
-    /// </summary>
-    TransitionFromAccepted
+    internal static AutomatonError<TTransition, TState> TransitionNotFound(State<TTransition, TState> fromState, TTransition transition)
+    {
+        var errorType = fromState.Type == StateType.Accepted
+            ? AutomatonErrorType.TransitionFromAccepted
+            : AutomatonErrorType.TransitionNotExists;
+        var error = new AutomatonError<TTransition, TState>(
+            errorType,
+            fromState.Some(),
+            transition.Some(),
+            Option.None<Exception>());
+        
+        return error;
+    }
+
+    internal static AutomatonError<TTransition, TState> ReducerError(State<TTransition, TState> fromState, TTransition transition, Exception exception)
+    {
+        var error = new AutomatonError<TTransition, TState>(
+            AutomatonErrorType.ReducerError,
+            fromState.Some(),
+            transition.Some(),
+            exception.Some());
+        
+        return error;
+    }
+
+    internal static AutomatonError<TTransition, TState> RuntimeError(Exception exception)
+    {
+        var error = new AutomatonError<TTransition, TState>(
+            AutomatonErrorType.RunError,
+            Option.None<State<TTransition, TState>>(),
+            Option.None<TTransition>(),
+            exception.Some());
+        
+        return error;
+    }
 }

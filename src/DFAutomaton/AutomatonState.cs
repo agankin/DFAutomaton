@@ -22,7 +22,19 @@ internal readonly record struct AutomatonState<TTransition, TState> where TTrans
             AutomatonState<TTransition, TState>.AtError);
     }
 
-    public Option<TState, AutomatonError<TTransition, TState>> GetValueOrError() => StateValueOrError.Map(state => state.Value);
+    public Option<TState, AutomatonError<TTransition, TState>> GetAcceptedValueOrError()
+    {
+        return StateValueOrError.FlatMap(state => state.State.Type == StateType.Accepted
+            ? state.Value.Some<TState, AutomatonError<TTransition, TState>>()
+            : Option.None<TState, AutomatonError<TTransition, TState>>(GetAccpetedNotReachedError()));
+    }
+
+    private static AutomatonError<TTransition, TState> GetAccpetedNotReachedError() => new(
+        AutomatonErrorType.AcceptedNotReached,
+        Option.None<State<TTransition, TState>>(),
+        Option.None<TTransition>(),
+        Option.None<Exception>()
+    );
 
     public readonly record struct StateValue(
         State<TTransition, TState> State,

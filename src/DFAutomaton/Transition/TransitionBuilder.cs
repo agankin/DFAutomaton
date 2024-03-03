@@ -5,7 +5,7 @@ namespace DFAutomaton;
 /// </summary>
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
-/// <param name="FromState">A state the new transition is originating from.</param>
+/// <param name="FromState">A state the new transition is starting from.</param>
 /// <param name="Transition">A transition value.</param>
 public record TransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
@@ -15,7 +15,7 @@ public record TransitionBuilder<TTransition, TState>(
     /// <summary>
     /// Creates a new fixed transition builder.
     /// </summary>
-    /// <param name="toValue">A state value after the transition performed.</param>
+    /// <param name="toValue">A new state value after the transition.</param>
     /// <returns>The created fixed transition builder.</returns>
     public FixedTransitionConfiguration<TTransition, TState> WithReducingTo(TState toValue)
     {
