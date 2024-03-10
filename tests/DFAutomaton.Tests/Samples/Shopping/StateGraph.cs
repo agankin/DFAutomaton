@@ -7,7 +7,7 @@ using StateOrError = Option<State, Errors>;
 
 public class StateGraph
 {
-    public static Automaton<Actions, StateOrError> BuildAutomaton() => GetBuilder().Build().ValueOrFailure();
+    public static Automaton<Actions, StateOrError> BuildAutomaton() => GetBuilder().Build().Value.ValueOrFailure();
 
     public static State<Actions, StateOrError> BeginCollectingGoods() => GetBuilder().Start;
 

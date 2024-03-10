@@ -7,8 +7,8 @@ namespace DFAutomaton.Tests;
 [TestFixture]
 public class StateGraphTests
 {
-    [Test(Description = "State graph transitions test scenario.")]
-    public void Transitions_scenario()
+    [Test(Description = "State graph traverse scenario.")]
+    public void Traverse_shopping_scenario()
     {
         var collectingGoods = StateGraph.BeginCollectingGoods();
         
@@ -30,7 +30,7 @@ public class StateGraphTests
             .Reduces(Actions.PutBreadToCart, emptyCartState, breadInCartState)
             .ToState
                 .IsSome()
-                .Is(StateType.Start);
+                .Has(StateType.Start);
 
         var breadButterInCartState = new State(
             Phase.CollectingGoods,
@@ -44,7 +44,7 @@ public class StateGraphTests
             .Reduces(Actions.PutButterToCart, breadInCartState, breadButterInCartState)
             .ToState
                 .IsSome()
-                .Is(StateType.Start);
+                .Has(StateType.Start);
 
         var walletAfterPayment = new Wallet(100 - Prices.Bread - Prices.Butter);
         var paidState = new State(
@@ -58,7 +58,7 @@ public class StateGraphTests
             .Reduces(Actions.PayForGoods, breadButterInCartState, paidState)
             .ToState
                 .IsSome()
-                .Is(StateType.SubState);
+                .Has(StateType.SubState);
 
         var purchasedState = new State(
             Phase.GoodsPurchased,
@@ -71,7 +71,7 @@ public class StateGraphTests
             .Reduces(Actions.ReceiveGoods, paidState, purchasedState)
             .ToState
                 .IsSome()
-                .Is(StateType.Accepted);
+                .Has(StateType.Accepted);
     }
 
     [Test(Description = "Tests transition not exists.")]

@@ -34,9 +34,9 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// </summary>
     /// <param name="configure">A delegate to setup the build configuration.</param>
     /// <returns>The result of the build.</returns>
-    public BuildResult<TTransition, TState> Build(Configure<ValidationConfiguration>? configure = null)
+    public BuildResult<TTransition, TState> Build(Configure<AutomatonBuildConfiguration>? configure = null)
     {
-        var configuration = (configure ?? (config => config))(ValidationConfiguration.Default);
+        var configuration = (configure ?? (config => config))(AutomatonBuildConfiguration.Default);
         var result = Validate(Start, configuration);
 
         return result.Value.Match<BuildResult<TTransition, TState>>(
@@ -44,9 +44,9 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
             error => error);
     }
 
-    private static ValidationResult<TTransition, TState> Validate(State<TTransition, TState> startState, ValidationConfiguration configuration)
+    private static ValidationResult<TTransition, TState> Validate(State<TTransition, TState> startState, AutomatonBuildConfiguration configuration)
     {
-        if (configuration.ValidateAnyReachesAccepted)
+        if (configuration.ValidateAnyReachesAcceptedEnabled)
         {
             return StateGraphValidator<TTransition, TState>.ValidateHasAccepted(startState).Value
                 .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState).Value);

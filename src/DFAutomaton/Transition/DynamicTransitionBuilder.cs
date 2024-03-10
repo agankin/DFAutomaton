@@ -7,7 +7,7 @@ namespace DFAutomaton;
 /// <typeparam name="TState">State value type.</typeparam>
 /// <param name="FromState">A state the new transition is starting from.</param>
 /// <param name="Transition">A transition value.</param>
-public record DynamicTransitionConfiguration<TTransition, TState>(
+public record DynamicTransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
     TTransition Transition
 ) where TTransition : notnull

@@ -17,7 +17,7 @@ public record TransitionBuilder<TTransition, TState>(
     /// </summary>
     /// <param name="toValue">A new state value after the transition.</param>
     /// <returns>The created fixed transition builder.</returns>
-    public FixedTransitionConfiguration<TTransition, TState> WithReducingTo(TState toValue)
+    public FixedTransitionBuilder<TTransition, TState> WithReducingTo(TState toValue)
     {
         Reduce<TTransition, TState> reducer = (_, _) => toValue;
         return new(FromState, Transition, reducer);
@@ -28,7 +28,7 @@ public record TransitionBuilder<TTransition, TState>(
     /// </summary>
     /// <param name="reducer">A reducer.</param>
     /// <returns>The created fixed transition builder.</returns>
-    public FixedTransitionConfiguration<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer)
+    public FixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer)
     {
         return new(FromState, Transition, reducer);
     }
@@ -37,5 +37,5 @@ public record TransitionBuilder<TTransition, TState>(
     /// Creates a new dynamic transition builder.
     /// </summary>
     /// <returns>The created dynamic transition builder.</returns>
-    public DynamicTransitionConfiguration<TTransition, TState> Dynamicly() => new(FromState, Transition);
+    public DynamicTransitionBuilder<TTransition, TState> Dynamicly() => new(FromState, Transition);
 }

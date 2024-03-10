@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Optional;
 
 namespace DFAutomaton.Tests;
 
@@ -14,7 +15,7 @@ public static class AutomatonErrorExtensions
     public static AutomatonError<TTransition, TState> OccuredOn<TTransition, TState>(this AutomatonError<TTransition, TState> error, TTransition expectedTransition)
         where TTransition : notnull
     {
-        Assert.AreEqual(expectedTransition, error.Transition);
+        Assert.AreEqual(expectedTransition.Some(), error.Transition);
         return error;
     }
 }

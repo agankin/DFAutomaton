@@ -52,9 +52,17 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetStateTransition(_id, transition);
 
     /// <summary>
-    /// Returns an instance of transition builder for building transition from this state.
+    /// Returns an instance of transition builder for building a transition from this state.
     /// </summary>
     public TransitionBuilder<TTransition, TState> TransitsBy(TTransition transition) => new(this, transition);
+
+    /// <summary>
+    /// Returns an instance of transition builder for building a fallback transition from this state.
+    /// </summary>
+    /// <remarks>
+    /// Fallback transition is a dynamic transition that is invoked for all unknown transition values.
+    /// </remarks>
+    public FallbackTransitionBuilder<TTransition, TState> AllOtherTransits() => new(this);
 
     /// <summary>
     /// Returns a text representation of the state.
@@ -84,6 +92,16 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
         var stateTransition = new Transition<TTransition, TState>(noneGoToState, reducer);
         
         OwningGraph.AddStateTransition(_id, transition, stateTransition);
+    }
+
+    internal void AddFallbackTransition(Reduce<TTransition, TState> reducer)
+    {
+        ValidateLinkingNotAccepted();
+
+        var noneGoToState = Option.None<State<TTransition, TState>>();
+        var stateTransition = new Transition<TTransition, TState>(noneGoToState, reducer);
+        
+        OwningGraph.AddFallbackTransition(_id, stateTransition);
     }
     
     private void ValidateLinkingNotAccepted()

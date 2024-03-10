@@ -8,7 +8,7 @@ namespace DFAutomaton;
 /// <param name="FromState">A state the new transition is starting from.</param>
 /// <param name="Transition">A transition value.</param>
 /// <param name="Reducer">An automaton transition reducer.</param>
-public record FixedTransitionConfiguration<TTransition, TState>(
+public record FixedTransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
     TTransition Transition,
     Reduce<TTransition, TState> Reducer

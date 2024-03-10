@@ -1,6 +1,7 @@
 ﻿using DFAutomaton.Tests.Samples.Shopping;
 using NUnit.Framework;
 using Optional;
+using Optional.Unsafe;
 
 namespace DFAutomaton.Tests;
 
@@ -61,8 +62,9 @@ public class AutomatonTests
             .IsError()
             .HasType(AutomatonErrorType.TransitionNotExists)
             .OccuredOn(Actions.ReceiveGoods)
-            .State
-                .Is(StateType.Start);
+            .WhenTransitioningFrom
+                .IsSome()
+                .Has(StateType.Start);
     }
 
     [Test(Description = "Automaton error occuring on transition from accepted state test scenario.")]
@@ -91,7 +93,8 @@ public class AutomatonTests
             .IsError()
             .HasType(AutomatonErrorType.TransitionFromAccepted)
             .OccuredOn(Actions.PayForGoods)
-            .State
-                .Is(StateType.Accepted);
+            .WhenTransitioningFrom
+                .IsSome()
+                .Has(StateType.Accepted);
     }
 }

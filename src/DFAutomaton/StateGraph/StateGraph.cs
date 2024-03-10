@@ -24,6 +24,9 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
     public void AddStateTransition(uint fromStateId, TTransition transition, Transition<TTransition, TState> stateTransition) =>
         _stateTransitionMap.AddStateTransition(fromStateId, transition, stateTransition);
 
+    public void AddFallbackTransition(uint fromStateId, Transition<TTransition, TState> stateTransition) =>
+        _stateTransitionMap.AddFallbackTransition(fromStateId, stateTransition);
+
     public object? GetTag(uint stateId) => _stateTagMap[stateId];
 
     public void SetTag(uint stateId, object? value) => _stateTagMap[stateId] = value;
