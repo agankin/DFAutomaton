@@ -10,13 +10,14 @@ namespace DFAutomaton;
 /// <typeparam name="TState">State value type.</typeparam>
 public class Automaton<TTransition, TState> where TTransition : notnull
 {
-    public State<TTransition, TState> _start;
+    private State<TTransition, TState> _start;
+    private Predicate<TState> _isErrorState;
 
-    /// <summary>
-    /// Creates <see cref="Automaton{TTransition, TState}"/>.
-    /// </summary>
-    /// <param name="start">The start state of an automaton.</param>
-    internal Automaton(State<TTransition, TState> start) => _start = start;
+    internal Automaton(State<TTransition, TState> start, Predicate<TState>? isErrorState)
+    {
+        _start = start;
+        _isErrorState = isErrorState ?? (_ => false);
+    }
 
     /// <summary>
     /// Contains a current transition at runtime.
@@ -33,17 +34,9 @@ public class Automaton<TTransition, TState> where TTransition : notnull
     {
         var startState = AutomatonState.State(_start, startValue);
         var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
-        
-        try
-        {
-            var result = Run(transitionsEnumerator, startState);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            return Option.None<TState, AutomatonError<TTransition, TState>>(
-                AutomatonError<TTransition, TState>.RuntimeError(ex));
-        }
+
+        var result = Run(transitionsEnumerator, startState);
+        return result;
     }
 
     private Option<TState, AutomatonError<TTransition, TState>> Run(
@@ -52,10 +45,20 @@ public class Automaton<TTransition, TState> where TTransition : notnull
     {
         CurrentTransition.Value = new(_start.OwningGraph, transitionsEnumerator.YieldNext);
         
-        var result = transitionsEnumerator.ToEnumerable()
-            .Aggregate(
-                startState,
-                (fromState, transition) => fromState.FlatMap(fromStateValue => Transit(fromStateValue, transition)))
+        var isErrorAutomatonState = new Predicate<AutomatonState<TTransition, TState>>(
+            automatonState => automatonState.MatchValueOrError(
+                stateValue => _isErrorState.Invoke(stateValue),
+                _ => false
+            )
+        );
+        var transitionsReducer = new SequenceAggregator<TTransition, AutomatonState<TTransition, TState>>(isErrorAutomatonState);
+        
+        var transitions = transitionsEnumerator.ToEnumerable();
+        Func<AutomatonState<TTransition, TState>, TTransition, AutomatonState<TTransition, TState>> reducer =
+            (fromState, transition) => fromState.FlatMap(fromStateValue => Transit(fromStateValue, transition));
+        
+        var result = transitionsReducer
+            .Reduce(startState, transitions, reducer)
             .GetAcceptedValueOrError();
 
         CurrentTransition.Value = null!;
@@ -80,13 +83,16 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         TTransition transition)
     {
         var (nextStateOption, reduce) = stateTransition;
+        var (fromState, fromValue) = fromStateValue;
         
         CurrentTransition.Value.TransitsTo = nextStateOption.Map(state => new ImmutableState<TTransition, TState>(state));
-        var nextStateValue = reduce(fromStateValue.Value, transition);
+        var nextValue = reduce(fromValue, transition);
 
         return nextStateOption.Else(CurrentTransition.Value.DynamiclyGoToState)
-            .Map(nextState => AutomatonState<TTransition, TState>.AtState(nextState, nextStateValue))
-            .ValueOr(() => GetTransitionNotFoundError(fromStateValue.State, transition));
+            .Map(nextState => _isErrorState(nextValue)
+                ? AutomatonState<TTransition, TState>.AtError(AutomatonError<TTransition, TState>.ReducerError(fromState, transition, nextValue))
+                : AutomatonState<TTransition, TState>.AtState(nextState, nextValue))
+            .ValueOr(() => GetTransitionNotFoundError(fromState, transition));
     }
 
     private static AutomatonState<TTransition, TState> GetTransitionNotFoundError(State<TTransition, TState> fromState, TTransition transition)

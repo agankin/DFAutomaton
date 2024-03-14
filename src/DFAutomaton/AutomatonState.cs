@@ -15,6 +15,13 @@ internal readonly record struct AutomatonState<TTransition, TState> where TTrans
     public static AutomatonState<TTransition, TState> AtError(AutomatonError<TTransition, TState> error) =>
         new() { StateValueOrError = Option.None<StateValue, AutomatonError<TTransition, TState>>(error) };
 
+    public TResult MatchValueOrError<TResult>(Func<TState, TResult> mapValue, Func<AutomatonError<TTransition, TState>, TResult> mapError)
+    {
+        return StateValueOrError.Match(
+            stateValue => mapValue(stateValue.Value),
+            error => mapError(error));
+    }
+    
     public AutomatonState<TTransition, TState> FlatMap(Func<StateValue, AutomatonState<TTransition, TState>> mapStateValue)
     {
         return StateValueOrError.Match(
@@ -26,15 +33,8 @@ internal readonly record struct AutomatonState<TTransition, TState> where TTrans
     {
         return StateValueOrError.FlatMap(state => state.State.Type == StateType.Accepted
             ? state.Value.Some<TState, AutomatonError<TTransition, TState>>()
-            : Option.None<TState, AutomatonError<TTransition, TState>>(GetAccpetedNotReachedError()));
+            : Option.None<TState, AutomatonError<TTransition, TState>>(AutomatonError<TTransition, TState>.AcceptedNotReached()));
     }
-
-    private static AutomatonError<TTransition, TState> GetAccpetedNotReachedError() => new(
-        AutomatonErrorType.AcceptedNotReached,
-        Option.None<State<TTransition, TState>>(),
-        Option.None<TTransition>(),
-        Option.None<Exception>()
-    );
 
     public readonly record struct StateValue(
         State<TTransition, TState> State,

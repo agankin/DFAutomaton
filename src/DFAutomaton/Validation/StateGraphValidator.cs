@@ -53,27 +53,20 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
         if (canReachAcceptedStates.Contains(state))
             return true;
 
-        var visitedStates = new HashSet<State<TTransition, TState>>();
-        var canReachAccepted = StateVisitor<TTransition, TState>.Visit(state, StopWhenAccepted(visitedStates));
-
+        var canReachAccepted = StateVisitor<TTransition, TState>.Visit(state, StopWhenCanReachAccepted(canReachAcceptedStates));
         if (canReachAccepted)
-            Copy(visitedStates, canReachAcceptedStates);
+            canReachAcceptedStates.Add(state);
 
         return canReachAccepted;
     }
 
-    private static Visit<TTransition, TState> StopWhenAccepted(ISet<State<TTransition, TState>> visitedStates)
+    private static Visit<TTransition, TState> StopWhenCanReachAccepted(ISet<State<TTransition, TState>> canReachAcceptedStates)
     {
         return state =>
         {
-            visitedStates.Add(state);
-            return state.Type == StateType.Accepted ? VisitResult.Stop : VisitResult.Continue;
+            return canReachAcceptedStates.Contains(state) || state.Type == StateType.Accepted
+                ? VisitResult.Stop
+                : VisitResult.Continue;
         };
-    }
-
-    private static void Copy<TItem>(IEnumerable<TItem> source, ISet<TItem> destination)
-    {
-        foreach (var item in source)
-            destination.Add(item);
     }
 }

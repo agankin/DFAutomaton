@@ -21,12 +21,7 @@ public enum AutomatonErrorType
     AcceptedNotReached,
 
     /// <summary>
-    /// An error occured on a reducer invocation.
+    /// An error state returned from a reducer.
     /// </summary>
-    ReducerError,
-
-    /// <summary>
-    /// An error occured on the automaton run.
-    /// </summary>
-    RunError
+    ReducerError
 }

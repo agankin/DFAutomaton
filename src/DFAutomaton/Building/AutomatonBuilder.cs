@@ -34,17 +34,19 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// </summary>
     /// <param name="configure">A delegate to setup the build configuration.</param>
     /// <returns>The result of the build.</returns>
-    public BuildResult<TTransition, TState> Build(Configure<AutomatonBuildConfiguration>? configure = null)
+    public BuildResult<TTransition, TState> Build(Configure<AutomatonBuildConfiguration<TState>>? configure = null)
     {
-        var configuration = (configure ?? (config => config))(AutomatonBuildConfiguration.Default);
+        var configuration = (configure ?? (config => config))(AutomatonBuildConfiguration<TState>.Default);
         var result = Validate(Start, configuration);
 
         return result.Value.Match<BuildResult<TTransition, TState>>(
-            startState => new Automaton<TTransition, TState>(startState),
+            startState => new Automaton<TTransition, TState>(startState, configuration.IsErrorState),
             error => error);
     }
 
-    private static ValidationResult<TTransition, TState> Validate(State<TTransition, TState> startState, AutomatonBuildConfiguration configuration)
+    private static ValidationResult<TTransition, TState> Validate(
+        State<TTransition, TState> startState,
+        AutomatonBuildConfiguration<TState> configuration)
     {
         if (configuration.ValidateAnyReachesAcceptedEnabled)
         {
