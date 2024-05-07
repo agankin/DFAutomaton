@@ -15,15 +15,15 @@ public class AutomatonBuildValidationTests
         
         var state1 = builder.Start;
         var state2 = state1
-            .TransitsBy(TO1).WithReducingTo(STATE1).ToSelf()
-            .TransitsBy(TO2).WithReducingTo(STATE2).ToNew();
+            .TransitsBy(TO_STATE_1).WithReducingTo(STATE_1).ToSelf()
+            .TransitsBy(TO_STATE_2).WithReducingTo(STATE_2).ToNew();
         var state3 = state1
-            .TransitsBy(TO3).WithReducingTo(STATE3).ToNew();
+            .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
 
         state2
-            .TransitsBy(TOACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
+            .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
         state3
-            .TransitsBy(TOACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
+            .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
 
         var automatonOrError = builder.Build(config => config.ValidateAnyReachesAccepted());
         automatonOrError.Value.IsSome();
@@ -36,10 +36,10 @@ public class AutomatonBuildValidationTests
 
         var state1 = builder.Start;
         var state2 = state1
-            .TransitsBy(TO1).WithReducingTo(STATE1).ToSelf()
-            .TransitsBy(TO2).WithReducingTo(STATE2).ToNew();
+            .TransitsBy(TO_STATE_1).WithReducingTo(STATE_1).ToSelf()
+            .TransitsBy(TO_STATE_2).WithReducingTo(STATE_2).ToNew();
         var state3 = state1
-            .TransitsBy(TO3).WithReducingTo(STATE3).ToNew();
+            .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
 
         var automatonOrError = builder.Build(config => config.ValidateAnyReachesAccepted());
         automatonOrError.Value.IsError(ValidationError.NoAccepted);
@@ -52,13 +52,13 @@ public class AutomatonBuildValidationTests
 
         var state1 = builder.Start;
         var state2 = state1
-            .TransitsBy(TO1).WithReducingTo(STATE1).ToSelf()
-            .TransitsBy(TO2).WithReducingTo(STATE2).ToNew();
+            .TransitsBy(TO_STATE_1).WithReducingTo(STATE_1).ToSelf()
+            .TransitsBy(TO_STATE_2).WithReducingTo(STATE_2).ToNew();
         var state3 = state1
-            .TransitsBy(TO3).WithReducingTo(STATE3).ToNew();
+            .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
 
         state2
-            .TransitsBy(TOACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
+            .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
 
         var automatonOrError = builder.Build(config => config.ValidateAnyReachesAccepted());
         automatonOrError.Value.IsError(ValidationError.AcceptedIsUnreachable);

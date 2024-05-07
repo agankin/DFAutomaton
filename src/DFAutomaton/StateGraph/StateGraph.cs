@@ -13,6 +13,8 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
 
     public State<TTransition, TState> StartState => this[StateId.StartStateId];
 
+    public State<TTransition, TState> AcceptedState => this[StateId.AcceptedStateId];
+
     public State<TTransition, TState> CreateState() => new State<TTransition, TState>(_nextId++, this);
 
     public IReadOnlyCollection<TTransition> GetTransitions(uint fromStateId) =>

@@ -1,9 +1,9 @@
-﻿using DFAutomaton.Tests.Samples.Shopping;
-using NUnit.Framework;
-using Optional;
-using Optional.Unsafe;
+﻿using NUnit.Framework;
 
 namespace DFAutomaton.Tests;
+
+using static Transitions;
+using static States;
 
 [TestFixture]
 public class AutomatonTests
@@ -11,88 +11,62 @@ public class AutomatonTests
     [Test(Description = "Automaton state transitions test scenario.")]
     public void Run_valid()
     {
-        var automaton = StateGraph.BuildAutomaton();
-
-        var wallet = new Wallet(100);
-        var initialState = new State(
-            Phase.CollectingGoods,
-            Cart.Empty,
-            wallet
-        ).Some<State, Errors>();
-
-        var expectedWalletAfterPurchase = new Wallet(100 - Prices.Bread - Prices.Butter);
-        var expectedAfterPurchaseState = new State(
-            Phase.GoodsPurchased,
-            new Cart(Goods.Bread, Goods.Butter),
-            expectedWalletAfterPurchase
-        ).Some<State, Errors>();
+        var automaton = TestAutomaton.Create();
 
         var transitions = new[]
         {
-            Actions.PutBreadToCart,
-            Actions.PutButterToCart,
-            Actions.PayForGoods,
-            Actions.ReceiveGoods
+            TO_STATE_1,
+            TO_STATE_2,
+            TO_STATE_3,
+            TO_STATE_4,
+            TO_ACCEPTED,
         };
 
-        var finalState = automaton.Run(initialState, transitions).IsSome();
-        Assert.AreEqual(expectedAfterPurchaseState, finalState);
+        var acceptedState = automaton.Run(STATE_1, transitions).IsSome();
+        Assert.AreEqual(ACCEPTED, acceptedState);
     }
 
     [Test(Description = "Automaton error occuring on transition not found test scenario.")]
     public void Run_with_transition_not_found()
     {
-        var automaton = StateGraph.BuildAutomaton();
+        var automaton = TestAutomaton.Create();
 
-        var wallet = new Wallet(100);
-        var initialState = new State(
-            Phase.CollectingGoods,
-            Cart.Empty,
-            wallet
-        ).Some<State, Errors>();
-        
         var transitions = new[]
         {
-            Actions.PutBreadToCart,
-            Actions.PutButterToCart,
-            Actions.ReceiveGoods
+            TO_STATE_1,
+            TO_STATE_2,
+            TO_STATE_3,
+            TO_STATE_5
         };
 
-        automaton.Run(initialState, transitions)
+        automaton.Run(STATE_1, transitions)
             .IsError()
             .HasType(AutomatonErrorType.TransitionNotExists)
-            .OccuredOn(Actions.ReceiveGoods)
+            .OccuredOn(TO_STATE_5)
             .WhenTransitioningFrom
                 .IsSome()
-                .Has(StateType.Start);
+                .Has(StateType.SubState);
     }
 
     [Test(Description = "Automaton error occuring on transition from accepted state test scenario.")]
-    public void Run_with_transit_from_accepted()
+    public void Run_with_transition_from_accepted()
     {
-        var automaton = StateGraph.BuildAutomaton();
-
-        var wallet = new Wallet(100);
-        var initialState = new State(
-            Phase.CollectingGoods,
-            Cart.Empty,
-            wallet
-        ).Some<State, Errors>();
+        var automaton = TestAutomaton.Create();
 
         var transitions = new[]
         {
-            Actions.PutBreadToCart,
-            Actions.PutButterToCart,
-            Actions.PayForGoods,
-            Actions.ReceiveGoods,
-
-            Actions.PayForGoods
+            TO_STATE_1,
+            TO_STATE_2,
+            TO_STATE_3,
+            TO_STATE_4,
+            TO_ACCEPTED,
+            TO_STATE_5
         };
 
-        automaton.Run(initialState, transitions)
+        automaton.Run(STATE_1, transitions)
             .IsError()
             .HasType(AutomatonErrorType.TransitionFromAccepted)
-            .OccuredOn(Actions.PayForGoods)
+            .OccuredOn(TO_STATE_5)
             .WhenTransitioningFrom
                 .IsSome()
                 .Has(StateType.Accepted);

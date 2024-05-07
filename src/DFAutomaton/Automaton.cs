@@ -85,6 +85,7 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         var (nextStateOption, reduce) = stateTransition;
         var (fromState, fromValue) = fromStateValue;
         
+        CurrentTransition.Value.DynamiclyGoToState = Option.None<State<TTransition, TState>>();
         CurrentTransition.Value.TransitsTo = nextStateOption.Map(state => new ImmutableState<TTransition, TState>(state));
         var nextValue = reduce(fromValue, transition);
 

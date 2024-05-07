@@ -29,7 +29,7 @@ public class AutomatonTransition<TTransition, TState> where TTransition : notnul
     /// <summary>
     /// A state the automaton must go to for a dynamic transition.
     /// </summary>
-    internal Option<State<TTransition, TState>> DynamiclyGoToState { get; private set; }
+    internal Option<State<TTransition, TState>> DynamiclyGoToState { get; set; }
 
     /// <summary>
     /// Yields the provided transition value into next automaton transitions enumeration.

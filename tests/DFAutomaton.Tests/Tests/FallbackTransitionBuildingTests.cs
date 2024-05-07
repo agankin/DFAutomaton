@@ -12,11 +12,11 @@ public partial class FallbackTransitionBuildingTests
     public void Add_dynamic_transition()
     {
         var state1 = new StateGraph<Transitions, States>().StartState;
-        state1.AllOtherTransits().WithReducing(Reducer.Create(TO2, STATE2));
+        state1.AllOtherTransits().WithReducing(Reducer.Create(TO_STATE_2, STATE_2));
 
-        state1[TO2]
+        state1[TO_STATE_2]
             .IsSome()
             .TransitsDynamicly()
-            .Reduces(TO2, STATE1, STATE2);
+            .Reduces(TO_STATE_2, STATE_1, STATE_2);
     }
 }

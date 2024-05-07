@@ -10,7 +10,15 @@ namespace DFAutomaton;
 /// <typeparam name="TState">State value type.</typeparam>
 public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
 {
-    private AutomatonBuilder(State<TTransition, TState> start) => Start = start;
+    private readonly StateGraph<TTransition, TState> _graph;
+
+    private AutomatonBuilder(StateGraph<TTransition, TState> graph)
+    {
+        _graph = graph;
+        
+        Start = _graph.StartState;
+        Accepted = _graph.AcceptedState;
+    }
 
     /// <summary>
     /// The start state.
@@ -18,16 +26,26 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     public State<TTransition, TState> Start { get; }
 
     /// <summary>
+    /// The accepted state.
+    /// </summary>
+    public State<TTransition, TState> Accepted { get; }
+
+    /// <summary>
     /// Creates a new instance.
     /// </summary>
     /// <returns>The created new instance.</returns> 
     public static AutomatonBuilder<TTransition, TState> Create()
     {
-        var stateGraph = new StateGraph<TTransition, TState>();
-        var start = stateGraph.StartState;
+        var graph = new StateGraph<TTransition, TState>();
         
-        return new AutomatonBuilder<TTransition, TState>(start);
+        return new AutomatonBuilder<TTransition, TState>(graph);
     }
+
+    /// <summary>
+    /// Creates a new state.
+    /// </summary>
+    /// <returns>The created new state.</returns>
+    public State<TTransition, TState> CreateState() => _graph.CreateState();
 
     /// <summary>
     /// Builds a new automaton.
