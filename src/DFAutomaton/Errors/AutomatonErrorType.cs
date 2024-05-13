@@ -16,6 +16,11 @@ public enum AutomatonErrorType
     TransitionFromAccepted,
 
     /// <summary>
+    /// No next state for a dynamic transition.
+    /// </summary>
+    NoNextState,
+
+    /// <summary>
     /// The accepted state was not reached after the automaton finished.
     /// </summary>
     AcceptedNotReached,

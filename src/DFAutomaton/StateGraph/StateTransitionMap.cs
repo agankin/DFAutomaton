@@ -1,5 +1,4 @@
 using Optional;
-using Optional.Collections;
 
 namespace DFAutomaton;
 
@@ -9,14 +8,19 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
     private Dictionary<uint, Transition<TTransition, TState>> _fallbackTransitionByStateId = new();
     private Dictionary<uint, List<TTransition>> _transitionsByStateId = new();
 
-    public Option<Transition<TTransition, TState>> this[uint fromStateId, TTransition transition] =>
-        _transitionByKey.GetValueOrNone(new(fromStateId, transition))
-            .Else(() => _fallbackTransitionByStateId.GetValueOrNone(fromStateId));
+    public Option<Transition<TTransition, TState>> this[uint fromStateId, TTransition transition]
+    {
+        get
+        {
+            if (_transitionByKey.TryGetValue(new(fromStateId, transition), out var stateTransition))
+                return stateTransition.Some();
+
+            return _fallbackTransitionByStateId.GetOrNone(fromStateId);
+        }
+    }
 
     public IReadOnlyCollection<TTransition> GetTransitions(uint fromStateId) =>
-         _transitionsByStateId.TryGetValue(fromStateId, out var transitions)
-            ? transitions
-            : Array.Empty<TTransition>();
+         _transitionsByStateId.GetOr(fromStateId, () => new List<TTransition>());
 
     public void AddStateTransition(uint fromStateId, TTransition transition, Transition<TTransition, TState> stateTransition)
     {

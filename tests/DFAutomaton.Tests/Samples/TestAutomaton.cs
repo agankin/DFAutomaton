@@ -28,24 +28,15 @@ internal static class TestAutomaton
 
         state2.TransitsBy(TO_STATE_3)
             .Dynamicly()
-            .WithReducing((_, _) =>
-            {
-                Automaton<Transitions, States>.CurrentTransition.Value?.DynamiclyGoTo(state3.Id.Some());
-                return STATE_3;
-            });
+            .WithReducing((_, _) => new ReductionResult<Transitions, States>(STATE_3).DynamiclyGoTo(state3));
 
         state3.AllOtherTransits()
             .WithReducing((state, transition) =>
             {
-                if (transition == TO_STATE_4)
-                {
-                    Automaton<Transitions, States>.CurrentTransition.Value?.DynamiclyGoTo(state4.Id.Some());
-                    
-                    Automaton<Transitions, States>.CurrentTransition.Value?.YieldNext(TO_STATE_5);
-                    Automaton<Transitions, States>.CurrentTransition.Value?.YieldNext(TO_STATE_6);
-                    
-                    return STATE_4;
-                }
+                if (transition == TO_STATE_4)                    
+                    return new ReductionResult<Transitions, States>(STATE_4).DynamiclyGoTo(state4)
+                        .YieldNext(TO_STATE_5)
+                        .YieldNext(TO_STATE_6);
 
                 return state;
             });

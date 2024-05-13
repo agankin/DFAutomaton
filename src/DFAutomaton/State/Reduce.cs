@@ -7,5 +7,8 @@ namespace DFAutomaton;
 /// <typeparam name="TState">State value type.</typeparam>
 /// <param name="state">A current state value.</param>
 /// <param name="transition">A transition value.</param>
-/// <returns>A next state value.</returns>
-public delegate TState Reduce<TTransition, TState>(TState state, TTransition transition) where TTransition : notnull;
+/// <returns>A next state.</returns>
+public delegate ReductionResult<TTransition, TState> Reduce<TTransition, TState>(
+    TState state,
+    TTransition transition
+) where TTransition : notnull;

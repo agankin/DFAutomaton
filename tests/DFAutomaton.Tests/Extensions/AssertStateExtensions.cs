@@ -21,4 +21,13 @@ public static class AssertStateExtensions
         Assert.AreEqual(expectedType, state.Type);
         return state;
     }
+
+    public static ImmutableState<TTransition, TState> Has<TTransition, TState>(
+        this ImmutableState<TTransition, TState> state,
+        StateType expectedType)
+        where TTransition : notnull
+    {
+        Assert.AreEqual(expectedType, state.Type);
+        return state;
+    }
 }
