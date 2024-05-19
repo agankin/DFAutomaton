@@ -1,4 +1,4 @@
-using Optional;
+using PureMonads;
 
 namespace DFAutomaton;
 
@@ -38,7 +38,7 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     /// <returns>The current instance.</returns>
     public ReductionResult<TTransition, TState> DynamiclyGoTo(State<TTransition, TState> state)
     {
-        DynamiclyGoToState = state.Some();
+        DynamiclyGoToState = state;
         return this;
     }
 

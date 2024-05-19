@@ -1,4 +1,4 @@
-﻿using Optional;
+﻿using PureMonads;
 
 namespace DFAutomaton;
 
@@ -78,7 +78,7 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
         ValidateLinkingNotAccepted();
 
         var toState = OwningGraph[toStateId];
-        var stateTransition = new Transition<TTransition, TState>(toState.Some(), reducer);
+        var stateTransition = new Transition<TTransition, TState>(toState, reducer);
         OwningGraph.AddStateTransition(_id, transition, stateTransition);
 
         return OwningGraph[toStateId];

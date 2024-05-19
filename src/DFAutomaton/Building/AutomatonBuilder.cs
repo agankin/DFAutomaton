@@ -1,5 +1,5 @@
 ﻿using DFAutomaton.Utils;
-using Optional;
+using PureMonads;
 
 namespace DFAutomaton;
 
@@ -72,6 +72,6 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
                 .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState).Value);
         }
 
-        return startState.Some<State<TTransition, TState>, ValidationError>();
+        return startState;
     }
 }

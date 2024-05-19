@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Optional.Unsafe;
 
 namespace DFAutomaton.Benchmarks;
 
@@ -18,6 +17,7 @@ public class Benchmarks
     public void RunGregorySeries()
     {
         var transitions = Enumerable.Range(0, AddSerieMemberStatesCount).Append(AddSerieMemberStatesCount);
-        var _ = _piGregorySeriesAutomaton.Run(0, transitions).ValueOrFailure();
+        var _ = _piGregorySeriesAutomaton.Run(0, transitions)
+                .Match(value => value, _ => throw new Exception("Result is Error."));
     }
 }

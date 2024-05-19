@@ -15,5 +15,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\DFAutomaton\DFAutomaton.csproj" />
   </ItemGroup>
-
+	
+  <ItemGroup>
+    <Reference Include="PureMonads">
+	  <HintPath>..\..\lib\PureMonads.dll</HintPath>
+	</Reference>
+  </ItemGroup>
 </Project>

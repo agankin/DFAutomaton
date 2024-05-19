@@ -1,4 +1,4 @@
-using Optional;
+using PureMonads;
 
 namespace DFAutomaton;
 
@@ -13,7 +13,7 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
         get
         {
             if (_transitionByKey.TryGetValue(new(fromStateId, transition), out var stateTransition))
-                return stateTransition.Some();
+                return stateTransition;
 
             return _fallbackTransitionByStateId.GetOrNone(fromStateId);
         }

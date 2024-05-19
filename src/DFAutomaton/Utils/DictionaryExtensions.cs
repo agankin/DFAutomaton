@@ -1,4 +1,4 @@
-using Optional;
+using PureMonads;
 
 namespace DFAutomaton;
 
@@ -8,7 +8,7 @@ internal static class DictionaryExtensions
         where TKey : notnull
     {
         return dict.TryGetValue(key, out var value)
-            ? value.Some()
+            ? value
             : Option.None<TValue>();
     }
 

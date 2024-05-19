@@ -1,4 +1,4 @@
-using Optional;
+using PureMonads;
 
 namespace DFAutomaton;
 
@@ -12,8 +12,8 @@ internal static class AutomatonErrorFactory
     {
         var error = new AutomatonError<TTransition, TState>(
             AutomatonErrorType.TransitionNotExists,
-            new ImmutableState<TTransition, TState>(fromState).Some(),
-            transition.Some(),
+            new ImmutableState<TTransition, TState>(fromState),
+            transition,
             Option.None<TState>());
         
         return error;
@@ -29,8 +29,8 @@ internal static class AutomatonErrorFactory
             : AutomatonErrorType.TransitionNotExists;
         var error = new AutomatonError<TTransition, TState>(
             errorType,
-            new ImmutableState<TTransition, TState>(fromState).Some(),
-            transition.Some(),
+            new ImmutableState<TTransition, TState>(fromState),
+            transition,
             Option.None<TState>());
         
         return error;
@@ -44,8 +44,8 @@ internal static class AutomatonErrorFactory
     {
         var error = new AutomatonError<TTransition, TState>(
             AutomatonErrorType.NoNextState,
-            new ImmutableState<TTransition, TState>(fromState).Some(),
-            transition.Some(),
+            new ImmutableState<TTransition, TState>(fromState),
+            transition,
             Option.None<TState>());
         
         return error;
@@ -71,9 +71,9 @@ internal static class AutomatonErrorFactory
     {
         var error = new AutomatonError<TTransition, TState>(
             AutomatonErrorType.ReducerError,
-            new ImmutableState<TTransition, TState>(fromState).Some(),
-            transition.Some(),
-            errorState.Some());
+            new ImmutableState<TTransition, TState>(fromState),
+            transition,
+            errorState);
         
         return error;
     }

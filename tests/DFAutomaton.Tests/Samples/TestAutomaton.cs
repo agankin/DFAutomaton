@@ -1,6 +1,3 @@
-using Optional;
-using Optional.Unsafe;
-
 namespace DFAutomaton.Tests;
 
 using static Transitions;
@@ -53,6 +50,8 @@ internal static class TestAutomaton
             .WithReducingTo(ACCEPTED)
             .ToAccepted();
 
-        return builder.Build().Value.ValueOrFailure();
+        return builder.Build().Value.Match(
+            value => value,
+            _ => throw new Exception("Result is Error."));
     }
 }

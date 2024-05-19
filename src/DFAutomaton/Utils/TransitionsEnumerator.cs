@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using Optional;
+﻿using PureMonads;
+using System.Collections;
 
 namespace DFAutomaton.Utils;
 
@@ -20,7 +20,7 @@ internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
     }
 
     /// <inheritdoc/>
-    public TTransition Current => _current.ValueOr(() => throw new InvalidOperationException());
+    public TTransition Current => _current.Or(() => throw new InvalidOperationException());
     
     /// <inheritdoc/>
     object? IEnumerator.Current => Current;
@@ -39,13 +39,13 @@ internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
     {
         if (_yieldedQueue.TryDequeue(out var transition))
         {
-            _current = transition.Some();
+            _current = transition;
             return true;
         }
 
         var hasCurrent = _transitionsEnumerator.MoveNext();
         _current = hasCurrent
-            ? _transitionsEnumerator.Current.Some()
+            ? _transitionsEnumerator.Current
             : Option.None<TTransition>();
 
         return hasCurrent;

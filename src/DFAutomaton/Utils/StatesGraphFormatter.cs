@@ -1,5 +1,4 @@
-﻿using Optional;
-using Optional.Unsafe;
+﻿using PureMonads;
 
 namespace DFAutomaton.Utils;
 
@@ -60,7 +59,7 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
 
     private static string FormatTransition(TTransition transition, Option<State<TTransition, TState>> toStateOption)
     {
-        var toStateFormatted = toStateOption.Map(toState => toState.Id.ToString()).ValueOr("DYNAMIC GOTO");
+        var toStateFormatted = toStateOption.Map(toState => toState.Id.ToString()).Or("DYNAMIC GOTO");
         return $"    {transition} -> State {toStateFormatted}";
     }
 }

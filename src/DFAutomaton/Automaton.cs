@@ -1,6 +1,5 @@
 ﻿using DFAutomaton.Utils;
-using Optional;
-using Optional.Unsafe;
+using PureMonads;
 
 namespace DFAutomaton;
 
@@ -28,7 +27,7 @@ public class Automaton<TTransition, TState> where TTransition : notnull
     /// <param name="startValue">A start value.</param>
     /// <param name="transitions">A sequence of transitions.</param>
     /// <returns>Some with an accepted value after applying all transitions or None with an error occured.</returns>
-    public Option<TState, AutomatonError<TTransition, TState>> Run(TState startValue, IEnumerable<TTransition> transitions)
+    public Result<TState, AutomatonError<TTransition, TState>> Run(TState startValue, IEnumerable<TTransition> transitions)
     {
         var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
         var result = Run(startValue, transitionsEnumerator);
@@ -36,7 +35,7 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         return result;
     }
 
-    private Option<TState, AutomatonError<TTransition, TState>> Run(TState startValue, TransitionsEnumerator<TTransition> transitionsEnumerator)
+    private Result<TState, AutomatonError<TTransition, TState>> Run(TState startValue, TransitionsEnumerator<TTransition> transitionsEnumerator)
     {        
         var transitions = transitionsEnumerator.ToEnumerable();
 
@@ -46,22 +45,22 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         foreach (var transition in transitions)
         {
             if (currentState.Type == StateType.Accepted)
-                return Error(TransitionFromAccepted(currentState, transition));
+                return TransitionFromAccepted(currentState, transition);
             
             var nextTransition = currentState[transition];
             if (!nextTransition.HasValue)
-                return Error(TransitionNotFound(currentState, transition));
+                return TransitionNotFound(currentState, transition);
 
             var (toState, reduce) = nextTransition.ValueOrFailure();
             var reductionResult = reduce(currentValue, transition);
 
-            var nextState = toState.Else(reductionResult.DynamiclyGoToState);
+            var nextState = toState.Or(reductionResult.DynamiclyGoToState);
             if (!nextState.HasValue)
-                return Error(NoNextState(currentState, transition));
+                return NoNextState(currentState, transition);
 
             var nextValue = reductionResult.Value;
             if (_isErrorValue(nextValue))
-                return Error(ReducerError(currentState, transition, nextValue));
+                return ReducerError(currentState, transition, nextValue);
 
             currentState = nextState.ValueOrFailure();
             currentValue = nextValue;
@@ -70,9 +69,9 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         }
 
         if (currentState.Type != StateType.Accepted)
-            return Option.None<TState, AutomatonError<TTransition, TState>>(AcceptedNotReached<TTransition, TState>());
+            return AcceptedNotReached<TTransition, TState>();
         
-        return currentValue.Some<TState, AutomatonError<TTransition, TState>>();
+        return currentValue;
     }
 
     private static void CopyYieldedTransitions(ReductionResult<TTransition, TState> reductionResult, TransitionsEnumerator<TTransition> transitionsEnumerator)
@@ -80,7 +79,4 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         foreach(var yieldedTransition in reductionResult.YieldedTransitions)
             transitionsEnumerator.YieldNext(yieldedTransition);
     }
-
-    private static Option<TState, AutomatonError<TTransition, TState>> Error(AutomatonError<TTransition, TState> error) =>
-        Option.None<TState, AutomatonError<TTransition, TState>>(error);
 }
