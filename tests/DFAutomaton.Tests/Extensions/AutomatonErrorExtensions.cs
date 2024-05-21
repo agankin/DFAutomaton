@@ -14,7 +14,9 @@ public static class AutomatonErrorExtensions
     public static AutomatonError<TTransition, TState> OccuredOn<TTransition, TState>(this AutomatonError<TTransition, TState> error, TTransition expectedTransition)
         where TTransition : notnull
     {
-        Assert.AreEqual(expectedTransition, error.Transition);
+        var transition = error.Transition.IsSome();
+        Assert.AreEqual(expectedTransition, transition);
+
         return error;
     }
 }

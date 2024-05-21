@@ -26,8 +26,28 @@ public class AutomatonTests
         Assert.AreEqual(ACCEPTED, acceptedState);
     }
 
-    [Test(Description = "Automaton error occuring on transition not found test scenario.")]
+    [Test(Description = "Test scenario for an automaton error occuring on transition not found.")]
     public void Run_with_transition_not_found()
+    {
+        var automaton = TestAutomaton.Create();
+
+        var transitions = new[]
+        {
+            TO_STATE_1,
+            TO_STATE_3
+        };
+
+        automaton.Run(STATE_1, transitions)
+            .IsError()
+            .HasType(AutomatonErrorType.TransitionNotExists)
+            .OccuredOn(TO_STATE_3)
+            .WhenTransitioningFrom
+                .IsSome()
+                .Has(StateType.Start);
+    }
+
+    [Test(Description = "Test scenario for an automaton error occuring on dynamic transition next state not found.")]
+    public void Run_with_no_next_state()
     {
         var automaton = TestAutomaton.Create();
 
@@ -41,14 +61,14 @@ public class AutomatonTests
 
         automaton.Run(STATE_1, transitions)
             .IsError()
-            .HasType(AutomatonErrorType.TransitionNotExists)
+            .HasType(AutomatonErrorType.NoNextState)
             .OccuredOn(TO_STATE_5)
             .WhenTransitioningFrom
                 .IsSome()
                 .Has(StateType.SubState);
     }
 
-    [Test(Description = "Automaton error occuring on transition from accepted state test scenario.")]
+    [Test(Description = "Test scenario for an automaton error occuring on transition from the accepted state.")]
     public void Run_with_transition_from_accepted()
     {
         var automaton = TestAutomaton.Create();

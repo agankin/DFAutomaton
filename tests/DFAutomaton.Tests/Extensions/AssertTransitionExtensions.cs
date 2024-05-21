@@ -41,7 +41,7 @@ public static class AssertTransitionExtensions
         where TTransition : notnull
     {
         var actualAfterReduce = stateTransition.Reducer(beforeReduce, transition);   
-        Assert.AreEqual(expectedAfterReduce, actualAfterReduce);
+        Assert.AreEqual(expectedAfterReduce, actualAfterReduce.Value);
         
         return stateTransition;
     }

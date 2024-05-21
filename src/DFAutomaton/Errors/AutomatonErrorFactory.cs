@@ -24,11 +24,8 @@ internal static class AutomatonErrorFactory
         TTransition transition
     ) where TTransition : notnull
     {
-        var errorType = fromState.Type == StateType.Accepted
-            ? AutomatonErrorType.TransitionFromAccepted
-            : AutomatonErrorType.TransitionNotExists;
         var error = new AutomatonError<TTransition, TState>(
-            errorType,
+            AutomatonErrorType.TransitionFromAccepted,
             new ImmutableState<TTransition, TState>(fromState),
             transition,
             Option.None<TState>());
