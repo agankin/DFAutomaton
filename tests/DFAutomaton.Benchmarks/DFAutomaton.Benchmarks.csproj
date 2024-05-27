@@ -9,15 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+    <PackageReference Include="Pure-Monads" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DFAutomaton\DFAutomaton.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="PureMonads">
-	  <HintPath>..\..\lib\PureMonads.dll</HintPath>
-	</Reference>
   </ItemGroup>
 </Project>
