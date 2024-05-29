@@ -18,7 +18,7 @@ namespace DFAutomaton;
 /// </param>
 public record AutomatonError<TTransition, TState>(
     AutomatonErrorType Type,
-    Option<ImmutableState<TTransition, TState>> WhenTransitioningFrom,
+    Option<FrozenState<TTransition, TState>> WhenTransitioningFrom,
     Option<TTransition> Transition,
     Option<TState> ErrorState
 )

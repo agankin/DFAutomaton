@@ -8,19 +8,17 @@ namespace DFAutomaton;
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 public readonly struct State<TTransition, TState> where TTransition : notnull
-{
-    private readonly StateId _id;
-    
+{    
     internal State(StateId id, StateGraph<TTransition, TState> owningGraph)
     {
-        _id = id;
+        Id = id;
         OwningGraph = owningGraph;
     }
 
     /// <summary>
     /// Contains an identifier that is unique within the scope of the containing state graph.
     /// </summary>
-    public uint Id => _id;
+    public StateId Id { get; }
 
     /// <summary>
     /// Contains a tag with additional information.
@@ -30,26 +28,26 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     /// </remarks>
     public object? Tag
     {
-        get => OwningGraph.GetTag(_id);
-        set => OwningGraph.SetTag(_id, value);
+        get => OwningGraph.GetTag(Id);
+        set => OwningGraph.SetTag(Id, value);
     }
 
     /// <summary>
     /// Contains the state type.
     /// </summary>
-    public StateType Type => _id.GetStateType();
+    public StateType Type => Id.GetStateType();
 
     /// <summary>
     /// Contains transitions to next states.
     /// </summary>
-    public IReadOnlyCollection<TTransition> Transitions => OwningGraph.GetTransitions(_id);
+    public IReadOnlyCollection<TTransition> Transitions => OwningGraph.GetTransitions(Id);
 
     /// <summary>
     /// Returns a state transition by a transition value.
     /// </summary>
     /// <param name="transition">A transition value.</param>
     /// <returns>Some state transition for the provided transition value or None if the transition doesn't exist.</returns>
-    public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetStateTransition(_id, transition);
+    public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetStateTransition(Id, transition);
 
     /// <summary>
     /// Returns an instance of transition builder for building a transition from this state.
@@ -73,13 +71,13 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
 
     internal StateGraph<TTransition, TState> OwningGraph { get; }
 
-    internal State<TTransition, TState> AddFixedTransition(uint toStateId, TTransition transition, Reduce<TTransition, TState> reducer)
+    internal State<TTransition, TState> AddFixedTransition(StateId toStateId, TTransition transition, Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
 
         var toState = OwningGraph[toStateId];
         var stateTransition = new Transition<TTransition, TState>(toState, reducer);
-        OwningGraph.AddStateTransition(_id, transition, stateTransition);
+        OwningGraph.AddStateTransition(Id, transition, stateTransition);
 
         return OwningGraph[toStateId];
     }
@@ -91,7 +89,7 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
         var noneGoToState = Option.None<State<TTransition, TState>>();
         var stateTransition = new Transition<TTransition, TState>(noneGoToState, reducer);
         
-        OwningGraph.AddStateTransition(_id, transition, stateTransition);
+        OwningGraph.AddStateTransition(Id, transition, stateTransition);
     }
 
     internal void AddFallbackTransition(Reduce<TTransition, TState> reducer)
@@ -101,7 +99,7 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
         var noneGoToState = Option.None<State<TTransition, TState>>();
         var stateTransition = new Transition<TTransition, TState>(noneGoToState, reducer);
         
-        OwningGraph.AddFallbackTransition(_id, stateTransition);
+        OwningGraph.AddFallbackTransition(Id, stateTransition);
     }
     
     private void ValidateLinkingNotAccepted()

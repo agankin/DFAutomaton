@@ -25,7 +25,7 @@ public record AutomatonBuildConfiguration<TState>
     /// Enables validation of any state reaches the accepted state.
     /// </summary>
     /// <returns>A new instance with the changes applied.</returns>
-    public AutomatonBuildConfiguration<TState> ValidateAnyReachesAccepted() =>
+    public AutomatonBuildConfiguration<TState> ValidateAnyCanReachAccepted() =>
         this with { ValidateAnyReachesAcceptedEnabled = true };
 
     /// <summary>
@@ -33,6 +33,6 @@ public record AutomatonBuildConfiguration<TState>
     /// </summary>
     /// <param name="isErrorState">A predicate for checking is automaton state an error state.</param>
     /// <returns>A new instance with the changes applied.</returns>
-    public AutomatonBuildConfiguration<TState> CheckIsErrorState(Predicate<TState> isErrorState) =>
+    public AutomatonBuildConfiguration<TState> AddCheckForErrorState(Predicate<TState> isErrorState) =>
         this with { IsErrorState = isErrorState };
 }

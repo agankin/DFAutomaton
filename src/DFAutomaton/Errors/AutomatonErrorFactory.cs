@@ -2,76 +2,47 @@ using PureMonads;
 
 namespace DFAutomaton;
 
+using static AutomatonErrorType;
+using static Option;
+
 internal static class AutomatonErrorFactory
 {
-    internal static AutomatonError<TTransition, TState> TransitionNotFound<TTransition, TState>(
-        State<TTransition, TState> fromState,
-        TTransition transition
-    )
-    where TTransition : notnull
+    internal static AutomatonError<TTransition, TState> CreateTransitionNotExists<TTransition, TState>(
+        FrozenState<TTransition, TState> fromState,
+        TTransition transition)
+        where TTransition : notnull
     {
-        var error = new AutomatonError<TTransition, TState>(
-            AutomatonErrorType.TransitionNotExists,
-            new ImmutableState<TTransition, TState>(fromState),
-            transition,
-            Option.None<TState>());
-        
-        return error;
+        return new(TransitionNotExists, fromState, transition, None<TState>());
     }
 
-    internal static AutomatonError<TTransition, TState> TransitionFromAccepted<TTransition, TState>(
-        State<TTransition, TState> fromState,
-        TTransition transition
-    ) where TTransition : notnull
+    internal static AutomatonError<TTransition, TState> CreateTransitionFromAccepted<TTransition, TState>(
+        FrozenState<TTransition, TState> fromState,
+        TTransition transition)
+        where TTransition : notnull
     {
-        var error = new AutomatonError<TTransition, TState>(
-            AutomatonErrorType.TransitionFromAccepted,
-            new ImmutableState<TTransition, TState>(fromState),
-            transition,
-            Option.None<TState>());
-        
-        return error;
+        return new(TransitionFromAccepted, fromState, transition, None<TState>());
     }
 
-    internal static AutomatonError<TTransition, TState> NoNextState<TTransition, TState>(
-        State<TTransition, TState> fromState,
-        TTransition transition
-    )
-    where TTransition : notnull
+    internal static AutomatonError<TTransition, TState> CreateNoNextState<TTransition, TState>(
+        FrozenState<TTransition, TState> fromState,
+        TTransition transition)
+        where TTransition : notnull
     {
-        var error = new AutomatonError<TTransition, TState>(
-            AutomatonErrorType.NoNextState,
-            new ImmutableState<TTransition, TState>(fromState),
-            transition,
-            Option.None<TState>());
-        
-        return error;
+        return new(NoNextState, fromState, transition, None<TState>());
     }
 
-    internal static AutomatonError<TTransition, TState> AcceptedNotReached<TTransition, TState>() where TTransition : notnull
+    internal static AutomatonError<TTransition, TState> CreateAcceptedNotReached<TTransition, TState>()
+        where TTransition : notnull
     {
-        var error = new AutomatonError<TTransition, TState>(
-            AutomatonErrorType.AcceptedNotReached,
-            Option.None<ImmutableState<TTransition, TState>>(),
-            Option.None<TTransition>(),
-            Option.None<TState>()
-        );
-        
-        return error;
+       return new(AcceptedNotReached, None<FrozenState<TTransition, TState>>(), None<TTransition>(), None<TState>());
     }
 
-    internal static AutomatonError<TTransition, TState> ReducerError<TTransition, TState>(
-        State<TTransition, TState> fromState,
+    internal static AutomatonError<TTransition, TState> CreateReducerError<TTransition, TState>(
+        FrozenState<TTransition, TState> fromState,
         TTransition transition,
-        TState errorState
-    ) where TTransition : notnull
+        TState errorState)
+        where TTransition : notnull
     {
-        var error = new AutomatonError<TTransition, TState>(
-            AutomatonErrorType.ReducerError,
-            new ImmutableState<TTransition, TState>(fromState),
-            transition,
-            errorState);
-        
-        return error;
+        return new(ReducerError, fromState, transition, errorState);
     }
 }

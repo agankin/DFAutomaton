@@ -21,7 +21,7 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// A state the automaton must go to for a dynamic transition.
     /// </summary>
-    internal Option<State<TTransition, TState>> DynamiclyGoToState { get; private set; } = Option.None<State<TTransition, TState>>();
+    internal Option<StateId> DynamiclyGoToStateId { get; private set; } = Option.None<StateId>();
 
     /// <summary>
     /// Yielded next transition values.
@@ -38,7 +38,7 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     /// <returns>The current instance.</returns>
     public ReductionResult<TTransition, TState> DynamiclyGoTo(State<TTransition, TState> state)
     {
-        DynamiclyGoToState = state;
+        DynamiclyGoToStateId = state.Id;
         return this;
     }
 

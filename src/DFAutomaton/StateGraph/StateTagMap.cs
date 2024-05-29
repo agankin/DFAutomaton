@@ -2,9 +2,9 @@ namespace DFAutomaton;
 
 internal class StateTagMap
 {
-    private readonly Dictionary<uint, object> _tagByStateId = new();
+    private readonly Dictionary<StateId, object> _tagByStateId = new();
 
-    public object? this[uint stateId]
+    public object? this[StateId stateId]
     {
         get => _tagByStateId.TryGetValue(stateId, out var tag) ? tag : null;
         set
@@ -14,5 +14,12 @@ internal class StateTagMap
             else
                 _tagByStateId[stateId] = value;
         }
+    }
+
+    public FrozenStateTagMap ToFrozen()
+    {
+        var tagByStateId = _tagByStateId.ToDictionary(entry => entry.Key, entry => entry.Value);
+
+        return new FrozenStateTagMap(tagByStateId);
     }
 }

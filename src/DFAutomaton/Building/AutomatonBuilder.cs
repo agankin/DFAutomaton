@@ -1,5 +1,4 @@
-﻿using DFAutomaton.Utils;
-using PureMonads;
+﻿using PureMonads;
 
 namespace DFAutomaton;
 
@@ -10,14 +9,15 @@ namespace DFAutomaton;
 /// <typeparam name="TState">State value type.</typeparam>
 public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
 {
-    private readonly StateGraph<TTransition, TState> _graph;
+    private readonly StateGraph<TTransition, TState> _stateGraph;
+    private AutomatonBuildConfiguration<TState> _configuration = AutomatonBuildConfiguration<TState>.Default;
 
-    private AutomatonBuilder(StateGraph<TTransition, TState> graph)
+    private AutomatonBuilder(StateGraph<TTransition, TState> stateGraph)
     {
-        _graph = graph;
+        _stateGraph = stateGraph;
         
-        Start = _graph.StartState;
-        Accepted = _graph.AcceptedState;
+        Start = _stateGraph.StartState;
+        Accepted = _stateGraph.AcceptedState;
     }
 
     /// <summary>
@@ -45,33 +45,52 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// Creates a new state.
     /// </summary>
     /// <returns>The created new state.</returns>
-    public State<TTransition, TState> CreateState() => _graph.CreateState();
+    public State<TTransition, TState> CreateState() => _stateGraph.CreateState();
+
+    /// <summary>
+    /// Enables validation of any state reaches the accepted state.
+    /// </summary>
+    /// <returns>The same instance of the builder.</returns>
+    public AutomatonBuilder<TTransition, TState> ValidateAnyCanReachAccepted()
+    {
+        _configuration = _configuration.ValidateAnyCanReachAccepted();
+        return this;
+    }
+
+    /// <summary>
+    /// Sets a predicate for checking is automaton state an error state.
+    /// </summary>
+    /// <param name="isErrorState">A predicate for checking is automaton state an error state.</param>
+    /// <returns>The same instance of the builder.</returns>
+    public AutomatonBuilder<TTransition, TState> AddCheckForErrorState(Predicate<TState> isErrorState)
+    {
+        _configuration = _configuration.AddCheckForErrorState(isErrorState);
+        return this;
+    }
 
     /// <summary>
     /// Builds a new automaton.
     /// </summary>
-    /// <param name="configure">A delegate to setup the build configuration.</param>
     /// <returns>The result of the build.</returns>
-    public BuildResult<TTransition, TState> Build(Configure<AutomatonBuildConfiguration<TState>>? configure = null)
+    public BuildResult<TTransition, TState> Build()
     {
-        var configuration = (configure ?? (config => config))(AutomatonBuildConfiguration<TState>.Default);
-        var result = Validate(Start, configuration);
+        var result = Validate();
 
-        return result.Value.Match<BuildResult<TTransition, TState>>(
-            startState => new Automaton<TTransition, TState>(startState, configuration.IsErrorState),
-            error => error);
+        return result.Value
+            .Map(stateGraph => stateGraph.ToFrozen())
+            .Match<BuildResult<TTransition, TState>>(
+                stateGraph => new Automaton<TTransition, TState>(stateGraph, _configuration.IsErrorState),
+                error => error);
     }
 
-    private static ValidationResult<TTransition, TState> Validate(
-        State<TTransition, TState> startState,
-        AutomatonBuildConfiguration<TState> configuration)
+    private ValidationResult<TTransition, TState> Validate()
     {
-        if (configuration.ValidateAnyReachesAcceptedEnabled)
+        if (_configuration.ValidateAnyReachesAcceptedEnabled)
         {
-            return StateGraphValidator<TTransition, TState>.ValidateHasAccepted(startState).Value
-                .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(startState).Value);
+            return StateGraphValidator<TTransition, TState>.ValidateHasAccepted(_stateGraph).Value
+                .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(_stateGraph).Value);
         }
 
-        return startState;
+        return _stateGraph;
     }
 }

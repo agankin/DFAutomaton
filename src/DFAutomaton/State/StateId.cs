@@ -1,17 +1,29 @@
 namespace DFAutomaton;
 
-internal readonly record struct StateId(uint Value)
+/// <summary>
+/// State Id.
+/// </summary>
+/// <param name="Value">State Id value.</param>
+public readonly record struct StateId(uint Value)
 {
-    public const uint StartStateId = 1;
-    public const uint AcceptedStateId = 0;
-    public const uint SubStateStartId = 2;
+    public static readonly StateId StartStateId = 1;
+    public static readonly StateId AcceptedStateId = 0;
+    public static readonly StateId SubStateStartId = 2;
 
-    public StateType GetStateType() => Value switch
+    /// <summary>
+    /// Returns state type.
+    /// </summary>
+    /// <returns>State type.</returns>
+    public StateType GetStateType()
     {
-        StartStateId => StateType.Start,
-        AcceptedStateId => StateType.Accepted,
-        _ => StateType.SubState
-    };
+        if (Value >= SubStateStartId)
+            return StateType.SubState;
+
+        if (Value == StartStateId)
+            return StateType.Start;
+
+        return StateType.Accepted;
+    }
 
     public static implicit operator StateId(uint id) => new(id);
 

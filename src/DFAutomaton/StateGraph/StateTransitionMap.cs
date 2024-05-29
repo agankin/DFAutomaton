@@ -4,28 +4,28 @@ namespace DFAutomaton;
 
 internal class StateTransitionMap<TTransition, TState> where TTransition : notnull
 {
-    private Dictionary<TransitionKey, Transition<TTransition, TState>> _transitionByKey = new();
-    private Dictionary<uint, Transition<TTransition, TState>> _fallbackTransitionByStateId = new();
-    private Dictionary<uint, List<TTransition>> _transitionsByStateId = new();
+    private Dictionary<TransitionKey<TTransition>, TransitionEntry<TTransition, TState>> _transitionByKey = new();
+    private Dictionary<StateId, TransitionEntry<TTransition, TState>> _fallbackTransitionByStateId = new();
+    private Dictionary<StateId, List<TTransition>> _transitionsByStateId = new();
 
-    public Option<Transition<TTransition, TState>> this[uint fromStateId, TTransition transition]
+    public Option<TransitionEntry<TTransition, TState>> this[StateId fromStateId, TTransition transition]
     {
         get
         {
-            if (_transitionByKey.TryGetValue(new(fromStateId, transition), out var stateTransition))
-                return stateTransition;
+            if (_transitionByKey.TryGetValue(new(fromStateId, transition), out var transitionEntry))
+                return transitionEntry;
 
             return _fallbackTransitionByStateId.GetOrNone(fromStateId);
         }
     }
 
-    public IReadOnlyCollection<TTransition> GetTransitions(uint fromStateId) =>
+    public IReadOnlyCollection<TTransition> GetTransitions(StateId fromStateId) =>
          _transitionsByStateId.GetOr(fromStateId, () => new List<TTransition>());
 
-    public void AddStateTransition(uint fromStateId, TTransition transition, Transition<TTransition, TState> stateTransition)
+    public void AddStateTransition(StateId fromStateId, TTransition transition, Transition<TTransition, TState> stateTransition)
     {
-        var key = new TransitionKey(fromStateId, transition);
-        _transitionByKey[key] = stateTransition;
+        var key = new TransitionKey<TTransition>(fromStateId, transition);
+        _transitionByKey[key] = stateTransition.ToEntry();
 
         if (!_transitionsByStateId.TryGetValue(fromStateId, out var transitions))
             _transitionsByStateId[fromStateId] = transitions = new List<TTransition>();
@@ -33,11 +33,18 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
         transitions.Add(transition);
     }
 
-    public void AddFallbackTransition(uint fromStateId, Transition<TTransition, TState> stateTransition) =>
-        _fallbackTransitionByStateId[fromStateId] = stateTransition;
+    public void AddFallbackTransition(StateId fromStateId, Transition<TTransition, TState> stateTransition) =>
+        _fallbackTransitionByStateId[fromStateId] = stateTransition.ToEntry();
 
-    private readonly record struct TransitionKey(
-        uint FromStateId,
-        TTransition Transition
-    );
+    public FrozenStateTransitionMap<TTransition, TState> ToFrozen()
+    {
+        var transitionByKey = _transitionByKey.ToDictionary(e => e.Key, e => e.Value);
+        var fallbackTransitionByStateId = _fallbackTransitionByStateId.ToDictionary(e => e.Key, e => e.Value);
+        var transitionsByStateId = _transitionsByStateId.ToDictionary(e => e.Key, e => e.Value);
+        
+        return new FrozenStateTransitionMap<TTransition, TState>(
+            transitionByKey,
+            fallbackTransitionByStateId,
+            transitionsByStateId);
+    }
 }

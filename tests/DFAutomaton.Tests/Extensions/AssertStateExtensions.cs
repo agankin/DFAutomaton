@@ -22,8 +22,8 @@ public static class AssertStateExtensions
         return state;
     }
 
-    public static ImmutableState<TTransition, TState> Has<TTransition, TState>(
-        this ImmutableState<TTransition, TState> state,
+    public static FrozenState<TTransition, TState> Has<TTransition, TState>(
+        this FrozenState<TTransition, TState> state,
         StateType expectedType)
         where TTransition : notnull
     {

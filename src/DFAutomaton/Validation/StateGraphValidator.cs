@@ -12,14 +12,15 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
     /// <returns>The result of the validation.</returns>
-    public static ValidationResult<TTransition, TState> ValidateHasAccepted(State<TTransition, TState> start)
+    public static ValidationResult<TTransition, TState> ValidateHasAccepted(StateGraph<TTransition, TState> stateGraph)
     {
-        var acceptedReached = StateVisitor<TTransition, TState>.Visit(start, StopWhenReachedAccepted);
+        var startState = stateGraph.StartState;
+        var acceptedReached = StateVisitor<TTransition, TState>.Visit(startState, StopWhenReachedAccepted);
         
         if (!acceptedReached)
             return ValidationError.NoAccepted;
 
-        return start;
+        return stateGraph;
     }
 
     /// <summary>
@@ -29,15 +30,16 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
     /// <returns>The result of the validation.</returns>
-    public static ValidationResult<TTransition, TState> ValidateAnyReachAccepted(State<TTransition, TState> start)
+    public static ValidationResult<TTransition, TState> ValidateAnyReachAccepted(StateGraph<TTransition, TState> stateGraph)
     {
         var canReachAcceptedStates = new HashSet<State<TTransition, TState>>();
-        var someCannotReachAccepted = StateVisitor<TTransition, TState>.Visit(start, StopWhenCannotReachAccepted(canReachAcceptedStates));
+        var startState = stateGraph.StartState;
+        var someCannotReachAccepted = StateVisitor<TTransition, TState>.Visit(startState, StopWhenCannotReachAccepted(canReachAcceptedStates));
         
         if (someCannotReachAccepted)
             return ValidationError.AcceptedIsUnreachable;
 
-        return start;
+        return stateGraph;
     }
 
     private static VisitResult StopWhenReachedAccepted(State<TTransition, TState> state) =>

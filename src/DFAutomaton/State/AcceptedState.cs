@@ -19,7 +19,7 @@ public readonly struct AcceptedState<TTransition, TState> where TTransition : no
     /// <summary>
     /// Contains an identifier that is unique within the scope of the containing state graph.
     /// </summary>
-    public uint Id => _id;
+    public StateId Id => _id;
 
     /// <summary>
     /// Contains a tag with additional information.

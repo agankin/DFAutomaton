@@ -25,7 +25,9 @@ public class AutomatonBuildValidationTests
         state3
             .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
 
-        var automatonOrError = builder.Build(config => config.ValidateAnyReachesAccepted());
+        var automatonOrError = builder
+            .ValidateAnyCanReachAccepted()
+            .Build();
         automatonOrError.Value.IsSome();
     }
 
@@ -41,7 +43,9 @@ public class AutomatonBuildValidationTests
         var state3 = state1
             .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
 
-        var automatonOrError = builder.Build(config => config.ValidateAnyReachesAccepted());
+        var automatonOrError = builder
+            .ValidateAnyCanReachAccepted()
+            .Build();
         automatonOrError.Value.IsError(ValidationError.NoAccepted);
     }
 
@@ -60,7 +64,9 @@ public class AutomatonBuildValidationTests
         state2
             .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
 
-        var automatonOrError = builder.Build(config => config.ValidateAnyReachesAccepted());
+        var automatonOrError = builder
+            .ValidateAnyCanReachAccepted()
+            .Build();
         automatonOrError.Value.IsError(ValidationError.AcceptedIsUnreachable);
     }
 }
