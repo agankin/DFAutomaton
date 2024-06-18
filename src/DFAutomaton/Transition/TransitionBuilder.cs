@@ -6,10 +6,10 @@ namespace DFAutomaton;
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 /// <param name="FromState">A state the new transition is starting from.</param>
-/// <param name="Transition">A transition value.</param>
+/// <param name="TransitionValueOrPredicate">A transition value or a transition predicate.</param>
 public record TransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
-    TTransition Transition
+    Either<TTransition, Predicate<TTransition>> TransitionValueOrPredicate
 ) where TTransition : notnull
 {
     /// <summary>
@@ -20,7 +20,7 @@ public record TransitionBuilder<TTransition, TState>(
     public FixedTransitionBuilder<TTransition, TState> WithReducingTo(TState toValue)
     {
         Reduce<TTransition, TState> reducer = (_, _) => toValue;
-        return new(FromState, Transition, reducer);
+        return new(FromState, TransitionValueOrPredicate, reducer);
     }
 
     /// <summary>
@@ -30,12 +30,12 @@ public record TransitionBuilder<TTransition, TState>(
     /// <returns>The created fixed transition builder.</returns>
     public FixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer)
     {
-        return new(FromState, Transition, reducer);
+        return new(FromState, TransitionValueOrPredicate, reducer);
     }
 
     /// <summary>
     /// Creates a new dynamic transition builder.
     /// </summary>
     /// <returns>The created dynamic transition builder.</returns>
-    public DynamicTransitionBuilder<TTransition, TState> Dynamicly() => new(FromState, Transition);
+    public DynamicTransitionBuilder<TTransition, TState> Dynamicly() => new(FromState, TransitionValueOrPredicate);
 }

@@ -40,19 +40,24 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Contains transitions to next states.
     /// </summary>
-    public IReadOnlyCollection<TTransition> Transitions => OwningGraph.GetTransitions(Id);
+    public IReadOnlyCollection<StateTransition<TTransition, TState>> Transitions => OwningGraph.GetTransitions(Id);
 
     /// <summary>
     /// Returns a state transition by a transition value.
     /// </summary>
     /// <param name="transition">A transition value.</param>
     /// <returns>Some state transition for the provided transition value or None if the transition doesn't exist.</returns>
-    public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetStateTransition(Id, transition);
+    public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetTransition(Id, transition);
 
     /// <summary>
     /// Returns an instance of transition builder for building a transition from this state.
     /// </summary>
     public TransitionBuilder<TTransition, TState> TransitsBy(TTransition transition) => new(this, transition);
+
+    /// <summary>
+    /// Returns an instance of transition builder for building a transition from this state.
+    /// </summary>
+    public TransitionBuilder<TTransition, TState> TransitsWhen(Predicate<TTransition> predicate) => new(this, predicate);
 
     /// <summary>
     /// Returns an instance of transition builder for building a fallback transition from this state.
@@ -71,25 +76,30 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
 
     internal StateGraph<TTransition, TState> OwningGraph { get; }
 
-    internal State<TTransition, TState> AddFixedTransition(StateId toStateId, TTransition transition, Reduce<TTransition, TState> reducer)
+    internal State<TTransition, TState> AddFixedTransition(
+        StateId toStateId,
+        Either<TTransition, Predicate<TTransition>> transitionValueOrPredicate,
+        Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
 
         var toState = OwningGraph[toStateId];
-        var stateTransition = new Transition<TTransition, TState>(toState, reducer);
-        OwningGraph.AddStateTransition(Id, transition, stateTransition);
+        var transition = new Transition<TTransition, TState>(toState, reducer);
+        OwningGraph.AddTransition(Id, transitionValueOrPredicate, transition);
 
         return OwningGraph[toStateId];
     }
     
-    internal void AddDynamicTransition(TTransition transition, Reduce<TTransition, TState> reducer)
+    internal void AddDynamicTransition(
+        Either<TTransition, Predicate<TTransition>> transitionValueOrPredicate,
+        Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
 
         var noneGoToState = Option.None<State<TTransition, TState>>();
-        var stateTransition = new Transition<TTransition, TState>(noneGoToState, reducer);
+        var transition = new Transition<TTransition, TState>(noneGoToState, reducer);
         
-        OwningGraph.AddStateTransition(Id, transition, stateTransition);
+        OwningGraph.AddTransition(Id, transitionValueOrPredicate, transition);
     }
 
     internal void AddFallbackTransition(Reduce<TTransition, TState> reducer)
@@ -97,9 +107,9 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
         ValidateLinkingNotAccepted();
 
         var noneGoToState = Option.None<State<TTransition, TState>>();
-        var stateTransition = new Transition<TTransition, TState>(noneGoToState, reducer);
+        var transition = new Transition<TTransition, TState>(noneGoToState, reducer);
         
-        OwningGraph.AddFallbackTransition(Id, stateTransition);
+        OwningGraph.AddFallbackTransition(Id, transition);
     }
     
     private void ValidateLinkingNotAccepted()

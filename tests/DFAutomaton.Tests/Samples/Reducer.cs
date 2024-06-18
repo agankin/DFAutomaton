@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using DFAutomaton.Tests;
 
 namespace DFAutomaton;
 
@@ -9,7 +9,7 @@ internal static class Reducer
     {
         return (state, transition) =>
         {
-            Assert.AreEqual(expectedTransition, transition);
+            transition.ItIs(expectedTransition);
             return reducedState;
         };
     }

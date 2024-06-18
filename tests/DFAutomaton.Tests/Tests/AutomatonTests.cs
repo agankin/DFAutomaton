@@ -23,7 +23,7 @@ public class AutomatonTests
         };
 
         var acceptedState = automaton.Run(STATE_1, transitions).IsSome();
-        Assert.AreEqual(ACCEPTED, acceptedState);
+        acceptedState.ItIs(ACCEPTED);
     }
 
     [Test(Description = "Test scenario for an automaton error occuring on transition not found.")]

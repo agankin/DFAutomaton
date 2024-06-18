@@ -1,5 +1,3 @@
-using NUnit.Framework;
-
 namespace DFAutomaton.Tests;
 
 public static class AutomatonErrorExtensions
@@ -7,7 +5,7 @@ public static class AutomatonErrorExtensions
     public static AutomatonError<TTransition, TState> HasType<TTransition, TState>(this AutomatonError<TTransition, TState> error, AutomatonErrorType expectedType)
         where TTransition : notnull
     {
-        Assert.AreEqual(expectedType, error.Type);
+        error.Type.ItIs(expectedType);
         return error;
     }
 
@@ -15,7 +13,7 @@ public static class AutomatonErrorExtensions
         where TTransition : notnull
     {
         var transition = error.Transition.IsSome();
-        Assert.AreEqual(expectedTransition, transition);
+        transition.ItIs(expectedTransition);
 
         return error;
     }

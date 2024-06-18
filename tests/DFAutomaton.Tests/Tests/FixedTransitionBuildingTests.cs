@@ -47,10 +47,10 @@ public partial class FixedTransitionBuildingTests
             .TransitsTo(state3)
             .Reduces(TO_STATE_3, STATE_1, STATE_3);
         state2
-            .Is(existingState2)
+            .ItIs(existingState2)
             .Has(StateType.SubState);
         state3
-            .Is(existingState3)
+            .ItIs(existingState3)
             .Has(StateType.SubState);
     }
 
@@ -70,8 +70,8 @@ public partial class FixedTransitionBuildingTests
             .IsSome()
             .TransitsTo(incremenedState3)
             .Reduces(TO_STATE_3, STATE_1, STATE_3);
-        incremenedState2.Is(state1);
-        incremenedState3.Is(state1);
+        incremenedState2.ItIs(state1);
+        incremenedState3.ItIs(state1);
     }
 
     [Test(Description = "Tests adding a fixed transition to the accepted state.")]
@@ -91,7 +91,7 @@ public partial class FixedTransitionBuildingTests
             .TransitsTo(StateType.Accepted)
             .Reduces(TO_STATE_3, STATE_1, STATE_3);
         
-        Assert.AreEqual(acceptedState2.Id, StateId.AcceptedStateId);
-        Assert.AreEqual(acceptedState3.Id, StateId.AcceptedStateId);
+        acceptedState2.Id.ItIs(StateId.AcceptedStateId);
+        acceptedState3.Id.ItIs(StateId.AcceptedStateId);
     }
 }

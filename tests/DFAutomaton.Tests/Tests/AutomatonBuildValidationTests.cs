@@ -16,13 +16,15 @@ public class AutomatonBuildValidationTests
         var state1 = builder.Start;
         var state2 = state1
             .TransitsBy(TO_STATE_1).WithReducingTo(STATE_1).ToSelf()
-            .TransitsBy(TO_STATE_2).WithReducingTo(STATE_2).ToNew();
+            .TransitsWhen(transition => transition == TO_STATE_2).WithReducingTo(STATE_2).ToNew();
         var state3 = state1
             .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
+        var state4 = state3
+            .TransitsWhen(transition => transition == TO_STATE_4).WithReducingTo(STATE_4).ToNew();
 
         state2
             .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
-        state3
+        state4
             .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
 
         var automatonOrError = builder

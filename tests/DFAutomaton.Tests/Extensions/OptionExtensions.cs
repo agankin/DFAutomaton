@@ -48,7 +48,7 @@ public static class OptionExtensions
             },
             error =>
             {
-                Assert.AreEqual(expectedError, error);
+                error.ItIs(expectedError);
                 return new Nothing();
             });
 }

@@ -6,11 +6,11 @@ namespace DFAutomaton;
 /// <typeparam name="TTransition">Transition value type.</typeparam>
 /// <typeparam name="TState">State value type.</typeparam>
 /// <param name="FromState">A state the new transition is starting from.</param>
-/// <param name="Transition">A transition value.</param>
+/// <param name="TransitionValueOrPredicate">A transition value or a transition predicate.</param>
 /// <param name="Reducer">An automaton transition reducer.</param>
 public record FixedTransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
-    TTransition Transition,
+    Either<TTransition, Predicate<TTransition>> TransitionValueOrPredicate,
     Reduce<TTransition, TState> Reducer
 )
 where TTransition : notnull
@@ -22,7 +22,7 @@ where TTransition : notnull
     public State<TTransition, TState> ToNew()
     {
         var toState = FromState.OwningGraph.CreateState();
-        return FromState.AddFixedTransition(toState.Id, Transition, Reducer);
+        return FromState.AddFixedTransition(toState.Id, TransitionValueOrPredicate, Reducer);
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ where TTransition : notnull
     /// <param name="toState">An existing state.</param>
     /// <returns>The provided existing state.</returns>
     public State<TTransition, TState> To(State<TTransition, TState> toState) =>
-        FromState.AddFixedTransition(toState.Id, Transition, Reducer);
+        FromState.AddFixedTransition(toState.Id, TransitionValueOrPredicate, Reducer);
 
     /// <summary>
     /// Adds a transition to the same state it starting from and completes the build.
@@ -40,7 +40,7 @@ where TTransition : notnull
     public State<TTransition, TState> ToSelf()
     {
         var toState = FromState;
-        return FromState.AddFixedTransition(toState.Id, Transition, Reducer);
+        return FromState.AddFixedTransition(toState.Id, TransitionValueOrPredicate, Reducer);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ where TTransition : notnull
     public AcceptedState<TTransition, TState> ToAccepted()
     {
         var toStateId = StateId.AcceptedStateId;
-        var acceptedState = FromState.AddFixedTransition(toStateId, Transition, Reducer);
+        var acceptedState = FromState.AddFixedTransition(toStateId, TransitionValueOrPredicate, Reducer);
 
         return new AcceptedState<TTransition, TState>(acceptedState.Id, acceptedState.OwningGraph);
     }

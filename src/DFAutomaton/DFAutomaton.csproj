@@ -14,6 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pure-Monads" Version="1.0.0" />
+    <PackageReference Include="Pure-Monads" Version="1.0.1" />
   </ItemGroup>
 </Project>

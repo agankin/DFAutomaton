@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-
-namespace DFAutomaton.Tests;
+﻿namespace DFAutomaton.Tests;
 
 public static class AssertTransitionExtensions
 {
@@ -10,7 +8,7 @@ public static class AssertTransitionExtensions
         where TTransition : notnull
     {
         var transitionState = transition.ToState.IsSome();
-        Assert.AreEqual(expectedState, transitionState);
+        transitionState.ItIs(expectedState);
         
         return transition;
     }
@@ -21,7 +19,7 @@ public static class AssertTransitionExtensions
         where TTransition : notnull
     {
         var transitionState = transition.ToState.IsSome();
-        Assert.AreEqual(expectedStateType, transitionState.Type);
+        transitionState.Type.ItIs(expectedStateType);
         
         return transition;
     }
@@ -34,15 +32,15 @@ public static class AssertTransitionExtensions
     }
 
     public static Transition<TTransition, TState> Reduces<TTransition, TState>(
-        this Transition<TTransition, TState> stateTransition,
-        TTransition transition,
+        this Transition<TTransition, TState> transition,
+        TTransition transitionValue,
         TState beforeReduce,
         TState expectedAfterReduce)
         where TTransition : notnull
     {
-        var actualAfterReduce = stateTransition.Reducer(beforeReduce, transition);   
-        Assert.AreEqual(expectedAfterReduce, actualAfterReduce.Value);
+        var actualAfterReduce = transition.Reducer(beforeReduce, transitionValue);   
+        actualAfterReduce.Value.ItIs(expectedAfterReduce);
         
-        return stateTransition;
+        return transition;
     }
 }

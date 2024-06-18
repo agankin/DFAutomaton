@@ -18,8 +18,8 @@ internal class StateTagMap
 
     public FrozenStateTagMap ToFrozen()
     {
-        var tagByStateId = _tagByStateId.ToDictionary(entry => entry.Key, entry => entry.Value);
+        var tagByStateId = _tagByStateId.Freeze();
 
-        return new FrozenStateTagMap(tagByStateId);
+        return new(tagByStateId);
     }
 }

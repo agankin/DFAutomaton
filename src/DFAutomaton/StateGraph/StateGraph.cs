@@ -4,22 +4,27 @@ namespace DFAutomaton;
 
 internal class StateGraph<TTransition, TState> where TTransition : notnull
 {
-    private readonly StateTransitionMap<TTransition, TState> _stateTransitionMap = new();
+    private readonly StateTransitionMap<TTransition, TState> _stateTransitionMap;
     private readonly StateTagMap _stateTagMap = new();
     private StateId _nextId = StateId.SubStateStartId;
-    
-    public State<TTransition, TState> this[StateId stateId] => new State<TTransition, TState>(stateId, this);
+
+    public StateGraph()
+    {
+        _stateTransitionMap = new(this);
+    }
+
+    public State<TTransition, TState> this[StateId stateId] => new(stateId, this);
 
     public State<TTransition, TState> StartState => this[StateId.StartStateId];
 
     public State<TTransition, TState> AcceptedState => this[StateId.AcceptedStateId];
 
-    public State<TTransition, TState> CreateState() => new State<TTransition, TState>(_nextId++, this);
+    public State<TTransition, TState> CreateState() => new(_nextId++, this);
 
-    public IReadOnlyCollection<TTransition> GetTransitions(StateId fromStateId) =>
+    public IReadOnlyCollection<StateTransition<TTransition, TState>> GetTransitions(StateId fromStateId) =>
         _stateTransitionMap.GetTransitions(fromStateId);
 
-    public Option<Transition<TTransition, TState>> GetStateTransition(StateId fromStateId, TTransition transition)
+    public Option<Transition<TTransition, TState>> GetTransition(StateId fromStateId, TTransition transition)
     {
         var transitionEntry = _stateTransitionMap[fromStateId, transition];
 
@@ -28,11 +33,19 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
             entry.Reducer));
     }
 
-    public void AddStateTransition(StateId fromStateId, TTransition transition, Transition<TTransition, TState> stateTransition) =>
-        _stateTransitionMap.AddStateTransition(fromStateId, transition, stateTransition);
+    public void AddTransition(
+        StateId fromStateId,
+        Either<TTransition, Predicate<TTransition>> transitionValueOrPredicate,
+        Transition<TTransition, TState> transition)
+    {
+        transitionValueOrPredicate.Match(
+            value => _stateTransitionMap.AddTransition(fromStateId, value, transition),
+            predicate => _stateTransitionMap.AddTransition(fromStateId, predicate, transition)
+        );
+    }
 
-    public void AddFallbackTransition(StateId fromStateId, Transition<TTransition, TState> stateTransition) =>
-        _stateTransitionMap.AddFallbackTransition(fromStateId, stateTransition);
+    public void AddFallbackTransition(StateId fromStateId, Transition<TTransition, TState> transition) =>
+        _stateTransitionMap.AddFallbackTransition(fromStateId, transition);
 
     public object? GetTag(StateId stateId) => _stateTagMap[stateId];
 

@@ -19,7 +19,7 @@ internal static class TestAutomaton
             .TransitsBy(TO_STATE_1)
                 .WithReducingTo(STATE_1)
                 .ToSelf()
-            .TransitsBy(TO_STATE_2)
+            .TransitsWhen(transition => transition == TO_STATE_2)
                 .WithReducingBy((_, _) => STATE_2)
                 .ToNew();
 

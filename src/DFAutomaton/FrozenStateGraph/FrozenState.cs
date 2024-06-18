@@ -46,6 +46,5 @@ public readonly struct FrozenState<TTransition, TState> where TTransition : notn
     /// </summary>
     /// <param name="transition">A transition value.</param>
     /// <returns>Some state transition for the provided transition value or None if the transition doesn't exist.</returns>
-    public Option<FrozenTransition<TTransition, TState>> this[TTransition transition] =>
-        _stateGraph.GetStateTransition(_stateId, transition);
+    public Option<FrozenTransition<TTransition, TState>> this[TTransition transition] => _stateGraph.GetTransition(_stateId, transition);
 }

@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-release",
-            "program": "${workspaceFolder}/tests/DFAutomaton.Benchmarks/bin/Release/net7.0/DFAutomaton.Benchmarks.dll",
+            "program": "${workspaceFolder}/tests/DFAutomaton.Benchmarks/bin/Release/net8.0/DFAutomaton.Benchmarks.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "console": "externalTerminal",

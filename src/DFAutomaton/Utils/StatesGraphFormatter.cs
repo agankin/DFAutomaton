@@ -31,13 +31,13 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
 
         yield return FormatState(state);
         
-        var formattedTransitions = state.Transitions.Select(FormatTransition(state));
+        var formattedTransitions = state.Transitions.Select(stateTransition => FormatTransition(stateTransition));
         foreach (var formattedTransition in formattedTransitions)
             yield return formattedTransition;
 
         yield return string.Empty;
 
-        var nextStates = state.Transitions.Select(transition => state[transition].ValueOrFailure().ToState)
+        var nextStates = state.Transitions.Select(stateTransition => stateTransition.Transition.ToState)
             .Where(nextState => nextState.HasValue)
             .Select(nextStateOption => nextStateOption.ValueOrFailure());
         var nextStatesLines = nextStates.SelectMany(nextState => GetStateLines(nextState, formattedStates));
@@ -45,21 +45,25 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
             yield return nextStateLine;
     }
 
-    private static Func<TTransition, string> FormatTransition(State<TTransition, TState> fromState)
+    private static string FormatTransition(StateTransition<TTransition, TState> stateTransition)
     {
-        return transition =>
-        {
-            var (toState, _) = fromState[transition].ValueOrFailure();
+        var (transitionValueOrPredicate, transition) = stateTransition;
+        var (toState, _) = transition;
 
-            return FormatTransition(transition, toState);
-        };
+        return FormatTransition(transitionValueOrPredicate, toState);
     }
 
     private static string FormatState(State<TTransition, TState> state) => state.Format();
 
-    private static string FormatTransition(TTransition transition, Option<State<TTransition, TState>> toStateOption)
+    private static string FormatTransition(
+        Either<TTransition, Predicate<TTransition>> transitionValueOrPredicate,
+        Option<State<TTransition, TState>> toStateOption)
     {
         var toStateFormatted = toStateOption.Map(toState => toState.Id.ToString()).Or("DYNAMIC GOTO");
-        return $"    {transition} -> State {toStateFormatted}";
+        var transitionFormatted = transitionValueOrPredicate.Match(
+            value => value.ToString(),
+            _ => "PREDICATE");
+        
+        return $"    {transitionFormatted} -> State {toStateFormatted}";
     }
 }
