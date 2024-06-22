@@ -31,14 +31,14 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Orders the automaton to go to a state.
     /// </summary>
-    /// <param name="state">A state the automaton must dynamicly go to.</param>
+    /// <param name="stateId">Id of a state the automaton must dynamicly go to.</param>
     /// <remarks>
     /// This method calls are ignored for fixed transitions.
     /// </remarks>
     /// <returns>The current instance.</returns>
-    public ReductionResult<TTransition, TState> DynamiclyGoTo(State<TTransition, TState> state)
+    public ReductionResult<TTransition, TState> DynamiclyGoTo(uint stateId)
     {
-        DynamiclyGoToStateId = state.Id;
+        DynamiclyGoToStateId = new StateId(stateId);
         return this;
     }
 

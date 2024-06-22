@@ -7,15 +7,15 @@ internal class FrozenStateGraph<TTransition, TState> where TTransition : notnull
     private readonly FrozenStateTransitionMap<TTransition, TState> _stateTransitionMap;
     private readonly FrozenStateTagMap _stateTagMap;
 
-    public FrozenStateGraph(FrozenStateTransitionMap<TTransition, TState> stateTransitionMap, FrozenStateTagMap stateTagMap)
+    public FrozenStateGraph(StateTransitionMap<TTransition, TState> stateTransitionMap, StateTagMap stateTagMap)
     {
-        _stateTransitionMap = stateTransitionMap;
-        _stateTagMap = stateTagMap;
+        _stateTransitionMap = stateTransitionMap.ToFrozen(this);
+        _stateTagMap = stateTagMap.ToFrozen();
     }
 
     public FrozenState<TTransition, TState> this[StateId stateId] => new FrozenState<TTransition, TState>(stateId, this);
 
-    public IReadOnlyCollection<TTransition> GetTransitions(StateId fromStateId) =>
+    public IReadOnlyCollection<FrozenStateTransition<TTransition, TState>> GetTransitions(StateId fromStateId) =>
         _stateTransitionMap.GetTransitions(fromStateId);
 
     public Option<FrozenTransition<TTransition, TState>> GetTransition(StateId fromStateId, TTransition transition)

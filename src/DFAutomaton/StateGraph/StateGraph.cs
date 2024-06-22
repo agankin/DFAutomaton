@@ -35,12 +35,12 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
 
     public void AddTransition(
         StateId fromStateId,
-        Either<TTransition, Predicate<TTransition>> transitionValueOrPredicate,
+        Either<TTransition, CanTransit<TTransition>> byValueOrPredicate,
         Transition<TTransition, TState> transition)
     {
-        transitionValueOrPredicate.Match(
-            value => _stateTransitionMap.AddTransition(fromStateId, value, transition),
-            predicate => _stateTransitionMap.AddTransition(fromStateId, predicate, transition)
+        byValueOrPredicate.Match(
+            byValue => _stateTransitionMap.AddTransition(fromStateId, byValue, transition),
+            canTransit => _stateTransitionMap.AddTransition(fromStateId, canTransit, transition)
         );
     }
 
@@ -51,11 +51,5 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
 
     public void SetTag(StateId stateId, object? value) => _stateTagMap[stateId] = value;
 
-    public FrozenStateGraph<TTransition, TState> ToFrozen()
-    {
-        var stateTransitionMap = _stateTransitionMap.ToFrozen();
-        var stateTagMap = _stateTagMap.ToFrozen();
-
-        return new FrozenStateGraph<TTransition, TState>(stateTransitionMap, stateTagMap);
-    }
+    public FrozenStateGraph<TTransition, TState> ToFrozen() => new(_stateTransitionMap, _stateTagMap);
 }

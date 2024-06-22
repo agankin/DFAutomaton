@@ -39,7 +39,7 @@ public readonly struct FrozenState<TTransition, TState> where TTransition : notn
     /// <summary>
     /// Contains transitions to next states.
     /// </summary>
-    public IReadOnlyCollection<TTransition> Transitions => _stateGraph.GetTransitions(_stateId);
+    public IReadOnlyCollection<FrozenStateTransition<TTransition, TState>> Transitions => _stateGraph.GetTransitions(_stateId);
 
     /// <summary>
     /// Returns a state transition by a transition value.

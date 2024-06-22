@@ -47,22 +47,22 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
 
     private static string FormatTransition(StateTransition<TTransition, TState> stateTransition)
     {
-        var (transitionValueOrPredicate, transition) = stateTransition;
+        var (byValueOrPredicate, transition) = stateTransition;
         var (toState, _) = transition;
 
-        return FormatTransition(transitionValueOrPredicate, toState);
+        return FormatTransition(byValueOrPredicate, toState);
     }
 
     private static string FormatState(State<TTransition, TState> state) => state.Format();
 
     private static string FormatTransition(
-        Either<TTransition, Predicate<TTransition>> transitionValueOrPredicate,
+        Either<TTransition, CanTransit<TTransition>> byValueOrPredicate,
         Option<State<TTransition, TState>> toStateOption)
     {
         var toStateFormatted = toStateOption.Map(toState => toState.Id.ToString()).Or("DYNAMIC GOTO");
-        var transitionFormatted = transitionValueOrPredicate.Match(
-            value => value.ToString(),
-            _ => "PREDICATE");
+        var transitionFormatted = byValueOrPredicate.Match(
+            byValue => byValue.ToString(),
+            canTransit => canTransit.ToString());
         
         return $"    {transitionFormatted} -> State {toStateFormatted}";
     }

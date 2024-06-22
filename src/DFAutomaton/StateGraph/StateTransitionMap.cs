@@ -49,10 +49,11 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
         _transitionsByStateId.AddValue(fromStateId, transitionValue);
     }
 
-    public void AddTransition(StateId fromStateId, Predicate<TTransition> predicate, Transition<TTransition, TState> transition)
+    public void AddTransition(StateId fromStateId, CanTransit<TTransition> canTransit, Transition<TTransition, TState> transition)
     {
         var transitionEntry = transition.ToEntry();
-        var transitionPredicate = new TransitionPredicate<TTransition, TState>(predicate, transitionEntry);
+        var (name, predicate) = canTransit;
+        var transitionPredicate = new TransitionPredicate<TTransition, TState>(name, predicate, transitionEntry);
 
         _transitionPredicatesByStateId.AddValue(fromStateId, transitionPredicate);
     }
@@ -60,7 +61,7 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
     public void AddFallbackTransition(StateId fromStateId, Transition<TTransition, TState> transition) =>
         _fallbackTransitionByStateId[fromStateId] = transition.ToEntry();
 
-    public FrozenStateTransitionMap<TTransition, TState> ToFrozen()
+    public FrozenStateTransitionMap<TTransition, TState> ToFrozen(FrozenStateGraph<TTransition, TState> owningGraph)
     {
         var transitionByKey = _transitionByKey.Freeze();
         var transitionPredicatesByStateId = _transitionPredicatesByStateId.Freeze();
@@ -68,6 +69,7 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
         var transitionsByStateId = _transitionsByStateId.Freeze();
         
         return new FrozenStateTransitionMap<TTransition, TState>(
+            owningGraph,
             transitionByKey,
             transitionPredicatesByStateId,
             fallbackTransitionByStateId,
@@ -85,12 +87,13 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
 
     private StateTransition<TTransition, TState> GetStateTransition(TransitionPredicate<TTransition, TState> transitionPredicate)
     {
-        var (predicate, transitionEntry) = transitionPredicate;
+        var (predicateName, predicate, transitionEntry) = transitionPredicate;
         var (toStateId, reducer) = transitionEntry;
 
+        var canTransit = new CanTransit<TTransition>(predicateName, predicate);
         var toState = toStateId.Map(id => new State<TTransition, TState>(id, _owningGraph));
         var transition = new Transition<TTransition, TState>(toState, reducer);
 
-        return new StateTransition<TTransition, TState>(predicate, transition);
+        return new StateTransition<TTransition, TState>(canTransit, transition);
     }
 }

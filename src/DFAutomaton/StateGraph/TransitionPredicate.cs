@@ -1,6 +1,7 @@
 namespace DFAutomaton;
 
-internal readonly record struct TransitionPredicate<TTransition, TState>(
+internal record TransitionPredicate<TTransition, TState>(
+    string? Name,
     Predicate<TTransition> Predicate,
     TransitionEntry<TTransition, TState> Transition
 )

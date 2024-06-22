@@ -7,8 +7,8 @@ namespace DFAutomaton;
 /// <typeparam name="TState">State value type.</typeparam>
 /// <param name="ByValueOrPredicate">Contains a value or a predicate the transition is performed by.</param>
 /// <param name="Transition">A transition to a next state.</param>
-public record StateTransition<TTransition, TState>(
+public record FrozenStateTransition<TTransition, TState>(
     Either<TTransition, CanTransit<TTransition>> ByValueOrPredicate,
-    Transition<TTransition, TState> Transition
+    FrozenTransition<TTransition, TState> Transition
 )
 where TTransition : notnull;
