@@ -1,4 +1,6 @@
-﻿namespace DFAutomaton;
+﻿using PureMonads;
+
+namespace DFAutomaton;
 
 /// <summary>
 /// Contains methods for state graph validation.
@@ -11,8 +13,8 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
-    /// <returns>The result of the validation.</returns>
-    public static ValidationResult<TTransition, TState> ValidateHasAccepted(StateGraph<TTransition, TState> stateGraph)
+    /// <returns>Some validation error or None.</returns>
+    public static Option<ValidationError> ValidateHasAccepted(StateGraph<TTransition, TState> stateGraph)
     {
         var startState = stateGraph.StartState;
         var acceptedReached = StateVisitor<TTransition, TState>.Visit(startState, StopWhenReachedAccepted);
@@ -20,7 +22,7 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
         if (!acceptedReached)
             return ValidationError.NoAccepted;
 
-        return stateGraph;
+        return Option.None<ValidationError>();
     }
 
     /// <summary>
@@ -29,8 +31,8 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
     /// <typeparam name="TTransition">Transition value type.</typeparam>
     /// <typeparam name="TState">State value type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
-    /// <returns>The result of the validation.</returns>
-    public static ValidationResult<TTransition, TState> ValidateAnyReachAccepted(StateGraph<TTransition, TState> stateGraph)
+    /// <returns>Some validation error or None.</returns>
+    public static Option<ValidationError> ValidateAnyReachAccepted(StateGraph<TTransition, TState> stateGraph)
     {
         var canReachAcceptedStates = new HashSet<State<TTransition, TState>>();
         var startState = stateGraph.StartState;
@@ -39,7 +41,7 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
         if (someCannotReachAccepted)
             return ValidationError.AcceptedIsUnreachable;
 
-        return stateGraph;
+        return Option.None<ValidationError>();
     }
 
     private static VisitResult StopWhenReachedAccepted(State<TTransition, TState> state) =>
@@ -55,7 +57,8 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
         if (canReachAcceptedStates.Contains(state))
             return true;
 
-        var canReachAccepted = StateVisitor<TTransition, TState>.Visit(state, StopWhenCanReachAccepted(canReachAcceptedStates));
+        Visit<TTransition, TState> StopWhenCanReachAccepted_() => StopWhenCanReachAccepted(canReachAcceptedStates);
+        var canReachAccepted = StateVisitor<TTransition, TState>.Visit(state, StopWhenCanReachAccepted_());
         if (canReachAccepted)
             canReachAcceptedStates.Add(state);
 

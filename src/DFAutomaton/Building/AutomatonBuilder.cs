@@ -74,23 +74,27 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// <returns>The result of the build.</returns>
     public BuildResult<TTransition, TState> Build()
     {
-        var result = Validate();
+        var validationResult = _configuration.ValidateAnyReachesAcceptedEnabled ? Validate(_stateGraph) : _stateGraph;
 
-        return result.Value
-            .Map(stateGraph => stateGraph.ToFrozen())
-            .Match<BuildResult<TTransition, TState>>(
-                stateGraph => new Automaton<TTransition, TState>(stateGraph, _configuration.IsErrorState),
-                error => error);
+        return validationResult.Match<BuildResult<TTransition, TState>>(
+            stateGraph => CreateAutomaton(stateGraph, _configuration.IsErrorState),
+            error => error);
     }
 
-    private ValidationResult<TTransition, TState> Validate()
+    private static Automaton<TTransition, TState> CreateAutomaton(StateGraph<TTransition, TState> stateGraph, Predicate<TState>? isErrorState)
     {
-        if (_configuration.ValidateAnyReachesAcceptedEnabled)
-        {
-            return StateGraphValidator<TTransition, TState>.ValidateHasAccepted(_stateGraph).Value
-                .FlatMap(_ => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(_stateGraph).Value);
-        }
+        var frozenStateGraph = stateGraph.ToFrozen();
+        return new Automaton<TTransition, TState>(frozenStateGraph, isErrorState);
+    }
 
-        return _stateGraph;
+    private static ValidationResult<TTransition, TState> Validate(StateGraph<TTransition, TState> stateGraph)
+    {
+        Option<ValidationError> ValidateHasAccepted() => StateGraphValidator<TTransition, TState>.ValidateHasAccepted(stateGraph);
+        Option<ValidationError> ValidateAnyReachAccepted() => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(stateGraph);
+
+        return ValidateHasAccepted().Or(ValidateAnyReachAccepted).Match<ValidationResult<TTransition, TState>>(
+            error => error,
+            () => stateGraph
+        );
     }
 }

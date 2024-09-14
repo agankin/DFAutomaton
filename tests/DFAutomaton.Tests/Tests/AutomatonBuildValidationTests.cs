@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using PureMonads;
 
 namespace DFAutomaton.Tests;
 
@@ -27,10 +28,10 @@ public class AutomatonBuildValidationTests
         state4
             .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
 
-        var automatonOrError = builder
+        Result<Automaton<Transitions, States>, ValidationError> automatonOrError = builder
             .ValidateAnyCanReachAccepted()
             .Build();
-        automatonOrError.Value.IsSome();
+        automatonOrError.IsSome();
     }
 
     [Test(Description = "Tests validation for no accepted state exists.")]
@@ -45,10 +46,10 @@ public class AutomatonBuildValidationTests
         var state3 = state1
             .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
 
-        var automatonOrError = builder
+        Result<Automaton<Transitions, States>, ValidationError> automatonOrError = builder
             .ValidateAnyCanReachAccepted()
             .Build();
-        automatonOrError.Value.IsError(ValidationError.NoAccepted);
+        automatonOrError.IsError(ValidationError.NoAccepted);
     }
 
     [Test(Description = "Tests validation for accepted state not reachable from a state.")]
@@ -66,9 +67,9 @@ public class AutomatonBuildValidationTests
         state2
             .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
 
-        var automatonOrError = builder
+        Result<Automaton<Transitions, States>, ValidationError> automatonOrError = builder
             .ValidateAnyCanReachAccepted()
             .Build();
-        automatonOrError.Value.IsError(ValidationError.AcceptedIsUnreachable);
+        automatonOrError.IsError(ValidationError.AcceptedIsUnreachable);
     }
 }

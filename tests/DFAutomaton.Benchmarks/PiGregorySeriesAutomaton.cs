@@ -10,8 +10,9 @@
             Reduce<int, double> calcPi = (acc, _) => 4 * acc;
             allMembersAddedState.TransitsBy(serieMembersCount).WithReducingBy(calcPi).ToAccepted();
 
-            return builder.Build().Value
-                .Match(value => value, _ => throw new Exception("Result is Error."));
+            return builder.Build().Match(
+                value => value,
+                _ => throw new Exception("Result is Error."));
         }
 
         private static State<int, double> ToAddNextSerieMemberState(State<int, double> state, int idx)

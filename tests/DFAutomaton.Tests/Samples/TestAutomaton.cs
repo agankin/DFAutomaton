@@ -50,7 +50,7 @@ internal static class TestAutomaton
             .WithReducingTo(ACCEPTED)
             .ToAccepted();
 
-        return builder.Build().Value.Match(
+        return builder.Build().Match(
             value => value,
             _ => throw new Exception("Result is Error."));
     }
