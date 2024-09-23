@@ -12,7 +12,7 @@ public class AutomatonBuildValidationTests
     [Test(Description = "Tests no error after valid automaton build.")]
     public void Build_valid_automaton()
     {
-        var builder = AutomatonBuilder<Transitions, States>.Create();
+        var builder = new AutomatonBuilder<Transitions, States>();
         
         var state1 = builder.Start;
         var state2 = state1
@@ -37,7 +37,7 @@ public class AutomatonBuildValidationTests
     [Test(Description = "Tests validation for no accepted state exists.")]
     public void Build_automaton_without_accepted()
     {
-        var builder = AutomatonBuilder<Transitions, States>.Create();
+        var builder = new AutomatonBuilder<Transitions, States>();
 
         var state1 = builder.Start;
         var state2 = state1
@@ -55,7 +55,7 @@ public class AutomatonBuildValidationTests
     [Test(Description = "Tests validation for accepted state not reachable from a state.")]
     public void Build_automaton_with_accepted_unreachable()
     {
-        var builder = AutomatonBuilder<Transitions, States>.Create();
+        var builder = new AutomatonBuilder<Transitions, States>();
 
         var state1 = builder.Start;
         var state2 = state1

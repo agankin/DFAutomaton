@@ -4,7 +4,7 @@
     {
         public static Automaton<int, double> Create(int serieMembersCount)
         {
-            var builder = AutomatonBuilder<int, double>.Create();
+            var builder = new AutomatonBuilder<int, double>();
             var allMembersAddedState = Enumerable.Range(0, serieMembersCount).Aggregate(builder.Start, ToAddNextSerieMemberState);
 
             Reduce<int, double> calcPi = (acc, _) => 4 * acc;

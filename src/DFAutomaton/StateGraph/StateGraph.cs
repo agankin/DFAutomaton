@@ -8,9 +8,9 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
     private readonly StateTagMap _stateTagMap = new();
     private StateId _nextId = StateId.SubStateStartId;
 
-    public StateGraph()
+    public StateGraph(IEqualityComparer<TTransition> transitionEqualityComparer)
     {
-        _stateTransitionMap = new(this);
+        _stateTransitionMap = new(this, transitionEqualityComparer);
     }
 
     public State<TTransition, TState> this[StateId stateId] => new(stateId, this);

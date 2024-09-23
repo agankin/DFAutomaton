@@ -7,7 +7,7 @@ internal static class TestAutomaton
 {
     public static Automaton<Transitions, States> Create()
     {
-        var builder = AutomatonBuilder<Transitions, States>.Create();
+        var builder = new AutomatonBuilder<Transitions, States>();
         
         var state1 = builder.Start;
         var state3 = builder.CreateState();

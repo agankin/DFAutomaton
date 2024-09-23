@@ -1,4 +1,4 @@
-﻿using PureMonads;
+using PureMonads;
 
 namespace DFAutomaton;
 
@@ -12,9 +12,9 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     private readonly StateGraph<TTransition, TState> _stateGraph;
     private AutomatonBuildConfiguration<TState> _configuration = AutomatonBuildConfiguration<TState>.Default;
 
-    private AutomatonBuilder(StateGraph<TTransition, TState> stateGraph)
+    public AutomatonBuilder(IEqualityComparer<TTransition>? transitionEqualityComparer = null)
     {
-        _stateGraph = stateGraph;
+        _stateGraph = new(transitionEqualityComparer ?? EqualityComparer<TTransition>.Default);
         
         Start = _stateGraph.StartState;
         Accepted = _stateGraph.AcceptedState;
@@ -29,17 +29,6 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// The accepted state.
     /// </summary>
     public State<TTransition, TState> Accepted { get; }
-
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    /// <returns>The created new instance.</returns> 
-    public static AutomatonBuilder<TTransition, TState> Create()
-    {
-        var graph = new StateGraph<TTransition, TState>();
-        
-        return new AutomatonBuilder<TTransition, TState>(graph);
-    }
 
     /// <summary>
     /// Creates a new state.

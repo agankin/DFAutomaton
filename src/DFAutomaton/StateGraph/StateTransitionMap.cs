@@ -4,16 +4,17 @@ namespace DFAutomaton;
 
 internal class StateTransitionMap<TTransition, TState> where TTransition : notnull
 {
-    private readonly StateGraph<TTransition, TState> _owningGraph;
-
-    private readonly Dictionary<TransitionKey<TTransition>, TransitionEntry<TTransition, TState>> _transitionByKey = new();
     private readonly Dictionary<StateId, List<TransitionPredicate<TTransition, TState>>> _transitionPredicatesByStateId = new();
     private readonly Dictionary<StateId, TransitionEntry<TTransition, TState>> _fallbackTransitionByStateId = new();
     private readonly Dictionary<StateId, List<TTransition>> _transitionsByStateId = new();
 
-    public StateTransitionMap(StateGraph<TTransition, TState> owningGraph)
+    private readonly StateGraph<TTransition, TState> _owningGraph;
+    private readonly Dictionary<TransitionKey<TTransition>, TransitionEntry<TTransition, TState>> _transitionByKey;
+
+    public StateTransitionMap(StateGraph<TTransition, TState> owningGraph, IEqualityComparer<TTransition> transitionEqualityComparer)
     {
         _owningGraph = owningGraph;
+        _transitionByKey = new(new TransitionKeyEqualityComparer<TTransition>(transitionEqualityComparer));
     }
 
     public Option<TransitionEntry<TTransition, TState>> this[StateId fromStateId, TTransition transition]
