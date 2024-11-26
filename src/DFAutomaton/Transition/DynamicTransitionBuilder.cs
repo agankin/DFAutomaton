@@ -1,12 +1,16 @@
+using PureMonads;
+
 namespace DFAutomaton;
 
 /// <summary>
-/// A builder for creating new dynamic transitions.
+/// A builder for creating a new dynamic transition.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
-/// <param name="FromState">A state the new transition is starting from.</param>
-/// <param name="ByValueOrPredicate">Contains a value or a predicate the transition is performed by.</param>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
+/// <param name="FromState">A state the transition originates from.</param>
+/// <param name="ByValueOrPredicate">
+/// Contains a transition value or predicate the transition will be selected by.
+/// </param>
 public record DynamicTransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
     Either<TTransition, CanTransit<TTransition>> ByValueOrPredicate
@@ -15,6 +19,6 @@ public record DynamicTransitionBuilder<TTransition, TState>(
     /// <summary>
     /// Adds a new dynamic transition and completes the build.
     /// </summary>
-    /// <param name="reducer">An automaton transition reducer.</param>
-    public void WithReducing(Reduce<TTransition, TState> reducer) => FromState.AddDynamicTransition(ByValueOrPredicate, reducer);
+    /// <param name="reducer">A transition reducer.</param>
+    public void WithReducingBy(Reduce<TTransition, TState> reducer) => FromState.AddDynamicTransition(ByValueOrPredicate, reducer);
 }

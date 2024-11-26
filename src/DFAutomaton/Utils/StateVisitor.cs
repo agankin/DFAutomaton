@@ -10,10 +10,10 @@ internal static class StateVisitor<TTransition, TState> where TTransition : notn
     /// <summary>
     /// Traverses a state graph calling a visitor function against each node.
     /// </summary>
-    /// <param name="start">The start state of a state graph.</param>
+    /// <param name="start">The start state.</param>
     /// <param name="visit">A visitor function.</param>
     /// <returns>
-    /// Boolean value. True value denotes the visitor function returned VisitResult.Stop at a node stopping traversal process. Otherwise returns false.
+    /// True means the visitor function returned VisitResult.Stop at a node that caused stop of the traversal process.
     /// </returns>
     public static bool Visit(State<TTransition, TState> start, Visit<TTransition, TState> visit)
     {

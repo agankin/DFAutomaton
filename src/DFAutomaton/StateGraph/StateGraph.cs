@@ -38,7 +38,7 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
         Either<TTransition, CanTransit<TTransition>> byValueOrPredicate,
         Transition<TTransition, TState> transition)
     {
-        byValueOrPredicate.Match(
+        byValueOrPredicate.On(
             byValue => _stateTransitionMap.AddTransition(fromStateId, byValue, transition),
             canTransit => _stateTransitionMap.AddTransition(fromStateId, canTransit, transition)
         );

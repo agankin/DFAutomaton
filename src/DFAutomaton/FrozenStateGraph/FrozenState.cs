@@ -3,10 +3,10 @@ using PureMonads;
 namespace DFAutomaton;
 
 /// <summary>
-/// An automaton state.
+/// Represents an immutable state.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 public readonly struct FrozenState<TTransition, TState> where TTransition : notnull
 {
     private readonly StateId _stateId;
@@ -27,7 +27,7 @@ public readonly struct FrozenState<TTransition, TState> where TTransition : notn
     /// Contains a tag with additional information.
     /// </summary>
     /// <remarks>
-    /// This information will be included in the text representation of the state returned from <see cref="Format"/> method.
+    /// This information will be included in the text representation of the state returned from the <see cref="Format"/> method.
     /// </remarks>
     public object? Tag => _stateGraph.GetTag(_stateId);
 
@@ -45,6 +45,6 @@ public readonly struct FrozenState<TTransition, TState> where TTransition : notn
     /// Returns a state transition by a transition value.
     /// </summary>
     /// <param name="transition">A transition value.</param>
-    /// <returns>Some state transition for the provided transition value or None if the transition doesn't exist.</returns>
+    /// <returns>An instance of <see cref="Option{FrozenTransition{TTransition, TState}}"/> containing a found transition or None if no transition found.</returns>
     public Option<FrozenTransition<TTransition, TState>> this[TTransition transition] => _stateGraph.GetTransition(_stateId, transition);
 }

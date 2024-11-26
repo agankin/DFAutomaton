@@ -6,10 +6,10 @@ namespace DFAutomaton;
 using static AutomatonErrorFactory;
 
 /// <summary>
-/// An automaton that can be run over a sequence of transitions transforming a start state value into an accepted state value.
+/// Represents an automaton performing state transformations over a sequence of transitions.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 public class Automaton<TTransition, TState> where TTransition : notnull
 {
     private FrozenStateGraph<TTransition, TState> _stateGraph;
@@ -26,7 +26,7 @@ public class Automaton<TTransition, TState> where TTransition : notnull
     /// </summary>
     /// <param name="startValue">A start value.</param>
     /// <param name="transitions">A sequence of transitions.</param>
-    /// <returns>Some with an accepted value after applying all transitions or None with an error occured.</returns>
+    /// <returns>An accepted value or an error occured.</returns>
     public Result<TState, AutomatonError<TTransition, TState>> Run(TState startValue, IEnumerable<TTransition> transitions)
     {
         var transitionsEnumerator = new TransitionsEnumerator<TTransition>(transitions);
@@ -45,38 +45,38 @@ public class Automaton<TTransition, TState> where TTransition : notnull
         foreach (var transition in transitions)
         {
             if (currentStateId.GetStateType() == StateType.Accepted)
-                return CreateTransitionFromAccepted(GetState(currentStateId), transition);
+                return TransitionFromAccepted(GetState(currentStateId), transition, currentValue);
             
             var nextTransition = _stateGraph.GetTransitionEntry(currentStateId, transition);
             if (!nextTransition.HasValue)
-                return CreateTransitionNotExists(GetState(currentStateId), transition);
+                return TransitionNotExists(GetState(currentStateId), transition, currentValue);
 
             var (toStateId, reduce) = nextTransition.ValueOrFailure();
             var reductionResult = reduce(currentValue, transition);
 
-            var nextStateId = toStateId.Or(reductionResult.DynamiclyGoToStateId);
-            if (!nextStateId.HasValue)
-                return CreateNoNextState(GetState(currentStateId), transition);
-
             var nextValue = reductionResult.Value;
             if (_isErrorValue(nextValue))
-                return CreateReducerError(GetState(currentStateId), transition, nextValue);
+                return StateError(GetState(currentStateId), transition, nextValue);
+            
+            var nextStateId = toStateId.Or(reductionResult.DynamiclyGoToStateId);
+            if (!nextStateId.HasValue)
+                return NoNextState(GetState(currentStateId), transition, currentValue);
 
             currentStateId = nextStateId.ValueOrFailure();
             currentValue = nextValue;
-                
-            CopyYieldedTransitions(reductionResult, transitionsEnumerator);
+
+            YieldNextTransitions(reductionResult, transitionsEnumerator);
         }
 
         if (currentStateId.GetStateType() != StateType.Accepted)
-            return CreateAcceptedNotReached<TTransition, TState>();
+            return AcceptedNotReached<TTransition, TState>(currentValue);
         
         return currentValue;
     }
 
     private FrozenState<TTransition, TState> GetState(StateId stateId) => _stateGraph[stateId];
 
-    private static void CopyYieldedTransitions(ReductionResult<TTransition, TState> reductionResult, TransitionsEnumerator<TTransition> transitionsEnumerator)
+    private static void YieldNextTransitions(ReductionResult<TTransition, TState> reductionResult, TransitionsEnumerator<TTransition> transitionsEnumerator)
     {
         foreach(var yieldedTransition in reductionResult.YieldedTransitions)
             transitionsEnumerator.YieldNext(yieldedTransition);

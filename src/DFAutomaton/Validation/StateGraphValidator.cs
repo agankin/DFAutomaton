@@ -2,18 +2,20 @@
 
 namespace DFAutomaton;
 
+using static Option;
+
 /// <summary>
 /// Contains methods for state graph validation.
 /// </summary>
 internal static class StateGraphValidator<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Validates the provided state graph contains the accepted state.
+    /// Validates a state graph has connections to the accepted state.
     /// </summary>
-    /// <typeparam name="TTransition">Transition value type.</typeparam>
-    /// <typeparam name="TState">State value type.</typeparam>
+    /// <typeparam name="TTransition">The transition type.</typeparam>
+    /// <typeparam name="TState">The state type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
-    /// <returns>Some validation error or None.</returns>
+    /// <returns><see cref="Option{ValidationError}"/> containing validation error or None.</returns>
     public static Option<ValidationError> ValidateHasAccepted(StateGraph<TTransition, TState> stateGraph)
     {
         var startState = stateGraph.StartState;
@@ -22,56 +24,61 @@ internal static class StateGraphValidator<TTransition, TState> where TTransition
         if (!acceptedReached)
             return ValidationError.NoAccepted;
 
-        return Option.None<ValidationError>();
+        return None<ValidationError>();
     }
 
     /// <summary>
-    /// Validates that any state can reach the accepted state (checks only states with fixed transitions).
+    /// Validates that any state is connected to the accepted state (checks only states with fixed transitions).
     /// </summary>
-    /// <typeparam name="TTransition">Transition value type.</typeparam>
-    /// <typeparam name="TState">State value type.</typeparam>
+    /// <typeparam name="TTransition">The transition type.</typeparam>
+    /// <typeparam name="TState">The state type.</typeparam>
     /// <param name="start">The start state of a state graph.</param>
-    /// <returns>Some validation error or None.</returns>
+    /// <returns><see cref="Option{ValidationError}"/> containing validation error or None.</returns>
     public static Option<ValidationError> ValidateAnyReachAccepted(StateGraph<TTransition, TState> stateGraph)
     {
-        var canReachAcceptedStates = new HashSet<State<TTransition, TState>>();
+        var validStates = new HashSet<State<TTransition, TState>>();
         var startState = stateGraph.StartState;
-        var someCannotReachAccepted = StateVisitor<TTransition, TState>.Visit(startState, StopWhenCannotReachAccepted(canReachAcceptedStates));
         
+        var someCannotReachAccepted = StateVisitor<TTransition, TState>.Visit(startState, StopWhenCannotReachAccepted(validStates));
         if (someCannotReachAccepted)
             return ValidationError.AcceptedIsUnreachable;
 
-        return Option.None<ValidationError>();
+        return None<ValidationError>();
     }
 
     private static VisitResult StopWhenReachedAccepted(State<TTransition, TState> state) =>
-        state.Type == StateType.Accepted ? VisitResult.Stop : VisitResult.Continue;
+        IsAccepted(state) || HasDynamicTransition(state) ? VisitResult.Stop : VisitResult.Continue;
 
-    private static Visit<TTransition, TState> StopWhenCannotReachAccepted(ISet<State<TTransition, TState>> canReachAcceptedStates)
+    private static Visit<TTransition, TState> StopWhenCannotReachAccepted(ISet<State<TTransition, TState>> validStates)
     {
-        return state => CanReachAccepted(state, canReachAcceptedStates) ? VisitResult.Continue : VisitResult.Stop;
+        return state => CanReachAccepted(state, validStates) ? VisitResult.Continue : VisitResult.Stop;
     }
 
-    private static bool CanReachAccepted(State<TTransition, TState> state, ISet<State<TTransition, TState>> canReachAcceptedStates)
+    private static bool CanReachAccepted(State<TTransition, TState> state, ISet<State<TTransition, TState>> validStates)
     {
-        if (canReachAcceptedStates.Contains(state))
+        if (validStates.Contains(state))
             return true;
 
-        Visit<TTransition, TState> StopWhenCanReachAccepted_() => StopWhenCanReachAccepted(canReachAcceptedStates);
-        var canReachAccepted = StateVisitor<TTransition, TState>.Visit(state, StopWhenCanReachAccepted_());
-        if (canReachAccepted)
-            canReachAcceptedStates.Add(state);
+        var reachesAccepted = StateVisitor<TTransition, TState>.Visit(state, StopWhenCanReachAccepted(validStates));
+        if (reachesAccepted)
+            validStates.Add(state);
 
-        return canReachAccepted;
+        return reachesAccepted;
     }
 
-    private static Visit<TTransition, TState> StopWhenCanReachAccepted(ISet<State<TTransition, TState>> canReachAcceptedStates)
+    private static Visit<TTransition, TState> StopWhenCanReachAccepted(ISet<State<TTransition, TState>> validStates)
     {
-        return state =>
-        {
-            return canReachAcceptedStates.Contains(state) || state.Type == StateType.Accepted
-                ? VisitResult.Stop
-                : VisitResult.Continue;
-        };
+        return state => validStates.Contains(state) || IsAccepted(state) || HasDynamicTransition(state)
+            ? VisitResult.Stop
+            : VisitResult.Continue;
     }
+
+    private static bool IsAccepted(State<TTransition, TState> state) =>
+        state.Type == StateType.Accepted;
+    
+    private static bool HasDynamicTransition(State<TTransition, TState> state) =>
+        state.Transitions.Any(IsDynamicTransition);
+
+    private static bool IsDynamicTransition(StateTransition<TTransition, TState> stateTransition) =>
+        !stateTransition.Transition.ToState.HasValue;
 }

@@ -6,7 +6,7 @@ using static Transitions;
 using static States;
 
 [TestFixture(Description = "Tests fixed transition building.")]
-public partial class FixedTransitionBuildingTests
+public class FixedTransitionBuildingTests
 {
     [Test(Description = "Tests adding a fixed transition to a new state.")]
     public void Add_fixed_transition_to_new()

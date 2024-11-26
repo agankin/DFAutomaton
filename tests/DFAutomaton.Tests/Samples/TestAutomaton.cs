@@ -25,10 +25,10 @@ internal static class TestAutomaton
 
         state2.TransitsBy(TO_STATE_3)
             .Dynamicly()
-            .WithReducing((_, _) => new ReductionResult<Transitions, States>(STATE_3).DynamiclyGoTo(state3.Id));
+            .WithReducingBy((_, _) => new ReductionResult<Transitions, States>(STATE_3).DynamiclyGoTo(state3.Id));
 
         state3.AllOtherTransits()
-            .WithReducing((state, transition) =>
+            .WithReducingBy((state, transition) =>
             {
                 if (transition == TO_STATE_4)                    
                     return new ReductionResult<Transitions, States>(STATE_4).DynamiclyGoTo(state4.Id)

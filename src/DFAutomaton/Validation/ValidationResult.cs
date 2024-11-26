@@ -5,8 +5,8 @@ namespace DFAutomaton;
 /// <summary>
 /// Contains a state graph validation result.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 internal readonly struct ValidationResult<TTransition, TState> where TTransition : notnull
 {
     private readonly Result<StateGraph<TTransition, TState>, ValidationError> _value;

@@ -1,38 +1,29 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// Contains an automaton build configuration.
+/// Contains configuration for building an automaton.
 /// </summary>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 public record AutomatonBuildConfiguration<TState>
 {
-    /// <summary>
-    /// The default instance.
-    /// </summary>
     internal static readonly AutomatonBuildConfiguration<TState> Default = new();
 
-    /// <summary>
-    /// Contains a flag to validate that any state reaches the accepted state. False by default.
-    /// </summary>
     internal bool ValidateAnyReachesAcceptedEnabled { get; private init; }
 
-    /// <summary>
-    /// A predicate for checking is automaton state an error state.
-    /// </summary>
     internal Predicate<TState>? IsErrorState { get; private init; }
 
     /// <summary>
     /// Enables validation of any state reaches the accepted state.
     /// </summary>
-    /// <returns>A new instance with the changes applied.</returns>
+    /// <returns>A copy of the <see cref="AutomatonBuildConfiguration{TState}"/> with the setting applied.</returns>
     public AutomatonBuildConfiguration<TState> ValidateAnyCanReachAccepted() =>
         this with { ValidateAnyReachesAcceptedEnabled = true };
 
     /// <summary>
-    /// Sets a predicate for checking is automaton state an error state.
+    /// Sets a predicate that checks an automaton state for errors.
     /// </summary>
-    /// <param name="isErrorState">A predicate for checking is automaton state an error state.</param>
-    /// <returns>A new instance with the changes applied.</returns>
+    /// <param name="isErrorState">A predicate checking an automaton state for errors.</param>
+    /// <returns>A copy of the <see cref="AutomatonBuildConfiguration{TState}"/> with the setting applied.</returns>
     public AutomatonBuildConfiguration<TState> AddCheckForErrorState(Predicate<TState> isErrorState) =>
         this with { IsErrorState = isErrorState };
 }

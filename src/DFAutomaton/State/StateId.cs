@@ -1,9 +1,9 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// State Id.
+/// Represents a state indentifier.
 /// </summary>
-/// <param name="Value">State Id value.</param>
+/// <param name="Value">A value of the state identifier.</param>
 public readonly record struct StateId(uint Value)
 {
     public static readonly StateId StartStateId = 1;
@@ -11,9 +11,9 @@ public readonly record struct StateId(uint Value)
     public static readonly StateId SubStateStartId = 2;
 
     /// <summary>
-    /// Returns state type.
+    /// Returns a state type corresponding to this state identifier.
     /// </summary>
-    /// <returns>State type.</returns>
+    /// <returns>A <see cref="StateType"/> value.</returns>
     public StateType GetStateType()
     {
         if (Value >= SubStateStartId)

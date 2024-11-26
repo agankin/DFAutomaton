@@ -9,12 +9,15 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
     private readonly Dictionary<StateId, List<TTransition>> _transitionsByStateId = new();
 
     private readonly StateGraph<TTransition, TState> _owningGraph;
+    private readonly IEqualityComparer<TransitionKey<TTransition>> _transitionKeyEqualityComparer;
     private readonly Dictionary<TransitionKey<TTransition>, TransitionEntry<TTransition, TState>> _transitionByKey;
 
     public StateTransitionMap(StateGraph<TTransition, TState> owningGraph, IEqualityComparer<TTransition> transitionEqualityComparer)
     {
         _owningGraph = owningGraph;
-        _transitionByKey = new(new TransitionKeyEqualityComparer<TTransition>(transitionEqualityComparer));
+
+        _transitionKeyEqualityComparer = new TransitionKeyEqualityComparer<TTransition>(transitionEqualityComparer);
+        _transitionByKey = new(_transitionKeyEqualityComparer);
     }
 
     public Option<TransitionEntry<TTransition, TState>> this[StateId fromStateId, TTransition transition]
@@ -64,10 +67,10 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
 
     public FrozenStateTransitionMap<TTransition, TState> ToFrozen(FrozenStateGraph<TTransition, TState> owningGraph)
     {
-        var transitionByKey = _transitionByKey.Freeze();
-        var transitionPredicatesByStateId = _transitionPredicatesByStateId.Freeze();
-        var fallbackTransitionByStateId = _fallbackTransitionByStateId.Freeze();
-        var transitionsByStateId = _transitionsByStateId.Freeze();
+        var transitionByKey = _transitionByKey.ToFrozen(_transitionKeyEqualityComparer);
+        var transitionPredicatesByStateId = _transitionPredicatesByStateId.ToFrozen();
+        var fallbackTransitionByStateId = _fallbackTransitionByStateId.ToFrozen();
+        var transitionsByStateId = _transitionsByStateId.ToFrozen();
         
         return new FrozenStateTransitionMap<TTransition, TState>(
             owningGraph,

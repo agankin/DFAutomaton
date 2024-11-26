@@ -1,22 +1,26 @@
+using PureMonads;
+
 namespace DFAutomaton;
 
 /// <summary>
 /// A builder for declaring new transitions.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
-/// <param name="FromState">A state the new transition is starting from.</param>
-/// <param name="ByValueOrPredicate">Contains a value or a predicate the transition is performed by.</param>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
+/// <param name="FromState">A state the transition originates from.</param>
+/// <param name="ByValueOrPredicate">
+/// Contains a transition value or predicate the transition will be selected by.
+/// </param>
 public record TransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
     Either<TTransition, CanTransit<TTransition>> ByValueOrPredicate
 ) where TTransition : notnull
 {
     /// <summary>
-    /// Creates a new fixed transition builder.
+    /// Creates a fixed transition builder.
     /// </summary>
-    /// <param name="toValue">A new state value after the transition.</param>
-    /// <returns>The created fixed transition builder.</returns>
+    /// <param name="toValue">A new state value after reduce.</param>
+    /// <returns>A new instance of <see cref="FixedTransitionBuilder{TTransition, TState}"/>.</returns>
     public FixedTransitionBuilder<TTransition, TState> WithReducingTo(TState toValue)
     {
         Reduce<TTransition, TState> reducer = (_, _) => toValue;
@@ -24,18 +28,18 @@ public record TransitionBuilder<TTransition, TState>(
     }
 
     /// <summary>
-    /// Creates a new fixed transition builder.
+    /// Creates a fixed transition builder.
     /// </summary>
-    /// <param name="reducer">A reducer.</param>
-    /// <returns>The created fixed transition builder.</returns>
+    /// <param name="reducer">A delegate reducing state values.</param>
+    /// <returns>A new instance of <see cref="FixedTransitionBuilder{TTransition, TState}"/>.</returns>
     public FixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer)
     {
         return new(FromState, ByValueOrPredicate, reducer);
     }
 
     /// <summary>
-    /// Creates a new dynamic transition builder.
+    /// Creates a dynamic transition builder.
     /// </summary>
-    /// <returns>The created dynamic transition builder.</returns>
+    /// <returns>A new instance of <see cref="DynamicTransitionBuilder{TTransition, TState}"/>.</returns>
     public DynamicTransitionBuilder<TTransition, TState> Dynamicly() => new(FromState, ByValueOrPredicate);
 }

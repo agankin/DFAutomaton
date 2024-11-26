@@ -4,9 +4,9 @@ using System.Collections;
 namespace DFAutomaton.Utils;
 
 /// <summary>
-/// The enumerator for transitions.
+/// An enumerator for transitions.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
 internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
 {
     private readonly IEnumerator<TTransition> _transitionsEnumerator;

@@ -1,6 +1,6 @@
 namespace DFAutomaton;
 
-internal readonly record struct TransitionKeyEqualityComparer<TTransition> : IEqualityComparer<TransitionKey<TTransition>>
+internal record TransitionKeyEqualityComparer<TTransition> : IEqualityComparer<TransitionKey<TTransition>>
     where TTransition : notnull 
 {
     private readonly IEqualityComparer<TTransition> _transitionEqualityComparer;
@@ -12,7 +12,7 @@ internal readonly record struct TransitionKeyEqualityComparer<TTransition> : IEq
 
     public bool Equals(TransitionKey<TTransition> first, TransitionKey<TTransition> second)
     {
-        if(first.FromStateId != second.FromStateId)
+        if (first.FromStateId != second.FromStateId)
         {
             return false;
         }
@@ -20,5 +20,10 @@ internal readonly record struct TransitionKeyEqualityComparer<TTransition> : IEq
         return _transitionEqualityComparer.Equals(first.Transition, second.Transition);
     }
 
-    public int GetHashCode(TransitionKey<TTransition> transitionKey) => transitionKey.GetHashCode();
+    public int GetHashCode(TransitionKey<TTransition> transitionKey)
+    {
+        var (fromStateId, transition) = transitionKey;
+
+        return ((int)fromStateId.Value << 16) + _transitionEqualityComparer.GetHashCode(transition);
+    }
 }

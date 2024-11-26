@@ -1,61 +1,64 @@
-using PureMonads;
-
 namespace DFAutomaton;
 
 /// <summary>
-/// A builder for creating a fixed transition.
+/// A builder for creating a fixed fallback transition.
 /// </summary>
 /// <typeparam name="TTransition">The transition type.</typeparam>
 /// <typeparam name="TState">The state type.</typeparam>
 /// <param name="FromState">A state the transition originates from.</param>
-/// <param name="ByValueOrPredicate">
-/// Contains a transition value or predicate the transition will be selected by.
-/// </param>
 /// <param name="Reducer">A delegate reducing state values.</param>
-public record FixedTransitionBuilder<TTransition, TState>(
+/// <remarks>
+/// Fallback transition is a per-state single transition that is invoked for all unknown transition values.
+/// </remarks>
+public record FallbackFixedTransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
-    Either<TTransition, CanTransit<TTransition>> ByValueOrPredicate,
     Reduce<TTransition, TState> Reducer
-)
-where TTransition : notnull
+) where TTransition : notnull
 {
     /// <summary>
-    /// Adds a fixed transition and completes the build.
+    /// Adds a fallback transition and completes the build.
     /// </summary>
     /// <returns>A new instance of <see cref="State{TTransition, TState}"/>.</returns>
     public State<TTransition, TState> ToNew()
     {
         var toState = FromState.OwningGraph.CreateState();
-        return FromState.AddFixedTransition(toState.Id, ByValueOrPredicate, Reducer);
+        FromState.AddFallbackTransition(toState.Id, Reducer);
+
+        return toState;
     }
 
     /// <summary>
-    /// Adds a fixed transition and completes the build.
+    /// Adds a fallback transition to an existing state and completes the build.
     /// </summary>
     /// <param name="toState">An existing state.</param>
     /// <returns>The instance of <see cref="State{TTransition, TState}"/>.</returns>
-    public State<TTransition, TState> To(State<TTransition, TState> toState) =>
-        FromState.AddFixedTransition(toState.Id, ByValueOrPredicate, Reducer);
+    public State<TTransition, TState> To(State<TTransition, TState> toState)
+    {
+        FromState.AddFallbackTransition(toState.Id, Reducer);
+        return toState;
+    }
 
     /// <summary>
-    /// Adds a fixed transition and completes the build.
+    /// Adds a fallback transition to the same state it originates from and completes the build.
     /// </summary>
     /// <returns>The instance of <see cref="State{TTransition, TState}"/>.</returns>
     public State<TTransition, TState> ToSelf()
     {
         var toState = FromState;
-        return FromState.AddFixedTransition(toState.Id, ByValueOrPredicate, Reducer);
+        FromState.AddFallbackTransition(toState.Id, Reducer);
+
+        return toState;
     }
 
     /// <summary>
-    /// Adds a fixed transition and completes the build.
+    /// Adds a fallback transition to the accepted state and completes the build.
     /// </summary>
     /// <returns>The instance of <see cref="AcceptedState{TTransition, TState}"/>.</returns>
     public AcceptedState<TTransition, TState> ToAccepted()
     {
         var toStateId = StateId.AcceptedStateId;
-        var acceptedState = FromState.AddFixedTransition(toStateId, ByValueOrPredicate, Reducer);
+        FromState.AddFallbackTransition(toStateId, Reducer);
 
-        return new AcceptedState<TTransition, TState>(acceptedState.Id, acceptedState.OwningGraph);
+        return new AcceptedState<TTransition, TState>(toStateId, FromState.OwningGraph);
     }
 }

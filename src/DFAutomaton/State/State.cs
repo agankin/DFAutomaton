@@ -3,10 +3,10 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// An automaton state.
+/// Represents an automaton state.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 public readonly struct State<TTransition, TState> where TTransition : notnull
 {    
     internal State(StateId id, StateGraph<TTransition, TState> owningGraph)
@@ -24,7 +24,7 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     /// Contains a tag with additional information.
     /// </summary>
     /// <remarks>
-    /// This information will be included in the text representation of the state returned from <see cref="Format"/> method.
+    /// This information will be included in the text representation of the state returned from the <see cref="Format"/> method.
     /// </remarks>
     public object? Tag
     {
@@ -46,16 +46,16 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     /// Returns a state transition by a transition value.
     /// </summary>
     /// <param name="transition">A transition value.</param>
-    /// <returns>Some state transition for the provided transition value or None if the transition doesn't exist.</returns>
+    /// <returns>An instance of <see cref="Option{Transition{TTransition, TState}}"/> containing a found state transition or None if no transition found.</returns>
     public Option<Transition<TTransition, TState>> this[TTransition transition] => OwningGraph.GetTransition(Id, transition);
 
     /// <summary>
-    /// Returns an instance of transition builder for building a transition from this state.
+    /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building a new transition from this state.
     /// </summary>
     public TransitionBuilder<TTransition, TState> TransitsBy(TTransition transition) => new(this, transition);
 
     /// <summary>
-    /// Returns an instance of transition builder for building a transition from this state.
+    /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building a new transition from this state.
     /// </summary>
     public TransitionBuilder<TTransition, TState> TransitsWhen(Predicate<TTransition> predicate)
     {
@@ -64,7 +64,7 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     }
 
     /// <summary>
-    /// Returns an instance of transition builder for building a transition from this state.
+    /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building a new transition from this state.
     /// </summary>
     public TransitionBuilder<TTransition, TState> TransitsWhen(string predicateName, Predicate<TTransition> predicate)
     {
@@ -73,10 +73,10 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     }
 
     /// <summary>
-    /// Returns an instance of transition builder for building a fallback transition from this state.
+    /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building the fallback transition from this state.
     /// </summary>
     /// <remarks>
-    /// Fallback transition is a dynamic transition that is invoked for all unknown transition values.
+    /// Fallback transition is a per-state single dynamic transition that is invoked for all unknown transition values.
     /// </remarks>
     public FallbackTransitionBuilder<TTransition, TState> AllOtherTransits() => new(this);
 
@@ -115,12 +115,13 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
         OwningGraph.AddTransition(Id, byValueOrPredicate, transition);
     }
 
-    internal void AddFallbackTransition(Reduce<TTransition, TState> reducer)
+    internal void AddFallbackTransition(Option<StateId> toStateId, Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
 
-        var noneGoToState = Option.None<State<TTransition, TState>>();
-        var transition = new Transition<TTransition, TState>(noneGoToState, reducer);
+        var owningGraph = OwningGraph;
+        var toState = toStateId.Map(value => owningGraph[value]);
+        var transition = new Transition<TTransition, TState>(toState, reducer);
         
         OwningGraph.AddFallbackTransition(Id, transition);
     }

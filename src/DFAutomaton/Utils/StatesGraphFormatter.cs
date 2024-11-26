@@ -5,12 +5,12 @@ namespace DFAutomaton.Utils;
 /// <summary>
 /// The formatter for obtaining text representations of state graphs.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 public static class StatesGraphFormatter<TTransition, TState> where TTransition : notnull
 {
     /// <summary>
-    /// Returns a text representation of the provided state graph.
+    /// Returns a text representation of a state graph.
     /// </summary>
     /// <param name="start">The start state of a state graph.</param>
     /// <returns>A text representation of the provided state graph.</returns>

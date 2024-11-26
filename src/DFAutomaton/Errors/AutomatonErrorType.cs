@@ -11,22 +11,22 @@ public enum AutomatonErrorType
     TransitionNotExists = 1,
     
     /// <summary>
-    /// An attempt of performing transition from the accepted state.
+    /// An attempt of transitioning from the accepted state.
     /// </summary>
     TransitionFromAccepted,
 
     /// <summary>
-    /// No next state for a dynamic transition.
+    /// No next state determined for a dynamic transition.
     /// </summary>
     NoNextState,
 
     /// <summary>
-    /// The accepted state was not reached after the automaton finished.
+    /// The accepted state was not reached on the automaton finish.
     /// </summary>
     AcceptedNotReached,
 
     /// <summary>
-    /// An error state returned from a reducer.
+    /// The automaton went to an error state.
     /// </summary>
-    ReducerError
+    StateError
 }

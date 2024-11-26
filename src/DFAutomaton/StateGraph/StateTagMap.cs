@@ -18,7 +18,7 @@ internal class StateTagMap
 
     public FrozenStateTagMap ToFrozen()
     {
-        var tagByStateId = _tagByStateId.Freeze();
+        var tagByStateId = _tagByStateId.ToFrozen();
 
         return new(tagByStateId);
     }

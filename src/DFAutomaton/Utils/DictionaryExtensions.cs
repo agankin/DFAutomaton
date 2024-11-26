@@ -18,12 +18,12 @@ internal static class DictionaryExtensions
             : getDefaultValue();
     }
 
-    public static IReadOnlyDictionary<TKey, TValue> Freeze<TKey, TValue>(this Dictionary<TKey, TValue> dict)
+    public static IReadOnlyDictionary<TKey, TValue> ToFrozen<TKey, TValue>(this Dictionary<TKey, TValue> dict, IEqualityComparer<TKey> equalityComparer = null!)
     {
-        return dict.ToDictionary(e => e.Key, e => e.Value);
+        return dict.ToDictionary(e => e.Key, e => e.Value, equalityComparer ?? EqualityComparer<TKey>.Default);
     }
 
-    public static ILookup<TKey, TValue> Freeze<TKey, TValue>(this Dictionary<TKey, List<TValue>> dict)
+    public static ILookup<TKey, TValue> ToFrozen<TKey, TValue>(this Dictionary<TKey, List<TValue>> dict)
     {
         return dict
             .SelectMany(e => e.Value.Select(value => (e.Key, value)))

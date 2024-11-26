@@ -6,17 +6,17 @@
 public enum StateType
 {
     /// <summary>
-    /// The start state that an automaton execution starts at.
+    /// The start state an automaton starts from.
     /// </summary>
     Start = 1,
 
     /// <summary>
-    /// An intermediate state at which an automaton expects next transitions.
+    /// An intermediate state an automaton is not expected to finish at.
     /// </summary>
     SubState,
 
     /// <summary>
-    /// The accepted state at which an automaton finishes.
+    /// The accepted state an automaton finishes on.
     /// </summary>
     Accepted
 }

@@ -1,12 +1,12 @@
-using PureMonads;
+﻿using PureMonads;
 
 namespace DFAutomaton;
 
 /// <summary>
-/// A builder for building automata.
+/// Configures and builds an automaton.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
 {
     private readonly StateGraph<TTransition, TState> _stateGraph;
@@ -33,13 +33,13 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Creates a new state.
     /// </summary>
-    /// <returns>The created new state.</returns>
+    /// <returns>A new instance of <see cref="State{TTransition, TState}"/>.</returns>
     public State<TTransition, TState> CreateState() => _stateGraph.CreateState();
 
     /// <summary>
     /// Enables validation of any state reaches the accepted state.
     /// </summary>
-    /// <returns>The same instance of the builder.</returns>
+    /// <returns>The same instance of <see cref="AutomatonBuilder{TTransition, TState}"/>.</returns>
     public AutomatonBuilder<TTransition, TState> ValidateAnyCanReachAccepted()
     {
         _configuration = _configuration.ValidateAnyCanReachAccepted();
@@ -47,10 +47,10 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     }
 
     /// <summary>
-    /// Sets a predicate for checking is automaton state an error state.
+    /// Sets a predicate that checks an automaton state for errors.
     /// </summary>
-    /// <param name="isErrorState">A predicate for checking is automaton state an error state.</param>
-    /// <returns>The same instance of the builder.</returns>
+    /// <param name="isErrorState">A predicate for checking an automaton state for errors.</param>
+    /// <returns>The same instance of <see cref="AutomatonBuilder{TTransition, TState}"/>.</returns>
     public AutomatonBuilder<TTransition, TState> AddCheckForErrorState(Predicate<TState> isErrorState)
     {
         _configuration = _configuration.AddCheckForErrorState(isErrorState);
@@ -58,9 +58,9 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     }
 
     /// <summary>
-    /// Builds a new automaton.
+    /// Builds a new instance of automaton.
     /// </summary>
-    /// <returns>The result of the build.</returns>
+    /// <returns>An instance of <see cref="BuildResult{TTransition, TState}"/>.</returns>
     public BuildResult<TTransition, TState> Build()
     {
         var validationResult = _configuration.ValidateAnyReachesAcceptedEnabled ? Validate(_stateGraph) : _stateGraph;
@@ -81,9 +81,8 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
         Option<ValidationError> ValidateHasAccepted() => StateGraphValidator<TTransition, TState>.ValidateHasAccepted(stateGraph);
         Option<ValidationError> ValidateAnyReachAccepted() => StateGraphValidator<TTransition, TState>.ValidateAnyReachAccepted(stateGraph);
 
-        return ValidateHasAccepted().Or(ValidateAnyReachAccepted).Match<ValidationResult<TTransition, TState>>(
-            error => error,
-            () => stateGraph
-        );
+        return ValidateHasAccepted()
+            .Or(ValidateAnyReachAccepted)
+            .Match<ValidationResult<TTransition, TState>>(error => error, () => stateGraph);
     }
 }

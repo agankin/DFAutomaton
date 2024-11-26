@@ -1,10 +1,10 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// An automaton accepted state.
+/// Represents an accepted state.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
 public readonly struct AcceptedState<TTransition, TState> where TTransition : notnull
 {
     private readonly StateId _id;

@@ -1,13 +1,13 @@
 namespace DFAutomaton;
 
 /// <summary>
-/// Reduces the provided current state value and transition and returns a next state value.
+/// A delegate reducing state values.
 /// </summary>
-/// <typeparam name="TTransition">Transition value type.</typeparam>
-/// <typeparam name="TState">State value type.</typeparam>
-/// <param name="state">A current state value.</param>
+/// <typeparam name="TTransition">The transition type.</typeparam>
+/// <typeparam name="TState">The state type.</typeparam>
+/// <param name="state">A state value.</param>
 /// <param name="transition">A transition value.</param>
-/// <returns>A next state.</returns>
+/// <returns>An instance of <see cref="ReductionResult{TTransition, TState}"/>.</returns>
 public delegate ReductionResult<TTransition, TState> Reduce<TTransition, TState>(
     TState state,
     TTransition transition
