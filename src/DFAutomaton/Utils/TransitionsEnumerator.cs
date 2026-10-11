@@ -10,7 +10,7 @@ namespace DFAutomaton.Utils;
 internal class TransitionsEnumerator<TTransition> : IEnumerator<TTransition>
 {
     private readonly IEnumerator<TTransition> _transitionsEnumerator;
-    private readonly Queue<TTransition> _yieldedQueue = new();
+    private readonly Queue<TTransition> _yieldedQueue = [];
 
     private Option<TTransition> _current = Option.None<TTransition>();
 

@@ -13,7 +13,7 @@ namespace DFAutomaton;
 /// </param>
 /// <param name="Transition">Information about transition to a next state.</param>
 public record FrozenStateTransition<TTransition, TState>(
-    Either<TTransition, CanTransit<TTransition>> ByValueOrPredicate,
+    Either<TTransition, InputPredicate<TTransition>> ByValueOrPredicate,
     FrozenTransition<TTransition, TState> Transition
 )
 where TTransition : notnull;

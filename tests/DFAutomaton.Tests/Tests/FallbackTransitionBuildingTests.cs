@@ -12,7 +12,10 @@ public partial class FallbackTransitionBuildingTests
     public void Add_fixed_fallback_transition()
     {
         var state1 = new AutomatonBuilder<Transitions, States>().Start;
-        state1.AllOtherTransits().WithReducingBy(Reducer.Create(TO_STATE_2, STATE_2)).ToSelf();
+        state1
+             .ForAllOtherInputs()
+             .WithReducingBy(Reducer.Create(TO_STATE_2, STATE_2))
+             .GoToSelf();
 
         state1[TO_STATE_2]
             .IsSome()
@@ -24,7 +27,9 @@ public partial class FallbackTransitionBuildingTests
     public void Add_dynamic_fallback_transition()
     {
         var state1 = new AutomatonBuilder<Transitions, States>().Start;
-        state1.AllOtherTransits().Dynamicly().WithReducingBy(Reducer.Create(TO_STATE_2, STATE_2));
+        state1
+            .ForAllOtherInputs()
+            .Reduce(Reducer.Create(TO_STATE_2, STATE_2));
 
         state1[TO_STATE_2]
             .IsSome()

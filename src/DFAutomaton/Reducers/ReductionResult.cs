@@ -9,7 +9,7 @@ namespace DFAutomaton;
 /// <typeparam name="TState">The state type.</typeparam>
 public class ReductionResult<TTransition, TState> where TTransition : notnull
 {
-    private readonly List<TTransition> _yieldedTransitions = new();
+    private readonly List<TTransition> _yieldedTransitions = [];
 
     public ReductionResult(TState value) => Value = value;
 
@@ -19,10 +19,13 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     public TState Value { get; set; }
 
     /// <summary>
-    /// Option containing a state the automaton will go to for dynamic transition or None.
+    /// Contains Some with a state the automaton will go to for dynamic transition or None.
     /// </summary>
     internal Option<StateId> DynamiclyGoToStateId { get; private set; } = Option.None<StateId>();
 
+    /// <summary>
+    /// A sequence of yielded transitions.
+    /// </summary>
     internal IReadOnlyCollection<TTransition> YieldedTransitions => _yieldedTransitions;
 
     /// <summary>
@@ -40,11 +43,12 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     }
 
     /// <summary>
-    /// Yields a transition value as next into automaton transitions enumeration.
+    /// Yields a new transition value as next into automaton transitions sequence.
     /// </summary>
     /// <param name="transition">A transition value.</param>
     /// <remarks>
-    /// The yielded value will be handled before initially provided transition values but after other previously yielded values.
+    /// The yielded value will be handled before initially provided transition values
+    /// but after other previously yielded values.
     /// </remarks>
     /// <returns>The same instance of <see cref="ReductionResult{TTransition, TState}"/>.</returns>
     public ReductionResult<TTransition, TState> YieldNext(TTransition transition)
@@ -53,5 +57,6 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
         return this;
     }
 
-    public static implicit operator ReductionResult<TTransition, TState>(TState value) => new(value);
+    public static implicit operator ReductionResult<TTransition, TState>(TState value) =>
+        new ReductionResult<TTransition, TState>(value);
 }

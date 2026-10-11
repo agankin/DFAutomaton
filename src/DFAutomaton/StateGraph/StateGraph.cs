@@ -5,21 +5,21 @@ namespace DFAutomaton;
 internal class StateGraph<TTransition, TState> where TTransition : notnull
 {
     private readonly StateTransitionMap<TTransition, TState> _stateTransitionMap;
-    private readonly StateTagMap _stateTagMap = new();
+    private readonly StateTagMap _stateTagMap = new StateTagMap();
     private StateId _nextId = StateId.SubStateStartId;
 
     public StateGraph(IEqualityComparer<TTransition> transitionEqualityComparer)
     {
-        _stateTransitionMap = new(this, transitionEqualityComparer);
+        _stateTransitionMap = new StateTransitionMap<TTransition, TState> (this, transitionEqualityComparer);
     }
 
-    public State<TTransition, TState> this[StateId stateId] => new(stateId, this);
+    public State<TTransition, TState> this[StateId stateId] => new State<TTransition, TState>(stateId, this);
 
     public State<TTransition, TState> StartState => this[StateId.StartStateId];
 
     public State<TTransition, TState> AcceptedState => this[StateId.AcceptedStateId];
 
-    public State<TTransition, TState> CreateState() => new(_nextId++, this);
+    public State<TTransition, TState> CreateState() => new State<TTransition, TState>(_nextId++, this);
 
     public IReadOnlyCollection<StateTransition<TTransition, TState>> GetTransitions(StateId fromStateId) =>
         _stateTransitionMap.GetTransitions(fromStateId);
@@ -35,12 +35,12 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
 
     public void AddTransition(
         StateId fromStateId,
-        Either<TTransition, CanTransit<TTransition>> byValueOrPredicate,
+        Either<TTransition, InputPredicate<TTransition>> byValueOrPredicate,
         Transition<TTransition, TState> transition)
     {
         byValueOrPredicate.On(
             byValue => _stateTransitionMap.AddTransition(fromStateId, byValue, transition),
-            canTransit => _stateTransitionMap.AddTransition(fromStateId, canTransit, transition)
+            inputPredicate => _stateTransitionMap.AddTransition(fromStateId, inputPredicate, transition)
         );
     }
 
@@ -51,5 +51,6 @@ internal class StateGraph<TTransition, TState> where TTransition : notnull
 
     public void SetTag(StateId stateId, object? value) => _stateTagMap[stateId] = value;
 
-    public FrozenStateGraph<TTransition, TState> ToFrozen() => new(_stateTransitionMap, _stateTagMap);
+    public FrozenStateGraph<TTransition, TState> ToFrozen() =>
+        new FrozenStateGraph<TTransition, TState>(_stateTransitionMap, _stateTagMap);
 }

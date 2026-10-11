@@ -12,7 +12,9 @@ public partial class DynamicTransitionBuildingTests
     public void Add_dynamic_transition()
     {
         var state1 = new AutomatonBuilder<Transitions, States>().Start;
-        state1.TransitsBy(TO_STATE_2).Dynamicly().WithReducingBy(Reducer.Create(TO_STATE_2, STATE_2));
+        state1
+            .ForInput(TO_STATE_2)
+            .Reduce(Reducer.Create(TO_STATE_2, STATE_2));
 
         state1[TO_STATE_2]
             .IsSome()

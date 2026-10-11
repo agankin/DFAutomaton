@@ -4,9 +4,9 @@ namespace DFAutomaton;
 
 internal class StateTransitionMap<TTransition, TState> where TTransition : notnull
 {
-    private readonly Dictionary<StateId, List<TransitionPredicate<TTransition, TState>>> _transitionPredicatesByStateId = new();
-    private readonly Dictionary<StateId, TransitionEntry<TTransition, TState>> _fallbackTransitionByStateId = new();
-    private readonly Dictionary<StateId, List<TTransition>> _transitionsByStateId = new();
+    private readonly Dictionary<StateId, List<TransitionPredicate<TTransition, TState>>> _transitionPredicatesByStateId = [];
+    private readonly Dictionary<StateId, TransitionEntry<TTransition, TState>> _fallbackTransitionByStateId = [];
+    private readonly Dictionary<StateId, List<TTransition>> _transitionsByStateId = [];
 
     private readonly StateGraph<TTransition, TState> _owningGraph;
     private readonly IEqualityComparer<TransitionKey<TTransition>> _transitionKeyEqualityComparer;
@@ -17,7 +17,7 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
         _owningGraph = owningGraph;
 
         _transitionKeyEqualityComparer = new TransitionKeyEqualityComparer<TTransition>(transitionEqualityComparer);
-        _transitionByKey = new(_transitionKeyEqualityComparer);
+        _transitionByKey = new Dictionary<TransitionKey<TTransition>, TransitionEntry<TTransition, TState>>(_transitionKeyEqualityComparer);
     }
 
     public Option<TransitionEntry<TTransition, TState>> this[StateId fromStateId, TTransition transition]
@@ -53,10 +53,13 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
         _transitionsByStateId.AddValue(fromStateId, transitionValue);
     }
 
-    public void AddTransition(StateId fromStateId, CanTransit<TTransition> canTransit, Transition<TTransition, TState> transition)
+    public void AddTransition(
+        StateId fromStateId,
+        InputPredicate<TTransition> inputPredicate,
+        Transition<TTransition, TState> transition)
     {
         var transitionEntry = transition.ToEntry();
-        var (name, predicate) = canTransit;
+        var (name, predicate) = inputPredicate;
         var transitionPredicate = new TransitionPredicate<TTransition, TState>(name, predicate, transitionEntry);
 
         _transitionPredicatesByStateId.AddValue(fromStateId, transitionPredicate);
@@ -94,10 +97,10 @@ internal class StateTransitionMap<TTransition, TState> where TTransition : notnu
         var (predicateName, predicate, transitionEntry) = transitionPredicate;
         var (toStateId, reducer) = transitionEntry;
 
-        var canTransit = new CanTransit<TTransition>(predicateName, predicate);
+        var inputPredicate = new InputPredicate<TTransition>(predicateName, predicate);
         var toState = toStateId.Map(id => new State<TTransition, TState>(id, _owningGraph));
         var transition = new Transition<TTransition, TState>(toState, reducer);
 
-        return new StateTransition<TTransition, TState>(canTransit, transition);
+        return new StateTransition<TTransition, TState>(inputPredicate, transition);
     }
 }

@@ -25,9 +25,12 @@ public readonly struct BuildResult<TTransition, TState> where TTransition : notn
         return _value.Match(onSuccess, onError);
     }
 
-    public static implicit operator BuildResult<TTransition, TState>(Automaton<TTransition, TState> automaton) => new(automaton);
+    public static implicit operator BuildResult<TTransition, TState>(Automaton<TTransition, TState> automaton) =>
+        new BuildResult<TTransition, TState>(automaton);
 
-    public static implicit operator BuildResult<TTransition, TState>(ValidationError error) => new(error);
+    public static implicit operator BuildResult<TTransition, TState>(ValidationError error) =>
+        new BuildResult<TTransition, TState>(error);
 
-    public static implicit operator Result<Automaton<TTransition, TState>, ValidationError>(BuildResult<TTransition, TState> result) => result._value;
+    public static implicit operator Result<Automaton<TTransition, TState>, ValidationError>(BuildResult<TTransition, TState> result) =>
+        result._value;
 }

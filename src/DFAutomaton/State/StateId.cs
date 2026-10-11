@@ -25,7 +25,7 @@ public readonly record struct StateId(uint Value)
         return StateType.Accepted;
     }
 
-    public static implicit operator StateId(uint id) => new(id);
+    public static implicit operator StateId(uint id) => new StateId(id);
 
     public static implicit operator uint(StateId stateId) => stateId.Value;
 }

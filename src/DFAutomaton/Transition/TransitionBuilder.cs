@@ -13,7 +13,7 @@ namespace DFAutomaton;
 /// </param>
 public record TransitionBuilder<TTransition, TState>(
     State<TTransition, TState> FromState,
-    Either<TTransition, CanTransit<TTransition>> ByValueOrPredicate
+    Either<TTransition, InputPredicate<TTransition>> ByValueOrPredicate
 ) where TTransition : notnull
 {
     /// <summary>
@@ -21,10 +21,10 @@ public record TransitionBuilder<TTransition, TState>(
     /// </summary>
     /// <param name="toValue">A new state value after reduce.</param>
     /// <returns>A new instance of <see cref="FixedTransitionBuilder{TTransition, TState}"/>.</returns>
-    public FixedTransitionBuilder<TTransition, TState> WithReducingTo(TState toValue)
+    public FixedTransitionBuilder<TTransition, TState> Reduce(TState toValue)
     {
         Reduce<TTransition, TState> reducer = (_, _) => toValue;
-        return new(FromState, ByValueOrPredicate, reducer);
+        return new FixedTransitionBuilder<TTransition, TState>(FromState, ByValueOrPredicate, reducer);
     }
 
     /// <summary>
@@ -32,14 +32,13 @@ public record TransitionBuilder<TTransition, TState>(
     /// </summary>
     /// <param name="reducer">A delegate reducing state values.</param>
     /// <returns>A new instance of <see cref="FixedTransitionBuilder{TTransition, TState}"/>.</returns>
-    public FixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer)
-    {
-        return new(FromState, ByValueOrPredicate, reducer);
-    }
+    public FixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer) =>
+        new FixedTransitionBuilder<TTransition, TState>(FromState, ByValueOrPredicate, reducer);
 
     /// <summary>
-    /// Creates a dynamic transition builder.
+    /// Adds a new dynamic transition and completes the state transition build.
     /// </summary>
-    /// <returns>A new instance of <see cref="DynamicTransitionBuilder{TTransition, TState}"/>.</returns>
-    public DynamicTransitionBuilder<TTransition, TState> Dynamicly() => new(FromState, ByValueOrPredicate);
+    /// <param name="reducer">A transition reducer.</param>
+    public void Reduce(Reduce<TTransition, TState> reducer) =>
+        FromState.AddDynamicTransition(ByValueOrPredicate, reducer);
 }

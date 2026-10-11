@@ -8,7 +8,7 @@
             var allMembersAddedState = Enumerable.Range(0, serieMembersCount).Aggregate(builder.Start, ToAddNextSerieMemberState);
 
             Reduce<int, double> calcPi = (acc, _) => 4 * acc;
-            allMembersAddedState.TransitsBy(serieMembersCount).WithReducingBy(calcPi).ToAccepted();
+            allMembersAddedState.ForInput(serieMembersCount).WithReducingBy(calcPi).GoToAccepted();
 
             return builder.Build().Match(
                 value => value,
@@ -23,7 +23,7 @@
                 return acc + sign / (2 * idx + 1);
             };
             
-            return state.TransitsBy(idx).WithReducingBy(applyNextSerieMember).ToNew();
+            return state.ForInput(idx).WithReducingBy(applyNextSerieMember).GoToNewState();
         }
     }
 }

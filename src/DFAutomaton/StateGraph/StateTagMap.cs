@@ -2,7 +2,7 @@ namespace DFAutomaton;
 
 internal class StateTagMap
 {
-    private readonly Dictionary<StateId, object> _tagByStateId = new();
+    private readonly Dictionary<StateId, object> _tagByStateId = [];
 
     public object? this[StateId stateId]
     {
@@ -20,6 +20,6 @@ internal class StateTagMap
     {
         var tagByStateId = _tagByStateId.ToFrozen();
 
-        return new(tagByStateId);
+        return new FrozenStateTagMap(tagByStateId);
     }
 }

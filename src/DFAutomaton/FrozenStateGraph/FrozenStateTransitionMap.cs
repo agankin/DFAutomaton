@@ -65,10 +65,10 @@ internal class FrozenStateTransitionMap<TTransition, TState> where TTransition :
         var (predicateName, predicate, transitionEntry) = transitionPredicate;
         var (toStateId, reducer) = transitionEntry;
 
-        var canTransit = new CanTransit<TTransition>(predicateName, predicate);
+        var inputPredicate = new InputPredicate<TTransition>(predicateName, predicate);
         var toState = toStateId.Map(id => new FrozenState<TTransition, TState>(id, _owningGraph));
         var transition = new FrozenTransition<TTransition, TState>(toState, reducer);
 
-        return new FrozenStateTransition<TTransition, TState>(canTransit, transition);
+        return new FrozenStateTransition<TTransition, TState>(inputPredicate, transition);
     }
 }

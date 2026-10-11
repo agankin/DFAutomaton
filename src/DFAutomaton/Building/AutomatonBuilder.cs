@@ -14,7 +14,8 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
 
     public AutomatonBuilder(IEqualityComparer<TTransition>? transitionEqualityComparer = null)
     {
-        _stateGraph = new(transitionEqualityComparer ?? EqualityComparer<TTransition>.Default);
+        var comparer = transitionEqualityComparer ?? EqualityComparer<TTransition>.Default;
+        _stateGraph = new StateGraph<TTransition, TState>(comparer);
         
         Start = _stateGraph.StartState;
         Accepted = _stateGraph.AcceptedState;
@@ -63,7 +64,9 @@ public class AutomatonBuilder<TTransition, TState> where TTransition : notnull
     /// <returns>An instance of <see cref="BuildResult{TTransition, TState}"/>.</returns>
     public BuildResult<TTransition, TState> Build()
     {
-        var validationResult = _configuration.ValidateAnyReachesAcceptedEnabled ? Validate(_stateGraph) : _stateGraph;
+        var validationResult = _configuration.ValidateAnyReachesAcceptedEnabled
+            ? Validate(_stateGraph)
+            : _stateGraph;
 
         return validationResult.Match<BuildResult<TTransition, TState>>(
             stateGraph => CreateAutomaton(stateGraph, _configuration.IsErrorState),

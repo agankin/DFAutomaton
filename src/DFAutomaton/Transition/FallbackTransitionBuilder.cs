@@ -1,3 +1,5 @@
+using PureMonads;
+
 namespace DFAutomaton;
 
 /// <summary>
@@ -19,11 +21,12 @@ public record FallbackTransitionBuilder<TTransition, TState>(
     /// <param name="reducer">A state reducer.</param>
     /// <returns>A new instance of <see cref="FallbackFixedTransitionBuilder{TTransition, TState}"/>.</returns>
     public FallbackFixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer) =>
-        new(FromState, reducer);
+        new FallbackFixedTransitionBuilder<TTransition, TState>(FromState, reducer);
 
     /// <summary>
-    /// Creates a dynamic fallback transition builder.
+    /// Adds a new dynamic fallback transition and completes the state transition build.
     /// </summary>
-    /// <returns>A new instance of <see cref="FallbackDynamicTransitionBuilder{TTransition, TState}"/>.</returns>
-    public FallbackDynamicTransitionBuilder<TTransition, TState> Dynamicly() => new(FromState);
+    /// <param name="reducer">A transition reducer.</param>
+    public void Reduce(Reduce<TTransition, TState> reducer) =>
+        FromState.AddFallbackTransition(Option.None<StateId>(), reducer);
 }

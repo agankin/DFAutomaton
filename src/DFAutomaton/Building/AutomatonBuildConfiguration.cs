@@ -6,7 +6,7 @@ namespace DFAutomaton;
 /// <typeparam name="TState">The state type.</typeparam>
 public record AutomatonBuildConfiguration<TState>
 {
-    internal static readonly AutomatonBuildConfiguration<TState> Default = new();
+    internal static readonly AutomatonBuildConfiguration<TState> Default = new AutomatonBuildConfiguration<TState>();
 
     internal bool ValidateAnyReachesAcceptedEnabled { get; private init; }
 

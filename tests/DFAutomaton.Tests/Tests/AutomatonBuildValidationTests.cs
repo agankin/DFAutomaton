@@ -16,17 +16,17 @@ public class AutomatonBuildValidationTests
         
         var state1 = builder.Start;
         var state2 = state1
-            .TransitsBy(TO_STATE_1).WithReducingTo(STATE_1).ToSelf()
-            .TransitsWhen(transition => transition == TO_STATE_2).WithReducingTo(STATE_2).ToNew();
+            .ForInput(TO_STATE_1).Reduce(STATE_1).GoToSelf()
+            .WhenInput(transition => transition == TO_STATE_2).Reduce(STATE_2).GoToNewState();
         var state3 = state1
-            .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
+            .ForInput(TO_STATE_3).Reduce(STATE_3).GoToNewState();
         var state4 = state3
-            .TransitsWhen(transition => transition == TO_STATE_4).WithReducingTo(STATE_4).ToNew();
+            .WhenInput(transition => transition == TO_STATE_4).Reduce(STATE_4).GoToNewState();
 
         state2
-            .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
+            .ForInput(TO_ACCEPTED).Reduce(ACCEPTED).GoToAccepted();
         state4
-            .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
+            .ForInput(TO_ACCEPTED).Reduce(ACCEPTED).GoToAccepted();
 
         Result<Automaton<Transitions, States>, ValidationError> automatonOrError = builder
             .ValidateAnyCanReachAccepted()
@@ -41,10 +41,10 @@ public class AutomatonBuildValidationTests
 
         var state1 = builder.Start;
         var state2 = state1
-            .TransitsBy(TO_STATE_1).WithReducingTo(STATE_1).ToSelf()
-            .TransitsBy(TO_STATE_2).WithReducingTo(STATE_2).ToNew();
+            .ForInput(TO_STATE_1).Reduce(STATE_1).GoToSelf()
+            .ForInput(TO_STATE_2).Reduce(STATE_2).GoToNewState();
         var state3 = state1
-            .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
+            .ForInput(TO_STATE_3).Reduce(STATE_3).GoToNewState();
 
         Result<Automaton<Transitions, States>, ValidationError> automatonOrError = builder
             .ValidateAnyCanReachAccepted()
@@ -59,13 +59,13 @@ public class AutomatonBuildValidationTests
 
         var state1 = builder.Start;
         var state2 = state1
-            .TransitsBy(TO_STATE_1).WithReducingTo(STATE_1).ToSelf()
-            .TransitsBy(TO_STATE_2).WithReducingTo(STATE_2).ToNew();
+            .ForInput(TO_STATE_1).Reduce(STATE_1).GoToSelf()
+            .ForInput(TO_STATE_2).Reduce(STATE_2).GoToNewState();
         var state3 = state1
-            .TransitsBy(TO_STATE_3).WithReducingTo(STATE_3).ToNew();
+            .ForInput(TO_STATE_3).Reduce(STATE_3).GoToNewState();
 
         state2
-            .TransitsBy(TO_ACCEPTED).WithReducingTo(ACCEPTED).ToAccepted();
+            .ForInput(TO_ACCEPTED).Reduce(ACCEPTED).GoToAccepted();
 
         Result<Automaton<Transitions, States>, ValidationError> automatonOrError = builder
             .ValidateAnyCanReachAccepted()

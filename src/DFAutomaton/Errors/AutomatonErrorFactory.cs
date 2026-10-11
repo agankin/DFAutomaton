@@ -13,7 +13,11 @@ internal static class AutomatonErrorFactory
         TState stateValue)
         where TTransition : notnull
     {
-        return new(ErrorType.TransitionNotExists, fromState, transition, stateValue);
+        return new AutomatonError<TTransition, TState>(
+            ErrorType.TransitionNotExists,
+            fromState,
+            transition,
+            stateValue);
     }
 
     internal static AutomatonError<TTransition, TState> TransitionFromAccepted<TTransition, TState>(
@@ -22,7 +26,11 @@ internal static class AutomatonErrorFactory
         TState stateValue)
         where TTransition : notnull
     {
-        return new(ErrorType.TransitionFromAccepted, fromState, transition, stateValue);
+        return new AutomatonError<TTransition, TState>(
+            ErrorType.TransitionFromAccepted,
+            fromState,
+            transition,
+            stateValue);
     }
 
     internal static AutomatonError<TTransition, TState> NoNextState<TTransition, TState>(
@@ -31,13 +39,21 @@ internal static class AutomatonErrorFactory
         TState stateValue)
         where TTransition : notnull
     {
-        return new(ErrorType.NoNextState, fromState, transition, stateValue);
+        return new AutomatonError<TTransition, TState>(
+            ErrorType.NoNextState,
+            fromState,
+            transition,
+            stateValue);
     }
 
     internal static AutomatonError<TTransition, TState> AcceptedNotReached<TTransition, TState>(TState stateValue)
         where TTransition : notnull
     {
-       return new(ErrorType.AcceptedNotReached, None<FrozenState<TTransition, TState>>(), None<TTransition>(), stateValue);
+        return new AutomatonError<TTransition, TState>(
+            ErrorType.AcceptedNotReached,
+            None<FrozenState<TTransition, TState>>(),
+            None<TTransition>(),
+            stateValue);
     }
 
     internal static AutomatonError<TTransition, TState> StateError<TTransition, TState>(
@@ -46,6 +62,10 @@ internal static class AutomatonErrorFactory
         TState stateValue)
         where TTransition : notnull
     {
-        return new(ErrorType.StateError, fromState, transition, stateValue);
+        return new AutomatonError<TTransition, TState>(
+            ErrorType.StateError,
+            fromState,
+            transition,
+            stateValue);
     }
 }

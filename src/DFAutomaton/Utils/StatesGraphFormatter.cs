@@ -56,13 +56,13 @@ public static class StatesGraphFormatter<TTransition, TState> where TTransition 
     private static string FormatState(State<TTransition, TState> state) => state.Format();
 
     private static string FormatTransition(
-        Either<TTransition, CanTransit<TTransition>> byValueOrPredicate,
+        Either<TTransition, InputPredicate<TTransition>> byValueOrPredicate,
         Option<State<TTransition, TState>> toStateOption)
     {
         var toStateFormatted = toStateOption.Map(toState => toState.Id.ToString()).Or("DYNAMIC GOTO");
         var transitionFormatted = byValueOrPredicate.Match(
             byValue => byValue.ToString(),
-            canTransit => canTransit.ToString());
+            inputPredicate => inputPredicate.ToString());
         
         return $"    {transitionFormatted} -> State {toStateFormatted}";
     }

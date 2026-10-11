@@ -11,14 +11,19 @@ internal readonly struct ValidationResult<TTransition, TState> where TTransition
 {
     private readonly Result<StateGraph<TTransition, TState>, ValidationError> _value;
 
-    public ValidationResult(Result<StateGraph<TTransition, TState>, ValidationError> value) => _value = value;
+    public ValidationResult(Result<StateGraph<TTransition, TState>, ValidationError> value) =>
+        _value = value;
 
-    internal TResult Match<TResult>(Func<StateGraph<TTransition, TState>, TResult> matchStateGraph, Func<ValidationError, TResult> matchError)
+    internal TResult Match<TResult>(
+        Func<StateGraph<TTransition, TState>, TResult> matchStateGraph,
+        Func<ValidationError, TResult> matchError)
     {
         return _value.Match(matchStateGraph, matchError);
     }
 
-    public static implicit operator ValidationResult<TTransition, TState>(StateGraph<TTransition, TState> stateGraph) => new(stateGraph);
+    public static implicit operator ValidationResult<TTransition, TState>(StateGraph<TTransition, TState> stateGraph) =>
+        new ValidationResult<TTransition, TState>(stateGraph);
 
-    public static implicit operator ValidationResult<TTransition, TState>(ValidationError error) => new(error);
+    public static implicit operator ValidationResult<TTransition, TState>(ValidationError error) =>
+        new ValidationResult<TTransition, TState>(error);
 }

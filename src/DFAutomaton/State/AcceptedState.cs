@@ -34,7 +34,7 @@ public readonly struct AcceptedState<TTransition, TState> where TTransition : no
     }
 
     /// <summary>
-    /// Returns a text representation of the state.
+    /// Returns a string representation of the state.
     /// </summary>
     public string Format() => string.IsNullOrEmpty(Tag?.ToString())
         ? $"State {Id}"

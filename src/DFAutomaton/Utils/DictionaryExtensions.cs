@@ -20,7 +20,8 @@ internal static class DictionaryExtensions
 
     public static IReadOnlyDictionary<TKey, TValue> ToFrozen<TKey, TValue>(this Dictionary<TKey, TValue> dict, IEqualityComparer<TKey> equalityComparer = null!)
     {
-        return dict.ToDictionary(e => e.Key, e => e.Value, equalityComparer ?? EqualityComparer<TKey>.Default);
+        var comparer = equalityComparer ?? EqualityComparer<TKey>.Default;
+        return dict.ToDictionary(e => e.Key, e => e.Value, comparer);
     }
 
     public static ILookup<TKey, TValue> ToFrozen<TKey, TValue>(this Dictionary<TKey, List<TValue>> dict)

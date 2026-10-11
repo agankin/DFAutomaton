@@ -52,36 +52,39 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     /// <summary>
     /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building a new transition from this state.
     /// </summary>
-    public TransitionBuilder<TTransition, TState> TransitsBy(TTransition transition) => new(this, transition);
+    public TransitionBuilder<TTransition, TState> ForInput(TTransition transition) =>
+        new TransitionBuilder<TTransition, TState>(this, transition);
 
     /// <summary>
     /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building a new transition from this state.
     /// </summary>
-    public TransitionBuilder<TTransition, TState> TransitsWhen(Predicate<TTransition> predicate)
+    public TransitionBuilder<TTransition, TState> WhenInput(Predicate<TTransition> predicate)
     {
-        var canTransit = new CanTransit<TTransition>(Name: null, predicate);
-        return new(this, canTransit);
+        var inputPredicate = new InputPredicate<TTransition>(Name: null, predicate);
+        return new TransitionBuilder<TTransition, TState>(this, inputPredicate);
     }
 
     /// <summary>
     /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building a new transition from this state.
     /// </summary>
-    public TransitionBuilder<TTransition, TState> TransitsWhen(string predicateName, Predicate<TTransition> predicate)
+    public TransitionBuilder<TTransition, TState> WhenInput(string predicateName, Predicate<TTransition> predicate)
     {
-        var canTransit = new CanTransit<TTransition>(predicateName, predicate);
-        return new(this, canTransit);
+        var inputPredicate = new InputPredicate<TTransition>(predicateName, predicate);
+        return new TransitionBuilder<TTransition, TState>(this, inputPredicate);
     }
 
     /// <summary>
-    /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building the fallback transition from this state.
+    /// Returns an instance of <see cref="TransitionBuilder{TTransition, TState}"/> for building the fallback transition
+    /// from this state.
     /// </summary>
     /// <remarks>
-    /// Fallback transition is a per-state single dynamic transition that is invoked for all unknown transition values.
+    /// The fallback transition is a per-state single dynamic transition that is invoked for all unknown transition values.
     /// </remarks>
-    public FallbackTransitionBuilder<TTransition, TState> AllOtherTransits() => new(this);
+    public FallbackTransitionBuilder<TTransition, TState> ForAllOtherInputs() =>
+        new FallbackTransitionBuilder<TTransition, TState>(this);
 
     /// <summary>
-    /// Returns a text representation of the state.
+    /// Returns a string representation of the state.
     /// </summary>
     public string Format() => string.IsNullOrEmpty(Tag?.ToString())
         ? $"State {Id}"
@@ -91,7 +94,7 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
 
     internal State<TTransition, TState> AddFixedTransition(
         StateId toStateId,
-        Either<TTransition, CanTransit<TTransition>> byValueOrPredicate,
+        Either<TTransition, InputPredicate<TTransition>> byValueOrPredicate,
         Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
@@ -104,7 +107,7 @@ public readonly struct State<TTransition, TState> where TTransition : notnull
     }
     
     internal void AddDynamicTransition(
-        Either<TTransition, CanTransit<TTransition>> byValueOrPredicate,
+        Either<TTransition, InputPredicate<TTransition>> byValueOrPredicate,
         Reduce<TTransition, TState> reducer)
     {
         ValidateLinkingNotAccepted();
