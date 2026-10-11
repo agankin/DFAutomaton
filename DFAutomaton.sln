@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8B2006E7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFAutomaton.Benchmarks", "tests\DFAutomaton.Benchmarks\DFAutomaton.Benchmarks.csproj", "{4EC65ABB-7329-43AB-A0E4-1E7D6C326858}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{C1954C41-0B9A-43B1-B685-07196F93C202}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFAutomaton.Samples", "samples\DFAutomaton.Samples\DFAutomaton.Samples.csproj", "{FCE9327D-F39E-4D33-ABA5-FEF30A00EDDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,10 @@ Global
 		{4EC65ABB-7329-43AB-A0E4-1E7D6C326858}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EC65ABB-7329-43AB-A0E4-1E7D6C326858}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EC65ABB-7329-43AB-A0E4-1E7D6C326858}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCE9327D-F39E-4D33-ABA5-FEF30A00EDDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCE9327D-F39E-4D33-ABA5-FEF30A00EDDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCE9327D-F39E-4D33-ABA5-FEF30A00EDDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCE9327D-F39E-4D33-ABA5-FEF30A00EDDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{373A2A6D-8D5C-4E4D-AB79-4858ABB9A5E6} = {8B2006E7-844C-4BD8-B15D-5D079D566CF7}
 		{4EC65ABB-7329-43AB-A0E4-1E7D6C326858} = {8B2006E7-844C-4BD8-B15D-5D079D566CF7}
+		{FCE9327D-F39E-4D33-ABA5-FEF30A00EDDA} = {C1954C41-0B9A-43B1-B685-07196F93C202}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C0568EF4-5DD9-4502-A740-3AD4683204DC}

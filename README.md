@@ -2,6 +2,10 @@
 
 DFAutomaton is a library for building State Automata.
 
+## Quick start
+
+- [Automaton model](#automaton-model)
+
 ### Automaton model
 
 An automaton works on a set of states interconnected by state transitions forming a graph.
