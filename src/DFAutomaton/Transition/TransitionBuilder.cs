@@ -23,7 +23,7 @@ public record TransitionBuilder<TTransition, TState>(
     /// <returns>A new instance of <see cref="FixedTransitionBuilder{TTransition, TState}"/>.</returns>
     public FixedTransitionBuilder<TTransition, TState> Reduce(TState toValue)
     {
-        Reduce<TTransition, TState> reducer = (_, _) => toValue;
+        Reduce<TTransition, TState> reducer = (_, _, _) => toValue;
         return new FixedTransitionBuilder<TTransition, TState>(FromState, ByValueOrPredicate, reducer);
     }
 
@@ -32,8 +32,11 @@ public record TransitionBuilder<TTransition, TState>(
     /// </summary>
     /// <param name="reducer">A delegate reducing state values.</param>
     /// <returns>A new instance of <see cref="FixedTransitionBuilder{TTransition, TState}"/>.</returns>
-    public FixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer) =>
-        new FixedTransitionBuilder<TTransition, TState>(FromState, ByValueOrPredicate, reducer);
+    public FixedTransitionBuilder<TTransition, TState> Reduce(PlainReduce<TTransition, TState> reducer) =>
+        new FixedTransitionBuilder<TTransition, TState>(
+            FromState,
+            ByValueOrPredicate,
+            (state, input, emit) => reducer(state, input));
 
     /// <summary>
     /// Adds a new dynamic transition and completes the state transition build.

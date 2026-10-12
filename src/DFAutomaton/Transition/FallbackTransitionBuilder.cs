@@ -20,8 +20,10 @@ public record FallbackTransitionBuilder<TTransition, TState>(
     /// </summary>
     /// <param name="reducer">A state reducer.</param>
     /// <returns>A new instance of <see cref="FallbackFixedTransitionBuilder{TTransition, TState}"/>.</returns>
-    public FallbackFixedTransitionBuilder<TTransition, TState> WithReducingBy(Reduce<TTransition, TState> reducer) =>
-        new FallbackFixedTransitionBuilder<TTransition, TState>(FromState, reducer);
+    public FallbackFixedTransitionBuilder<TTransition, TState> Reduce(PlainReduce<TTransition, TState> reducer) =>
+        new FallbackFixedTransitionBuilder<TTransition, TState>(
+            FromState,
+            (state, input, emit) => reducer(state, input));
 
     /// <summary>
     /// Adds a new dynamic fallback transition and completes the state transition build.

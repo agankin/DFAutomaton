@@ -14,7 +14,7 @@ public partial class FallbackTransitionBuildingTests
         var state1 = new AutomatonBuilder<Transitions, States>().Start;
         state1
              .ForAllOtherInputs()
-             .WithReducingBy(Reducer.Create(TO_STATE_2, STATE_2))
+             .Reduce(Reducer.CreatePlain(TO_STATE_2, STATE_2))
              .GoToSelf();
 
         state1[TO_STATE_2]

@@ -52,20 +52,27 @@ public class Automaton<TTransition, TState> where TTransition : notnull
                 return TransitionNotExists(GetState(currentStateId), transition, currentValue);
 
             var (toStateId, reduce) = nextTransition.ValueOrFailure();
-            var reductionResult = reduce(currentValue, transition);
+            var controlEvents = new List<ReducerEvent<TTransition, TState>>();
+            
+            ReductionResult<TTransition, TState> result = reduce(
+                currentValue,
+                transition,
+                emit: controlEvents.Add);
 
-            var nextValue = reductionResult.Value;
+            var finalResult = controlEvents.Aggregate(result, (result, controlEvent) => controlEvent.Apply(result));
+
+            var nextValue = finalResult.Value;
             if (_isErrorValue(nextValue))
                 return StateError(GetState(currentStateId), transition, nextValue);
             
-            var nextStateId = toStateId.Or(reductionResult.DynamiclyGoToStateId);
+            var nextStateId = toStateId.Or(finalResult.DynamiclyGoToStateId);
             if (!nextStateId.HasValue)
                 return NoNextState(GetState(currentStateId), transition, currentValue);
 
             currentStateId = nextStateId.ValueOrFailure();
             currentValue = nextValue;
 
-            YieldNextTransitions(reductionResult, transitionsEnumerator);
+            YieldNextTransitions(finalResult, transitionsEnumerator);
         }
 
         if (currentStateId.GetStateType() != StateType.Accepted)

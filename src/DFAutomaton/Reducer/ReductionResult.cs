@@ -3,11 +3,11 @@ using PureMonads;
 namespace DFAutomaton;
 
 /// <summary>
-/// A state reduction result.
+/// The state reduction result.
 /// </summary>
 /// <typeparam name="TTransition">The transition type.</typeparam>
 /// <typeparam name="TState">The state type.</typeparam>
-public class ReductionResult<TTransition, TState> where TTransition : notnull
+internal class ReductionResult<TTransition, TState> where TTransition : notnull
 {
     private readonly List<TTransition> _yieldedTransitions = [];
 
@@ -19,7 +19,7 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     public TState Value { get; set; }
 
     /// <summary>
-    /// Contains Some with a state the automaton will go to for dynamic transition or None.
+    /// Contains Some with a state the automaton will go to or None for fixed transition.
     /// </summary>
     internal Option<StateId> DynamiclyGoToStateId { get; private set; } = Option.None<StateId>();
 
@@ -29,13 +29,10 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     internal IReadOnlyCollection<TTransition> YieldedTransitions => _yieldedTransitions;
 
     /// <summary>
-    /// Orders an automaton to go to a state on dynamic transition.
+    /// Instructs the automaton to go to a state for dynamic transition.
     /// </summary>
-    /// <param name="stateId">Id of a state the automaton will dynamicly go to on dynamic transition.</param>
-    /// <remarks>
-    /// The method call is ignored for fixed transitions.
-    /// </remarks>
-    /// <returns>The same instance of <see cref="ReductionResult{TTransition, TState}"/>.</returns>
+    /// <param name="stateId">Identifier of the state.</param>
+    /// <returns>The current instance of <see cref="ReductionResult{TTransition, TState}"/>.</returns>
     public ReductionResult<TTransition, TState> DynamiclyGoTo(uint stateId)
     {
         DynamiclyGoToStateId = new StateId(stateId);
@@ -43,14 +40,10 @@ public class ReductionResult<TTransition, TState> where TTransition : notnull
     }
 
     /// <summary>
-    /// Yields a new transition value as next into automaton transitions sequence.
+    /// Adds a new input that will be prepended to the automaton remaining input sequence
     /// </summary>
-    /// <param name="transition">A transition value.</param>
-    /// <remarks>
-    /// The yielded value will be handled before initially provided transition values
-    /// but after other previously yielded values.
-    /// </remarks>
-    /// <returns>The same instance of <see cref="ReductionResult{TTransition, TState}"/>.</returns>
+    /// <param name="transition">The new input.</param>
+    /// <returns>The current instance of <see cref="ReductionResult{TTransition, TState}"/>.</returns>
     public ReductionResult<TTransition, TState> YieldNext(TTransition transition)
     {
         _yieldedTransitions.Add(transition);

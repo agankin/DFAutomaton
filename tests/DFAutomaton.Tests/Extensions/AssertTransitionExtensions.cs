@@ -38,8 +38,9 @@ public static class AssertTransitionExtensions
         TState expectedAfterReduce)
         where TTransition : notnull
     {
-        var actualAfterReduce = transition.Reducer(beforeReduce, transitionValue);   
-        actualAfterReduce.Value.ItIs(expectedAfterReduce);
+        Action<ReducerEvent<TTransition, TState>> emit = _ => {};
+        var actualAfterReduce = transition.Reducer(beforeReduce, transitionValue, emit);   
+        actualAfterReduce.ItIs(expectedAfterReduce);
         
         return transition;
     }

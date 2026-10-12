@@ -12,8 +12,14 @@ public class FixedTransitionBuildingTests
     public void Add_fixed_transition_to_new()
     {
         var state1 = new AutomatonBuilder<Transitions, States>().Start;
-        var state2 = state1.ForInput(TO_STATE_2).Reduce(STATE_2).GoToNewState();
-        var state3 = state1.ForInput(TO_STATE_3).WithReducingBy(Reducer.Create(TO_STATE_3, STATE_3)).GoToNewState();
+        var state2 = state1
+            .ForInput(TO_STATE_2)
+            .Reduce(STATE_2)
+            .GoToNewState();
+        var state3 = state1
+            .ForInput(TO_STATE_3)
+            .Reduce(Reducer.CreatePlain(TO_STATE_3, STATE_3))
+            .GoToNewState();
 
         state1[TO_STATE_2]
             .IsSome()
@@ -35,8 +41,14 @@ public class FixedTransitionBuildingTests
         var existingState2 = automatonBuilder.CreateState();
         var existingState3 = automatonBuilder.CreateState();
         
-        var state2 = state1.ForInput(TO_STATE_2).Reduce(STATE_2).GoTo(existingState2);
-        var state3 = state1.ForInput(TO_STATE_3).WithReducingBy(Reducer.Create(TO_STATE_3, STATE_3)).GoTo(existingState3);
+        var state2 = state1
+            .ForInput(TO_STATE_2)
+            .Reduce(STATE_2)
+            .GoTo(existingState2);
+        var state3 = state1
+            .ForInput(TO_STATE_3)
+            .Reduce(Reducer.CreatePlain(TO_STATE_3, STATE_3))
+            .GoTo(existingState3);
 
         state1[TO_STATE_2]
             .IsSome()
@@ -59,8 +71,14 @@ public class FixedTransitionBuildingTests
     {
         var state1 = new AutomatonBuilder<Transitions, States>().Start;
         
-        var incremenedState2 = state1.ForInput(TO_STATE_2).Reduce(STATE_2).GoToSelf();
-        var incremenedState3 = state1.ForInput(TO_STATE_3).WithReducingBy(Reducer.Create(TO_STATE_3, STATE_3)).GoToSelf();
+        var incremenedState2 = state1
+            .ForInput(TO_STATE_2)
+            .Reduce(STATE_2)
+            .GoToSelf();
+        var incremenedState3 = state1
+            .ForInput(TO_STATE_3)
+            .Reduce(Reducer.CreatePlain(TO_STATE_3, STATE_3))
+            .GoToSelf();
 
         state1[TO_STATE_2]
             .IsSome()
@@ -79,8 +97,14 @@ public class FixedTransitionBuildingTests
     {
         var automatonBuilder = new AutomatonBuilder<Transitions, States>();
         var state1 = automatonBuilder.Start;
-        var acceptedState2 = state1.ForInput(TO_STATE_2).Reduce(STATE_2).GoToAccepted();
-        var acceptedState3 = state1.ForInput(TO_STATE_3).WithReducingBy(Reducer.Create(TO_STATE_3, STATE_3)).GoToAccepted();
+        var acceptedState2 = state1
+            .ForInput(TO_STATE_2)
+            .Reduce(STATE_2)
+            .GoToAccepted();
+        var acceptedState3 = state1
+            .ForInput(TO_STATE_3)
+            .Reduce(Reducer.CreatePlain(TO_STATE_3, STATE_3))
+            .GoToAccepted();
 
         state1[TO_STATE_2]
             .IsSome()
